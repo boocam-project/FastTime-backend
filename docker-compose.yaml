@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  maria-db:
+    container_name: fastTime_mariaDB
+    image: mariadb:10.6-focal
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: 1234
+      MARIADB_USER: fasttime
+      MARIADB_PASSWORD: 1234
+      MARIADB_DATABASE: 'fast_time'
+    volumes:
+      - ${MARIADB_VOLUME}:/var/lib/mysql
+
