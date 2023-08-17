@@ -34,7 +34,7 @@ public class Post extends BaseTimeEntity {
     @Embedded
     private PostContent content;
 
-    private boolean anounumity;
+    private boolean anonymity;
 
     private int likeCount;
 
@@ -44,24 +44,24 @@ public class Post extends BaseTimeEntity {
     private ReportStatus reportStatus;
 
     @Builder
-    public Post(Long id, Member member, String title, String content, boolean anounumity,
+    public Post(Long id, Member member, String title, String content, boolean anonymity,
         int likeCount, int hateCount, ReportStatus reportStatus) {
         this.id = id;
         this.member = member;
-        this.title = title;
+        this.title = title;정
         this.content = new PostContent(content);
-        this.anounumity = anounumity;
+        this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
         this.reportStatus = reportStatus;
     }
 
-    public static Post createNewPost(Member member, String title, String content, boolean anounumity) {
+    public static Post createNewPost(Member member, String title, String content, boolean anonymity) {
         return Post.builder()
             .member(member)
             .title(title)
             .content(content)
-            .anounumity(anounumity)
+            .anonymity(anonymity)
             .likeCount(0)
             .hateCount(0)
             .reportStatus(ReportStatus.NORMAL)
