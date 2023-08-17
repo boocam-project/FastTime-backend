@@ -17,7 +17,7 @@ class PostTest {
         boolean anounumity = true;
 
         // when
-        Post createdPost = Post.of(null, title, content, anounumity);
+        Post createdPost = Post.createNewPost(null, title, content, anounumity);
 
         // then
         assertThat(createdPost).extracting("title", "content", "anounumity")
@@ -31,7 +31,7 @@ class PostTest {
         String title = "제목1";
         String content = "내용1";
         boolean anounumity = true;
-        Post createdPost = Post.of(null, title, content, anounumity);
+        Post createdPost = Post.createNewPost(null, title, content, anounumity);
 
         // when
         String updateContent = "새로운 내용1";
