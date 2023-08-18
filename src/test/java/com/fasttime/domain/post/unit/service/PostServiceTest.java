@@ -46,7 +46,7 @@ class PostServiceTest {
             assertThat(response).extracting(
                     "id", "title", "content", "anounumity", "likeCount", "hateCount")
                 .containsExactly(savedPost.getId(), savedPost.getTitle(), savedPost.getContent(),
-                    savedPost.isAnounumity(), savedPost.getLikeCount(), savedPost.getHateCount());
+                    savedPost.isAnonymity(), savedPost.getLikeCount(), savedPost.getHateCount());
         }
     }
 }
