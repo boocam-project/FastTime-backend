@@ -1,5 +1,5 @@
 ---
-name: Issue.
+name: Basic Issue Template
 about: Issue 템플릿입니다.
 title: 00 을 한다.
 labels: ''
