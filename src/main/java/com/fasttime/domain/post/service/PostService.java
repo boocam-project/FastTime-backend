@@ -21,7 +21,7 @@ public class PostService {
     public PostResponseDto writePost(PostCreateServiceDto serviceDto) {
         // TODO: Validate MemberId
 
-        Post createdPost = Post.of(null, serviceDto.getTitle(), serviceDto.getContent(),
+        Post createdPost = Post.createNewPost(null, serviceDto.getTitle(), serviceDto.getContent(),
             false);
 
         Post savedPost = postRepository.save(createdPost);
