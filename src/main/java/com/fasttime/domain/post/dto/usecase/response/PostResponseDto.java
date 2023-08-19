@@ -28,7 +28,7 @@ public class PostResponseDto {
         return new PostResponseDto(post.getId(),
             post.getTitle(),
             post.getContent(),
-            post.isAnounumity(),
+            post.isAnonymity(),
             post.getLikeCount(),
             post.getHateCount());
     }
