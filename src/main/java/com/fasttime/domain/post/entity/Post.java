@@ -48,7 +48,7 @@ public class Post extends BaseTimeEntity {
         int likeCount, int hateCount, ReportStatus reportStatus) {
         this.id = id;
         this.member = member;
-        this.title = title;정
+        this.title = title;
         this.content = new PostContent(content);
         this.anonymity = anonymity;
         this.likeCount = likeCount;
