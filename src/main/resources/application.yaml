@@ -1,10 +1,11 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/fasttime
+    url: jdbc:mariadb://localhost:3306/fast-time
     username: root
-    password: 1234
+    password: dnwnrlfls12
 
   jpa:
     hibernate:
       ddl-auto: create
+
