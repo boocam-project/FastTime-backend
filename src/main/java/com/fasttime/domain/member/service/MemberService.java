@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+
 
 import lombok.RequiredArgsConstructor;
 
 
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
+
 
 @Service
 @Transactional
