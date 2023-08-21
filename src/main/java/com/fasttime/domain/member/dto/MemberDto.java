@@ -22,9 +22,7 @@ public class MemberDto {
     private String nickname; // 닉네임
 
 
-
-
-    public Member toEntity(){
+    public Member toEntity() {
         return Member.builder()
             .email(email)
             .password(password)
@@ -34,11 +32,10 @@ public class MemberDto {
     }
 
     public static MemberDto convertToDto(Optional<Member> member) {
-        if(member.isPresent()){
+        if (member.isPresent()) {
             Member u = member.get();
             MemberDto memberDto = new MemberDto();
             memberDto.setNickname(u.getNickname());
-
 
             return memberDto;
         }

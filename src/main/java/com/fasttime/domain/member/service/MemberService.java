@@ -1,8 +1,9 @@
 package com.fasttime.domain.member.service;
 
-import com.fasttime.domain.member.entity.FcMember;
+
 import com.fasttime.domain.member.repository.FcMemberRepository;
 
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.fasttime.domain.member.entity.Member;
@@ -26,10 +27,14 @@ public class MemberService {
 
 
     public void save(MemberDto memberDto) {
+        //패스워드 인코딩(security적용 후 주석 해제)
+        //String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
 
         Member member = new Member();
         member.setEmail(memberDto.getEmail());
-        member.setPassword(memberDto.getPassword()); // 인코딩된 패스워드 저장?
+        member.setPassword(memberDto.getPassword());
+        //security적용 후 주석 해제
+        //member.setPassword(encodedPassword);
         member.setNickname(memberDto.getNickname());
 
         memberRepository.save(member);
@@ -54,12 +59,10 @@ public class MemberService {
     }
 
 
-    public void deleteMember(int userId) throws UserNotFoundException {
-        Optional<Member> member = memberRepository.findById(userId);
-        if (!member.isPresent()) {
-            throw new UserNotFoundException("User not found with id: " + userId);
-        }
-        memberRepository.delete(member.get());
+    public void softDeleteMember(Member member) {
+        //deleted_at 칼럼에 값이 있으면 탈퇴된 회원으로 간주
+        member.setDeletedAt(LocalDateTime.now()); // 현재 시간으로 소프트 삭제 시간 설정
+        memberRepository.save(member); // 업데이트된 정보를 데이터베이스에 저장
     }
 
 
