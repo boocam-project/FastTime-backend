@@ -1,5 +1,8 @@
 package com.fasttime.domain.member.service;
 
+import com.fasttime.domain.member.entity.FcMember;
+import com.fasttime.domain.member.repository.FcMemberRepository;
+
 import org.springframework.stereotype.Service;
 
 import com.fasttime.domain.member.entity.Member;
@@ -19,11 +22,10 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
+    private final FcMemberRepository fcMemberRepository;
 
 
     public void save(MemberDto memberDto) {
-
 
         Member member = new Member();
         member.setEmail(memberDto.getEmail());
@@ -33,26 +35,23 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    public boolean isEmailExistsInFcmember(String email) {
+        return fcMemberRepository.existsByEmail(email);
+    }
+
+    public boolean isEmailExistsInMember(String email) {
+        return memberRepository.existsByEmail(email);
+    }
+
 
     public void save(Member member) {
         memberRepository.save(member);
     }
 
-/*
 
-    public Member findByEmail(String email){
-        return fc_memberRepository.findByEmail(email)
-
-            .orElseThrow(() -> new UserNotFoundException("유저를 찾을 수 없습니다." + email));
+    public boolean checkDuplicateNickname(String nickname) {
+        return memberRepository.findByNickname(nickname).isPresent();
     }
-*/
-
-
-
-    public boolean checkDuplicateNickname(String username) {
-        return memberRepository.findByNickname(username).isPresent();
-    }
-
 
 
     public void deleteMember(int userId) throws UserNotFoundException {
