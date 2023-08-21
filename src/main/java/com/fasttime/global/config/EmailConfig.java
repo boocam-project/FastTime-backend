@@ -15,8 +15,8 @@ public class EmailConfig {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost("smtp.naver.com"); // smtp 서버 주소
         javaMailSender.setPort(465); // 메일 인증 서버 포트
-        javaMailSender.setUsername("ghrltjdtprbs"); // 아이디 입력
-        javaMailSender.setPassword("7mcyhd12"); // 비밀번호 입력
+        javaMailSender.setUsername("********"); // 아이디 입력
+        javaMailSender.setPassword("********"); // 비밀번호 입력
         javaMailSender.setDefaultEncoding("utf-8");
         javaMailSender.setJavaMailProperties(getMailProperties()); // 메일 인증서버 정보 가져오기
 
