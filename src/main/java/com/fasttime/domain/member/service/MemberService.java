@@ -1,21 +1,22 @@
 package com.fasttime.domain.member.service;
 
-
+import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.repository.FcMemberRepository;
-
 import java.time.LocalDateTime;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
-
+import com.fasttime.domain.member.exception.UserNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
 
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -24,19 +25,17 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final FcMemberRepository fcMemberRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public void save(MemberDto memberDto) {
-        //패스워드 인코딩(security적용 후 주석 해제)
-        //String encodedPassword = passwordEncoder.encode(memberDto.getPassword());
+
 
         Member member = new Member();
         member.setEmail(memberDto.getEmail());
-        member.setPassword(memberDto.getPassword());
-        //security적용 후 주석 해제
-        //member.setPassword(encodedPassword);
+        member.setPassword(memberDto.getPassword()); // 인코딩된 패스워드 저장?
         member.setNickname(memberDto.getNickname());
-
+        member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
         memberRepository.save(member);
     }
 
@@ -54,6 +53,7 @@ public class MemberService {
     }
 
 
+
     public boolean checkDuplicateNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isPresent();
     }
@@ -65,5 +65,19 @@ public class MemberService {
         memberRepository.save(member); // 업데이트된 정보를 데이터베이스에 저장
     }
 
+    public MemberDto loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+        Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
+        if (!byEmail.isPresent()) {
+            throw new UserNotFoundException("User not found with email: " + dto.getEmail());
+        }
+        Member member = byEmail.get();
+        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
+            throw new BadCredentialsException("Not match password!");
+        } else {
+            return new MemberDto(member.getEmail(), member.getPassword(),
+                member.getNickname());
+        }
+
+    }
 
 }
