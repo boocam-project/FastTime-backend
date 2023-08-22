@@ -1,8 +1,10 @@
 package com.fasttime.domain.comment.entity;
 
+import com.fasttime.domain.comment.dto.CommentDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.global.common.BaseTimeEntity;
+import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +40,33 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "comment_parent_id")
     @ManyToOne
     private Comment parentComment;
+
+    @Builder
+    public Comment(Long id, Post post, Member member, String content, boolean anonymity,
+        Comment parentComment) {
+        this.id = id;
+        this.post = post;
+        this.member = member;
+        this.content = content;
+        this.anonymity = anonymity;
+        this.parentComment = parentComment;
+    }
+
+    public void deleteComment() {
+        this.delete(LocalDateTime.now());
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public CommentDto toDto() {
+        Long parentCommentId = null;
+        if (this.parentComment != null) {
+            parentCommentId = this.parentComment.getId();
+        }
+        return CommentDto.builder().id(this.id).postId(this.post.getId())
+            .memberId(this.member.getId()).content(this.content).anonymity(this.anonymity)
+            .parentCommentId(parentCommentId).build();
+    }
 }
