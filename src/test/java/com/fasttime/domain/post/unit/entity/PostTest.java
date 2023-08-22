@@ -20,7 +20,7 @@ class PostTest {
         Post createdPost = Post.createNewPost(null, title, content, anounumity);
 
         // then
-        assertThat(createdPost).extracting("title", "content", "anounumity")
+        assertThat(createdPost).extracting("title", "content", "anonymity")
             .containsExactly(title, content, anounumity);
     }
 
@@ -38,7 +38,7 @@ class PostTest {
         createdPost.update(updateContent);
 
         // then
-        assertThat(createdPost).extracting("title", "content", "anounumity")
+        assertThat(createdPost).extracting("title", "content", "anonymity")
             .containsExactly(title, updateContent, anounumity);
     }
 }

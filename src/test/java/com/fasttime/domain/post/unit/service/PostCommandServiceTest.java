@@ -2,11 +2,11 @@ package com.fasttime.domain.post.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasttime.domain.post.dto.usecase.request.PostCreateServiceDto;
-import com.fasttime.domain.post.dto.usecase.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
+import com.fasttime.domain.post.dto.service.response.PostResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
-import com.fasttime.domain.post.service.PostService;
+import com.fasttime.domain.post.service.PostCommandService;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-class PostServiceTest {
+class PostCommandServiceTest {
 
     @Autowired
-    private PostService postService;
+    private PostCommandService postCommandService;
 
     @Autowired
     private PostRepository postRepository;
@@ -36,7 +36,7 @@ class PostServiceTest {
             PostCreateServiceDto dto = new PostCreateServiceDto(1L, "title", "content", true);
 
             // when
-            PostResponseDto response = postService.writePost(dto);
+            PostResponseDto response = postCommandService.writePost(dto);
 
             // then
             Optional<Post> optionalPost = postRepository.findById(response.getId());
@@ -44,7 +44,7 @@ class PostServiceTest {
 
             Post savedPost = optionalPost.get();
             assertThat(response).extracting(
-                    "id", "title", "content", "anounumity", "likeCount", "hateCount")
+                    "id", "title", "content", "anonymity", "likeCount", "hateCount")
                 .containsExactly(savedPost.getId(), savedPost.getTitle(), savedPost.getContent(),
                     savedPost.isAnonymity(), savedPost.getLikeCount(), savedPost.getHateCount());
         }
