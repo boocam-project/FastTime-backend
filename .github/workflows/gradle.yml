@@ -1,0 +1,45 @@
+name: PR 테스트 자동화
+
+on:
+  push:
+    branches: [ "main", "feature/*", "develop" ]
+  pull_request:
+    branches: [ "main", "feature/*", "develop" ]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repository 로딩
+    - uses: actions/checkout@v3
+    
+    - name: JDK 11 설치
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: gradlew 접근권한 설정
+      run: chmod +x gradlew
+
+    - name: Gradle Project 테스트
+      run: ./gradlew build
+
+    - name: 테스트 결과 등록.
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: '**/build/test-results/test/TEST-*.xml'
+        
+    - name: 테스트 실패 Lines 등록
+      uses: mikepenz/action-junit-report@v3
+      if: always()
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+        token: ${{ github.token }}
