@@ -1,4 +1,4 @@
-package com.fasttime.domain.post.dto.usecase.response;
+package com.fasttime.domain.post.dto.service.response;
 
 import com.fasttime.domain.post.entity.Post;
 import lombok.Getter;
@@ -9,16 +9,16 @@ public class PostResponseDto {
     private final Long id;
     private final String title;
     private final String content;
-    private final boolean anounumity;
+    private final boolean anonymity;
     private final int likeCount;
     private final int hateCount;
 
-    private PostResponseDto(Long id, String title, String content, boolean anounumity, int likeCount,
+    private PostResponseDto(Long id, String title, String content, boolean anonymity, int likeCount,
         int hateCount) {
         this.id = id;
         this.title = title;
         this.content = content;
-        this.anounumity = anounumity;
+        this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
     }
