@@ -1,8 +1,6 @@
 name: PR 테스트 자동화
 
 on:
-  push:
-    branches: [ "main", "feature/*", "develop" ]
   pull_request:
     branches: [ "main", "feature/*", "develop" ]
 
@@ -42,4 +40,3 @@ jobs:
       if: always()
       with:
         report_paths: '**/build/test-results/test/TEST-*.xml'
-        token: ${{ github.token }}
