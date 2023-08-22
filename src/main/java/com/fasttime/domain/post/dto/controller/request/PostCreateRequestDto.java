@@ -16,13 +16,13 @@ public class PostCreateRequestDto {
     @NotBlank
     private final String content;
 
-    private final boolean anounumity;
+    private final boolean anonymity;
 
-    public PostCreateRequestDto(Long memberId, String title, String content, boolean anounumity) {
+    public PostCreateRequestDto(Long memberId, String title, String content, boolean anonymity) {
         this.memberId = memberId;
         this.title = title;
         this.content = content;
-        this.anounumity = anounumity;
+        this.anonymity = anonymity;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class PostCreateRequestDto {
             "memberId=" + memberId +
             ", title='" + title + '\'' +
             ", content='" + content + '\'' +
-            ", anounumity=" + anounumity +
+            ", anonymity=" + anonymity +
             '}';
     }
 }
