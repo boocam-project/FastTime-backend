@@ -18,15 +18,17 @@ public class EmailController {
 
     private final HttpSession session;
 
-    @PostMapping("/emailconfirm") // 인증번호 발송 버튼 누르면 메일 가게
-    public ResponseEntity<String> mailConfirm(@RequestBody EmailRequest emailRequest) throws Exception{
+    @PostMapping("v1/emailconfirm") // 인증번호 발송 버튼 누르면 메일 가게
+    public ResponseEntity<String> mailConfirm(@RequestBody EmailRequest emailRequest)
+        throws Exception {
         String code = emailService.sendSimpleMessage(emailRequest.getEmail());
         session.setAttribute("emailCode", code);
         return ResponseEntity.ok("success");
     }
 
-    @GetMapping("/verify/{code}") // 이메일 인증하기 버튼
-    public ResponseEntity<Map<String, Object>> verifyEmail(@PathVariable("code") String code, HttpSession session) {
+    @GetMapping("v1/verify/{code}") // 이메일 인증하기 버튼
+    public ResponseEntity<Map<String, Object>> verifyEmail(@PathVariable("code") String code,
+        HttpSession session) {
         Map<String, Object> resultMap = new HashMap<>();
         session.setMaxInactiveInterval(30 * 60);
 
