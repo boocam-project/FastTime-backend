@@ -21,30 +21,4 @@ public class MemberDto {
 
     private String nickname; // 닉네임
 
-
-
-
-    public Member toEntity(){
-        return Member.builder()
-            .email(email)
-            .password(password)
-            .nickname(nickname)
-
-            .build();
-    }
-
-    public static MemberDto convertToDto(Optional<Member> member) {
-        if(member.isPresent()){
-            Member u = member.get();
-            MemberDto memberDto = new MemberDto();
-            memberDto.setNickname(u.getNickname());
-
-
-            return memberDto;
-        }
-
-        return null;
-    }
-
-
 }
