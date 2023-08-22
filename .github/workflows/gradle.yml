@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [ "main", "feature/*", "develop" ]
 
+permissions:
+  checks: write
+  pull-requests: write
+
 jobs:
   build:
 
@@ -30,9 +34,11 @@ jobs:
       if: always()
       with:
         files: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ github.token }}
         
     - name: 테스트 실패 Lines 등록
       uses: mikepenz/action-junit-report@v3
       if: always()
       with:
         report_paths: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ github.token }}
