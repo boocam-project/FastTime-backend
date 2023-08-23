@@ -8,7 +8,9 @@ import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
+import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.EditResponse;
+import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,11 +103,11 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
-        MemberDto memberDto = memberService.loginMember(dto);
-        session.setAttribute("MEMBER", memberRepository.findByEmail(memberDto.getEmail()));
+        MemberResponse response = memberService.loginMember(dto);
+        session.setAttribute("MEMBER", memberRepository.findByEmail(response.getEmail()));
         Map<String, Object> message = new HashMap<>();
         message.put("status", 200);
-        message.put("data", memberDto);
+        message.put("data", response);
         return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 
@@ -122,6 +124,18 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(message);
     }
 
-
+    @PostMapping("/v1/RePassword")
+    public ResponseEntity<Map<String, Object>> RePassword
+        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
+        throws BindException {
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+        MemberResponse response = memberService.RePassword(request);
+        Map<String, Object> message = new HashMap<>();
+        message.put("status", 200);
+        message.put("data", response);
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+    }
 }
 
