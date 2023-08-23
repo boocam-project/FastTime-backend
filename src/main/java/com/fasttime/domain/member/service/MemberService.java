@@ -2,7 +2,10 @@ package com.fasttime.domain.member.service;
 
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.repository.FcMemberRepository;
+import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.MemberResponse;
 import java.time.LocalDateTime;
+import javax.naming.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,10 +33,8 @@ public class MemberService {
 
     public void save(MemberDto memberDto) {
 
-
         Member member = new Member();
         member.setEmail(memberDto.getEmail());
-        member.setPassword(memberDto.getPassword()); // 인코딩된 패스워드 저장?
         member.setNickname(memberDto.getNickname());
         member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
         memberRepository.save(member);
@@ -53,7 +54,6 @@ public class MemberService {
     }
 
 
-
     public boolean checkDuplicateNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isPresent();
     }
@@ -65,7 +65,7 @@ public class MemberService {
         memberRepository.save(member); // 업데이트된 정보를 데이터베이스에 저장
     }
 
-    public MemberDto loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+    public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
         Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
         if (!byEmail.isPresent()) {
             throw new UserNotFoundException("User not found with email: " + dto.getEmail());
@@ -74,10 +74,19 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         } else {
-            return new MemberDto(member.getEmail(), member.getPassword(),
+            return new MemberResponse(member.getEmail(),
                 member.getNickname());
         }
+    }
 
+    public MemberResponse RePassword(RePasswordRequest request) {
+        if (request.getPassword().equals(request.getRePassword())) {
+            Member member = memberRepository.findByEmail(request.getEmail()).get();
+            member.setPassword(passwordEncoder.encode(request.getPassword()));
+            return new MemberResponse(member.getEmail(), member.getNickname());
+        } else {
+            throw new BadCredentialsException("Not Match RePassword!");
+        }
     }
 
 }
