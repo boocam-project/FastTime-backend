@@ -5,6 +5,8 @@ import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
+import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.MemberResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,10 +45,10 @@ public class MemberServiceTestForAuto {
             //given
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
             //when
-            MemberDto memberDto = memberService.loginMember(dto);
-            Member byEmail = memberRepository.findByEmail(memberDto.getEmail()).get();
+            MemberResponse response = memberService.loginMember(dto);
+            Member byEmail = memberRepository.findByEmail(response.getEmail()).get();
             //then
-            Assertions.assertThat(memberDto.getNickname()).isEqualTo(byEmail.getNickname());
+            Assertions.assertThat(response.getNickname()).isEqualTo(byEmail.getNickname());
         }
 
         @DisplayName("아이디가 맞지 않아 실패한다.")
@@ -69,6 +71,44 @@ public class MemberServiceTestForAuto {
             Assertions.assertThatThrownBy(() -> memberService.loginMember(dto))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Not match password!");
+        }
+    }
+
+    @DisplayName("비밀번호 재설정을")
+    @Nested
+    class RePasswordTest{
+        @BeforeEach
+        void testMember() {
+            MemberDto memberDto = new MemberDto("testEmail",
+                "testPassword", "testNickname");
+            memberService.save(memberDto);
+        }
+
+        @DisplayName("성공한다.")
+        @Test
+        void _willSuccess(){
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("testEmail", "newPassword", "newPassword");
+            //when
+            MemberResponse response = memberService.RePassword(request);
+            Member member = memberRepository.findByEmail(response.getEmail()).get();
+            //then
+            Assertions.assertThat(response.getNickname()).isEqualTo(member.getNickname());
+        }
+        @DisplayName("비밀번호 재확인으로 인해 실패한다.")
+        @Test
+        void Re_willFail(){
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("testEmail", "newPassword", "new");
+            //when
+
+            //then
+            Assertions.assertThatThrownBy(() -> memberService.RePassword(request))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Not Match RePassword!");
+
         }
     }
 
