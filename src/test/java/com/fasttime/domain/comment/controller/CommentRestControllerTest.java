@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.comment.dto.CommentDto;
+import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
@@ -45,7 +45,7 @@ public class CommentRestControllerTest {
             // given
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
-            CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+            CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
             given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                 commentDto);
@@ -74,7 +74,7 @@ public class CommentRestControllerTest {
                 // given
                 CreateCommentRequest request = CreateCommentRequest.builder().postId(null)
                     .memberId(0L).content("test").anonymity(false).parentCommentId(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                     commentDto);
@@ -99,7 +99,7 @@ public class CommentRestControllerTest {
                 // given
                 CreateCommentRequest request = CreateCommentRequest.builder().postId(0L)
                     .memberId(null).content("test").anonymity(false).parentCommentId(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                     commentDto);
@@ -124,7 +124,7 @@ public class CommentRestControllerTest {
                 // given
                 CreateCommentRequest request = CreateCommentRequest.builder().postId(0L)
                     .memberId(0L).content(null).anonymity(false).parentCommentId(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                     commentDto);
@@ -144,7 +144,7 @@ public class CommentRestControllerTest {
                 // given
                 CreateCommentRequest request = CreateCommentRequest.builder().postId(0L)
                     .memberId(0L).content(" ").anonymity(false).parentCommentId(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                     commentDto);
@@ -169,7 +169,7 @@ public class CommentRestControllerTest {
                 // given
                 CreateCommentRequest request = CreateCommentRequest.builder().postId(0L)
                     .memberId(0L).content("test").anonymity(null).parentCommentId(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.createComment(any(CreateCommentRequest.class))).willReturn(
                     commentDto);
@@ -194,7 +194,7 @@ public class CommentRestControllerTest {
 
             // given
             DeleteCommentRequest request = DeleteCommentRequest.builder().id(0L).build();
-            CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+            CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
             given(commentService.deleteComment(any(DeleteCommentRequest.class))).willReturn(
                 commentDto);
@@ -222,7 +222,7 @@ public class CommentRestControllerTest {
 
                 // given
                 DeleteCommentRequest request = DeleteCommentRequest.builder().id(null).build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.deleteComment(any(DeleteCommentRequest.class))).willReturn(
                     commentDto);
@@ -248,7 +248,7 @@ public class CommentRestControllerTest {
             // given
             UpdateCommentRequest request = UpdateCommentRequest.builder().id(0L).content("modified")
                 .build();
-            CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+            CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                 .content("modified").anonymity(false).parentCommentId(null).build();
             given(commentService.updateComment(any(UpdateCommentRequest.class))).willReturn(
                 commentDto);
@@ -277,7 +277,7 @@ public class CommentRestControllerTest {
                 // given
                 UpdateCommentRequest request = UpdateCommentRequest.builder().id(null)
                     .content("modified").build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.updateComment(any(UpdateCommentRequest.class))).willReturn(
                     commentDto);
@@ -302,7 +302,7 @@ public class CommentRestControllerTest {
                 // given
                 UpdateCommentRequest request = UpdateCommentRequest.builder().id(0L).content(null)
                     .build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.updateComment(any(UpdateCommentRequest.class))).willReturn(
                     commentDto);
@@ -322,7 +322,7 @@ public class CommentRestControllerTest {
                 // given
                 UpdateCommentRequest request = UpdateCommentRequest.builder().id(0L).content(" ")
                     .build();
-                CommentDto commentDto = CommentDto.builder().id(0L).postId(0L).memberId(0L)
+                CommentDTO commentDto = CommentDTO.builder().id(0L).postId(0L).memberId(0L)
                     .content("test").anonymity(false).parentCommentId(null).build();
                 given(commentService.updateComment(any(UpdateCommentRequest.class))).willReturn(
                     commentDto);

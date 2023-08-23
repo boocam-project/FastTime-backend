@@ -1,6 +1,6 @@
 package com.fasttime.domain.comment.service;
 
-import com.fasttime.domain.comment.dto.CommentDto;
+import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
@@ -25,7 +25,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public CommentDto createComment(CreateCommentRequest req) {
+    public CommentDTO createComment(CreateCommentRequest req) {
         // TODO : post, member 각각 postService, memberService 를 통해 읽어 온다.
         Optional<Post> post = postRepository.findById(req.getPostId());
         Optional<Member> member = memberRepository.findById(req.getMemberId());
@@ -46,36 +46,36 @@ public class CommentService {
         } else {
             return commentRepository.save(
                 Comment.builder().post(post.get()).member(member.get()).content(req.getContent())
-                    .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDto();
+                    .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDTO();
         }
     }
 
-    public CommentDto getComment(Long id) {
+    public CommentDTO getComment(Long id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
             throw new NotFoundException("존재하지 않는 댓글입니다.");
         } else {
-            return comment.get().toDto();
+            return comment.get().toDTO();
         }
     }
 
-    public CommentDto deleteComment(DeleteCommentRequest req) {
+    public CommentDTO deleteComment(DeleteCommentRequest req) {
         Optional<Comment> comment = commentRepository.findById(req.getId());
         if (comment.isEmpty()) {
             throw new NotFoundException("존재하지 않는 댓글입니다.");
         } else {
             comment.get().deleteComment();
-            return comment.get().toDto();
+            return comment.get().toDTO();
         }
     }
 
-    public CommentDto updateComment(UpdateCommentRequest req) {
+    public CommentDTO updateComment(UpdateCommentRequest req) {
         Optional<Comment> comment = commentRepository.findById(req.getId());
         if (comment.isEmpty()) {
             throw new NotFoundException("존재하지 않는 댓글입니다.");
         } else {
             comment.get().updateContent(req.getContent());
         }
-        return comment.get().toDto();
+        return comment.get().toDTO();
     }
 }
