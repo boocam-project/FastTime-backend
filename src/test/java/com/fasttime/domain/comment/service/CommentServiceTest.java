@@ -9,7 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.fasttime.domain.comment.dto.CommentDto;
+import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
@@ -66,7 +66,7 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.createComment(request);
+            CommentDTO CommentDto = commentService.createComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -93,7 +93,7 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.createComment(request);
+            CommentDTO CommentDto = commentService.createComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -123,7 +123,7 @@ public class CommentServiceTest {
             given(memberRepository.findById(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
             // when
-            CommentDto CommentDto = commentService.createComment(request);
+            CommentDTO CommentDto = commentService.createComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -154,7 +154,7 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.createComment(request);
+            CommentDTO CommentDto = commentService.createComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -255,7 +255,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.getComment(0L);
+            CommentDTO CommentDto = commentService.getComment(0L);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -300,7 +300,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.updateComment(request);
+            CommentDTO CommentDto = commentService.updateComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
@@ -346,7 +346,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentDto CommentDto = commentService.deleteComment(request);
+            CommentDTO CommentDto = commentService.deleteComment(request);
 
             // then
             assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",

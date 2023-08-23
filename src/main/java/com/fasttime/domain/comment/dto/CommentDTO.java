@@ -2,11 +2,10 @@ package com.fasttime.domain.comment.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Builder
 @Getter
-public class CommentDto {
+public class CommentDTO {
 
     private Long id;
     private Long postId;
