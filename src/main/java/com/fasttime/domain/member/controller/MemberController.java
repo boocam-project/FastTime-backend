@@ -104,7 +104,7 @@ public class MemberController {
             throw new BindException(bindingResult);
         }
         MemberResponse response = memberService.loginMember(dto);
-        session.setAttribute("MEMBER", memberRepository.findByEmail(response.getEmail()));
+        session.setAttribute("MEMBER", response.getEmail());
         Map<String, Object> message = new HashMap<>();
         message.put("status", 200);
         message.put("data", response);
