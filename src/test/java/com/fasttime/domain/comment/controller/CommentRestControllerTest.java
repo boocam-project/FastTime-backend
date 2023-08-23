@@ -83,7 +83,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
         }
@@ -108,7 +108,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
         }
@@ -133,7 +133,7 @@ public class CommentRestControllerTest {
                 // whCreate
                 mockMvc.perform(post("/api/v1/comment/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
 
@@ -153,7 +153,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
         }
@@ -178,7 +178,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
         }
@@ -231,7 +231,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/delete").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).deleteComment(any(DeleteCommentRequest.class));
             }
         }
@@ -286,7 +286,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/update").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
         }
@@ -311,7 +311,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/update").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
 
@@ -331,7 +331,7 @@ public class CommentRestControllerTest {
                 // when, then
                 mockMvc.perform(post("/api/v1/comment/update").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").exists()).andDo(print());
+                    .andExpect(jsonPath("$.message").exists()).andDo(print());
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
         }

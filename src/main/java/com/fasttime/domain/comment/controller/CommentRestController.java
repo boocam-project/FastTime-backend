@@ -4,8 +4,7 @@ import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
 import com.fasttime.domain.comment.service.CommentService;
-import java.util.HashMap;
-import java.util.Map;
+import com.fasttime.global.util.ResponseDTO;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,33 +24,29 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> create(
+    public ResponseEntity<ResponseDTO> create(
         @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         log.info("CreateCommentRequest: " + createCommentRequest);
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 201);
-        message.put("data", commentService.createComment(createCommentRequest));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(message);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ResponseDTO.res(HttpStatus.CREATED, "댓글을 성공적으로 등록했습니다.",
+                commentService.createComment(createCommentRequest)));
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<Map<String, Object>> delete(
+    public ResponseEntity<ResponseDTO> delete(
         @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
         log.info("DeleteCommentRequest: " + deleteCommentRequest);
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", commentService.deleteComment(deleteCommentRequest));
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
+                commentService.deleteComment(deleteCommentRequest)));
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Map<String, Object>> update(
+    public ResponseEntity<ResponseDTO> update(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", commentService.updateComment(updateCommentRequest));
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
+                commentService.updateComment(updateCommentRequest)));
     }
 }
