@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.interceptor.LoginCheckInterceptor;
 import org.apache.juli.logging.Log;
@@ -77,7 +78,6 @@ public class MemberControllerTestForAuto {
                     .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.email").exists())
-                .andExpect(jsonPath("$.data.password").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
                 .andDo(print());
         }
@@ -92,6 +92,34 @@ public class MemberControllerTestForAuto {
             String s = om.writeValueAsString(dto);
             mockMvc.perform(post("/v1/login")
                     .with(csrf())
+                    .content(s)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").exists())
+                .andDo(print());
+        }
+        @DisplayName("등록되지않는 이메일로 인해 실패한다.")
+        @Test
+        @WithMockUser
+        void Email_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
+            //when,then
+            String s = om.writeValueAsString(dto);
+            mockMvc.perform(post("/v1/login")
+                    .content(s)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").exists())
+                .andDo(print());
+        }
+        @DisplayName("비밀번호가 달라 실패한다.")
+        @Test
+        @WithMockUser
+        void password_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
+            //when,then
+            String s = om.writeValueAsString(dto);
+            mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error").exists())
@@ -124,6 +152,60 @@ public class MemberControllerTestForAuto {
             //when, then
             mockMvc.perform(get("/v1/logout"))
                 .andExpect(redirectedUrl("/v1/login"));
+        }
+    }
+    @DisplayName("비밀번호 재설정을")
+    @Nested
+    class RePassword {
+        @BeforeEach
+        void testMember() {
+            MemberDto memberDto = new MemberDto("testEmail",
+                "testPassword", "testNickname");
+            memberService.save(memberDto);
+        }
+        @DisplayName("성공한다.")
+        @Test
+        void _willSuccess() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("testEmail", "newPassword", "newPassword");
+            //when, the
+            String s = om.writeValueAsString(request);
+            mockMvc.perform(post("/v1/RePassword")
+                    .content(s)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.email").exists())
+                .andExpect(jsonPath("$.data.nickname").exists())
+                .andDo(print());
+        }
+        @DisplayName("검증으로 인해 실패한다.")
+        @Test
+        void validation_willFail() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("testEmail", " ", "newPassword");
+            //when, the
+            String s = om.writeValueAsString(request);
+            mockMvc.perform(post("/v1/RePassword")
+                    .content(s)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").exists())
+                .andDo(print());
+        }
+        @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
+        @Test
+        void Re_willFail() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("testEmail", "newPassword", "new");
+            //when, the
+            String s = om.writeValueAsString(request);
+            mockMvc.perform(post("/v1/RePassword")
+                    .content(s)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error").exists())
+                .andDo(print());
         }
     }
 }
