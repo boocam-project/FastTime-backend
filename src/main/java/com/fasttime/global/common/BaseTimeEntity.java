@@ -24,7 +24,13 @@ public abstract class BaseTimeEntity {
     private LocalDateTime deletedAt;
 
     protected void delete(LocalDateTime currentTime) {
-        deletedAt = currentTime;
+        if (deletedAt == null) {
+            deletedAt = currentTime;
+        }
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
     }
 
     protected void restore() {

@@ -2,6 +2,7 @@ package com.fasttime.domain.post.entity;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
+import java.time.LocalDateTime;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -74,5 +75,23 @@ public class Post extends BaseTimeEntity {
 
     public String getContent() {
         return content.getContent();
+    }
+
+    public void report() {
+        if (this.reportStatus == ReportStatus.NORMAL) {
+            this.reportStatus = ReportStatus.REPORTED;
+        }
+    }
+
+    public void approveReport(LocalDateTime currentTime) {
+        if (this.reportStatus == ReportStatus.REPORTED) {
+            delete(currentTime);
+        }
+    }
+
+    public void rejectReport() {
+        if (this.reportStatus == ReportStatus.REPORTED) {
+            this.reportStatus = ReportStatus.REPORT_REJECTED;
+        }
     }
 }
