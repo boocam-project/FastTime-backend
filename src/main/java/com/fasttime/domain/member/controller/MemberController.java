@@ -1,17 +1,26 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.dto.MemberDto;
 
 
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
+import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.EditResponse;
+import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
@@ -23,6 +32,7 @@ public class MemberController {
     private final MemberService memberService;
 
     private final MemberRepository memberRepository;
+
 
     @PostMapping("/v1/join")
     public ResponseEntity<String> join(@Valid @RequestBody MemberDto memberDto) {
@@ -86,6 +96,46 @@ public class MemberController {
         }
     }
 
+    @PostMapping("/v1/login")
+    public ResponseEntity<Map<String, Object>> LogIn(@Validated @RequestBody LoginRequestDTO dto
+        , BindingResult bindingResult, HttpSession session)
+        throws UserNotFoundException, BindException {
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+        MemberResponse response = memberService.loginMember(dto);
+        session.setAttribute("MEMBER", response.getEmail());
+        Map<String, Object> message = new HashMap<>();
+        message.put("status", 200);
+        message.put("data", response);
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+    }
 
+    @GetMapping("/v1/logout")
+    public ResponseEntity<Map<String, Object>> LogOut(HttpSession session) {
+        if (session.getAttribute("ADMIN") != null) {
+            session.removeAttribute("ADMIN");
+        }
+        if (session.getAttribute("MEMBER") != null) {
+            session.removeAttribute("MEMBER");
+        }
+        Map<String, Object> message = new HashMap<>();
+        message.put("status", 200);
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+    }
+
+    @PostMapping("/v1/RePassword")
+    public ResponseEntity<Map<String, Object>> RePassword
+        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
+        throws BindException {
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        }
+        MemberResponse response = memberService.RePassword(request);
+        Map<String, Object> message = new HashMap<>();
+        message.put("status", 200);
+        message.put("data", response);
+        return ResponseEntity.status(HttpStatus.OK).body(message);
+    }
 }
 
