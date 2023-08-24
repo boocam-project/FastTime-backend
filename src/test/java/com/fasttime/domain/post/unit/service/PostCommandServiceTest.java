@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
@@ -14,6 +15,8 @@ import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
+import com.fasttime.domain.post.exception.NotPostWriterException;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostCommandService;
 import java.time.LocalDateTime;
@@ -64,7 +67,7 @@ class PostCommandServiceTest {
                 .containsExactly(1L, "title", "content", true, 0, 0);
         }
 
-        @DisplayName("회원 정보가 DB에 없는 경우 IllegalArgumentException을 던진다.")
+        @DisplayName("회원 정보가 DB에 없는 경우 UserNotFoundException을 던진다.")
         @Test
         void member_notExist_throwIllArgumentException() {
             // given
@@ -77,7 +80,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.writePost(dto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("회원 정보가 없습니다.");
         }
     }
@@ -107,7 +110,7 @@ class PostCommandServiceTest {
                 .containsExactly(1L, "title", "newContent", true, 0, 0);
         }
 
-        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 IllegalArgumentException을 던진다.")
+        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
         @Test
         void post_notExist_throwIllArgumentException() {
             // given
@@ -118,11 +121,11 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.updatePost(serviceDto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(PostNotFoundException.class)
                 .hasMessage("존재하지 않는 게시글입니다.");
         }
 
-        @DisplayName("게시글 작성자가 아닌 경우 IllegalArgumentException을 던진다.")
+        @DisplayName("게시글 작성자가 아닌 경우 NotPostWriterException을 던진다.")
         @Test
         void member_validateFail_throwIllArgumentException() {
             // given
@@ -135,7 +138,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.updatePost(serviceDto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotPostWriterException.class)
                 .hasMessage("해당 게시글에 대한 권한이 없습니다.");
         }
     }
@@ -144,7 +147,7 @@ class PostCommandServiceTest {
     @Nested
     class Context_deletePost {
 
-        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 IllegalArgumentException을 던진다.")
+        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
         @Test
         void post_notExist_throwIllArgumentException() {
             // given
@@ -155,11 +158,11 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.deletePost(serviceDto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(PostNotFoundException.class)
                 .hasMessage("존재하지 않는 게시글입니다.");
         }
 
-        @DisplayName("게시글 작성자가 아닌 경우 IllegalArgumentException을 던진다.")
+        @DisplayName("게시글 작성자가 아닌 경우 UserNotFoundException을 던진다.")
         @Test
         void member_validateFail_throwIllArgumentException() {
             // given
@@ -171,7 +174,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.deletePost(serviceDto))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotPostWriterException.class)
                 .hasMessage("해당 게시글에 대한 권한이 없습니다.");
         }
     }
