@@ -11,6 +11,7 @@ import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostCommandService;
+import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +29,6 @@ public class AdminControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    private AdminService adminService;
     @Autowired
     private PostCommandService postCommandService;
     @Autowired
@@ -50,8 +49,10 @@ public class AdminControllerTest {
             PostResponseDto postResponseDto2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             Post post2 = postRepository.findById(postResponseDto2.getId()).get();
-            post1.ChangeReportStatus(ReportStatus.REPORTED);
-            post2.ChangeReportStatus(ReportStatus.REPORTED);
+            post1.report();
+            post2.report();
+            post1.approveReport(LocalDateTime.now());
+            post2.approveReport(LocalDateTime.now());
             // when, then
             mockMvc.perform(get("/v1/admin"))
                 .andExpect(jsonPath("$.data").exists())
@@ -87,7 +88,8 @@ public class AdminControllerTest {
                 (0L, "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            post1.ChangeReportStatus(ReportStatus.REPORTED);
+            post1.report();
+            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/v1/admin/{post_id}", post1.getId()))
                 .andExpect(status().isOk())
@@ -103,11 +105,29 @@ public class AdminControllerTest {
                 (0L, "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            post1.ChangeReportStatus(ReportStatus.REPORTED);
+            post1.report();
+            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/v1/admin/{post_id}", 1000L))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").value("게시글이 없습니다."))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(print());
+        }
+        // AccessException
+        @DisplayName("신고처리가 되지않는 게시글 접근으로 인해 조회할 수 없다.")
+        @Test
+        void Access_willFail() throws Exception {
+            //given
+            PostCreateServiceDto dto1 = new PostCreateServiceDto
+                (0L, "testTitle1", "testContent1", false);
+            PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
+            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
+            //when, then
+            mockMvc.perform(get("/v1/admin/{post_id}",  post1.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("잘못된 접근입니다."))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
 
@@ -119,10 +139,13 @@ public class AdminControllerTest {
                 (0L, "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            post1.ChangeReportStatus(ReportStatus.REPORTED);
+            post1.report();
+            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/v1/admin/{post_id}/delete", post1.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                    .value("신고가 10번이상된 게시글을 삭제합니다."))
                 .andDo(print());
         }
         @DisplayName("검토완료로 바꿀 수 있다.")
@@ -133,10 +156,13 @@ public class AdminControllerTest {
                 (0L, "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            post1.ChangeReportStatus(ReportStatus.REPORTED);
+            post1.report();
+            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/v1/admin/{post_id}/pass", post1.getId()))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message")
+                    .value("신고가 10번이상된 게시글을 복구합니다."))
                 .andDo(print());
         }
     }
