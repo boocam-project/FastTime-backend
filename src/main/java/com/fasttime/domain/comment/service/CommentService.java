@@ -44,7 +44,7 @@ public class CommentService {
         if (post.isEmpty()) {
             throw new PostNotFoundException();
         } else if (member.isEmpty()) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException("존재하지 않는 회원입니다.");
         } else {
             return commentRepository.save(
                 Comment.builder().post(post.get()).member(member.get()).content(req.getContent())
