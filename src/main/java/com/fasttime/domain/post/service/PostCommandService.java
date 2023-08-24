@@ -1,6 +1,9 @@
 package com.fasttime.domain.post.service;
 
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
+import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostResponseDto;
 import com.fasttime.domain.post.entity.Post;
@@ -14,15 +17,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PostCommandService {
 
+    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
-    public PostCommandService(PostRepository postRepository) {
+    public PostCommandService(MemberRepository memberRepository, PostRepository postRepository) {
+        this.memberRepository = memberRepository;
         this.postRepository = postRepository;
     }
 
     public PostResponseDto writePost(PostCreateServiceDto serviceDto) {
 
-        Post createdPost = Post.createNewPost(null, serviceDto.getTitle(), serviceDto.getContent(),
+        Member member = memberRepository.findById(serviceDto.getMemberId())
+            .orElseThrow(() -> new IllegalArgumentException("회원 정보가 없습니다."));
+
+        Post createdPost = Post.createNewPost(member, serviceDto.getTitle(), serviceDto.getContent(),
             false);
 
         Post savedPost = postRepository.save(createdPost);
