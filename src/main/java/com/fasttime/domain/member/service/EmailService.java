@@ -46,9 +46,9 @@ public class EmailService {
     public MimeMessage createMessage(String to)
         throws MessagingException, UnsupportedEncodingException {
         createCode();
-        String setFrom = "gjwldud0719@naver.com";
+        String setFrom = "test@naver.com";
         String toEmail = to;
-        String title = "회원가입 인증 번호";
+        String title = "FastTime 인증 번호";
 
         MimeMessage message = emailsender.createMimeMessage();
         message.addRecipients(MimeMessage.RecipientType.TO, to); // 보내는 대상
@@ -57,10 +57,10 @@ public class EmailService {
         String n = "";
         n += "<div style='margin:100px;'>";
         n += "<h1> 안녕하세요 FastTime 입니다.</h1>";
-        n += "<p>아래 코드를 회원가입 창으로 돌아가 입력해주세요.<p>";
+        n += "<p>아래 인증 코드를 웹 사이트로 돌아가 입력해주세요.<p>";
         n += "<br>";
         n += "<div align='center' style='border:1px solid black; font-family:verdana';>";
-        n += "<h3 style='color:#9AC1D1;'>회원가입 인증 코드</h3>";
+        n += "<h3 style='color:#9AC1D1;'>인증 코드</h3>";
         n += "<div style='font-size:130%'>";
         n += "CODE : <strong>";
         n += authNum + "</strong><div><br/> "; // 메일에 인증번호 넣기
