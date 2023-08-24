@@ -1,8 +1,8 @@
 package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.service.AdminService;
-import java.util.HashMap;
-import java.util.Map;
+import com.fasttime.global.util.ResponseDTO;
+import java.rmi.AccessException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -22,37 +22,31 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/admin")
-    public ResponseEntity<Map<String, Object>> PostList() {
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", adminService.FindReportedPost());
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+    public ResponseEntity<ResponseDTO> PostList() {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
+            ,"신고가 10번이상된 게시글들을 보여줍니다.",adminService.FindReportedPost()));
     }
 
     @GetMapping("/admin/{post_id}")
-    public ResponseEntity<Map<String, Object>> PostDetail
-        (@PathVariable("post_id") Long post_id) {
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", adminService.FindOneReportedPost(post_id));
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+    public ResponseEntity<ResponseDTO> PostDetail
+        (@PathVariable("post_id") Long post_id) throws AccessException {
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
+            ,"신고가 10번이상된 게시글을 보여줍니다.",adminService.FindOneReportedPost(post_id)));
     }
 
     @GetMapping("/admin/{post_id}/delete") // 문제가 있는 Post를 삭제
-    public ResponseEntity<Map<String, Object>> DeletePost
-        (@PathVariable("post_id") Long post_id) {
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
+    public ResponseEntity<ResponseDTO> DeletePost
+        (@PathVariable("post_id") Long post_id) throws AccessException {
         adminService.DeletePost(post_id);
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
+            , "신고가 10번이상된 게시글을 삭제합니다."));
     }
 
     @GetMapping("/admin/{post_id}/pass") // 문제가 없는 Post 검토완료로 변경
-    public ResponseEntity<Map<String, Object>> PassPost
-        (@PathVariable("post_id") Long post_id) {
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
+    public ResponseEntity<ResponseDTO> PassPost
+        (@PathVariable("post_id") Long post_id) throws AccessException {
         adminService.PassPost(post_id);
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
+            , "신고가 10번이상된 게시글을 복구합니다."));
     }
 }
