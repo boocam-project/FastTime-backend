@@ -80,6 +80,7 @@ public class MemberControllerTestForAuto {
                 .andExpect(jsonPath("$.data.email").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
                 .andDo(print());
+
         }
 
         @DisplayName("검증으로 인해 실패한다.")
@@ -109,7 +110,10 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message")
+                    .value("User not found with email: email"))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
         @DisplayName("비밀번호가 달라 실패한다.")
@@ -123,7 +127,10 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").value("Not match password!"))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message")
+                    .value("Not match password!"))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
 
@@ -206,8 +213,11 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("Not Match RePassword!"))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
+
         }
     }
 }
