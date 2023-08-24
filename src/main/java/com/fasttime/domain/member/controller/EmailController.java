@@ -1,7 +1,9 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.member.request.CodeRequest;
 import com.fasttime.domain.member.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
+import javax.naming.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,10 @@ public class EmailController {
         throws Exception {
         String code = emailService.sendSimpleMessage(emailRequest.getEmail());
         session.setAttribute("emailCode", code);
+
         return ResponseEntity.ok("success");
     }
+
 
     @GetMapping("v1/verify/{code}") // 이메일 인증하기 버튼
     public ResponseEntity<Map<String, Object>> verifyEmail(@PathVariable("code") String code,
@@ -44,4 +48,31 @@ public class EmailController {
         }
     }
 
+    // 인증번호 발송 버튼 누르면 메일 가는 메소드 (Response에 이메일 추가를 위해 다시만들었습니다.)
+    @PostMapping("v1/Repassword/emailconfirm")
+    public ResponseEntity<Map<String, Object>> mailConfirmForRePassword
+    (@RequestBody EmailRequest emailRequest) throws Exception {
+        String code = emailService.sendSimpleMessage(emailRequest.getEmail());
+        session.setAttribute("emailCode", code);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("success", true);
+        resultMap.put("email", emailRequest.getEmail());
+        return ResponseEntity.ok(resultMap);
+    }
+
+    @PostMapping("v1/RePassword/verify") // 비밀번호 재설정을 위한 코드 받기
+    public ResponseEntity<Map<String, Object>> verifyMember(@RequestBody CodeRequest request
+        , HttpSession session) throws AuthenticationException {
+        Map<String, Object> resultMap = new HashMap<>();
+        session.setMaxInactiveInterval(30 * 60);
+        String sessionCode = (String) session.getAttribute("emailCode");
+
+        if (sessionCode != null && sessionCode.equals(request.getCode())) {
+            resultMap.put("email", request.getEmail());
+        } else {
+            // 인증 실패
+            throw new AuthenticationException();
+        }
+        return ResponseEntity.ok(resultMap);
+    }
 }
