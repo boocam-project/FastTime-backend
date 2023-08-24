@@ -65,6 +65,11 @@ public class MemberService {
         memberRepository.save(member); // 업데이트된 정보를 데이터베이스에 저장
     }
 
+    public Member getMember(Long id) throws UserNotFoundException {
+        return memberRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
+
     public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
         Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
         if (!byEmail.isPresent()) {
