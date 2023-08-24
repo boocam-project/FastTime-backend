@@ -1,6 +1,7 @@
 package com.fasttime.domain.post.service;
 
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
@@ -28,7 +29,7 @@ public class PostCommandService {
     public PostResponseDto writePost(PostCreateServiceDto serviceDto) {
 
         Member member = memberRepository.findById(serviceDto.getMemberId())
-            .orElseThrow(() -> new IllegalArgumentException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new UserNotFoundException("회원 정보가 없습니다."));
 
         Post createdPost = Post.createNewPost(member, serviceDto.getTitle(), serviceDto.getContent(),
             false);
@@ -47,6 +48,16 @@ public class PostCommandService {
         post.update(serviceDto.getContent());
 
         return PostResponseDto.of(post);
+    }
+
+    public void deletePost(PostDeleteServiceDto serviceDto) {
+
+        Post post = postRepository.findById(serviceDto.getPostId())
+            .orElseThrow(PostNotFoundException::new);
+
+        validateMemberAuthority(serviceDto.getMemberId(), post.getMember().getId());
+
+        post.delete(serviceDto.getDeletedAt());
     }
 
     private Post findPostById(PostUpdateServiceDto serviceDto) {
