@@ -94,7 +94,8 @@ public class MemberControllerTestForAuto {
                     .with(csrf())
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").value("must not be blank"))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
         @DisplayName("등록되지않는 이메일로 인해 실패한다.")
@@ -122,7 +123,7 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error").value("Not match password!"))
                 .andDo(print());
         }
 
@@ -190,7 +191,8 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").value("must not be blank"))
+                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
         @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
