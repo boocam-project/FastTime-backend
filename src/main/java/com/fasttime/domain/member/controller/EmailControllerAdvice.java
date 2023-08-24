@@ -1,5 +1,6 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.global.util.ResponseDTO;
 import java.util.HashMap;
 import java.util.Map;
 import javax.naming.AuthenticationException;
@@ -12,11 +13,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class EmailControllerAdvice {
     @ExceptionHandler
-    public ResponseEntity<?> AuthenticationException(AuthenticationException e){
-        Map<String, Object> message = new HashMap<>();
-        message.put("error", e.getMessage());
+    public ResponseEntity<ResponseDTO> AuthenticationException(AuthenticationException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(message);
+            .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 }
