@@ -190,7 +190,7 @@ class PostTest {
             testPost.delete(deletedAt);
 
             // when
-            LocalDateTime newDeletedAt = LocalDateTime.now();
+            LocalDateTime newDeletedAt = LocalDateTime.now().plusSeconds(10);
             testPost.delete(newDeletedAt);
 
             // then
