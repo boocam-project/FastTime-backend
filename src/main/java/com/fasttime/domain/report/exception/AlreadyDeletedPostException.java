@@ -1,8 +1,11 @@
 package com.fasttime.domain.report.exception;
 
-public class AlreadyDeletedPostException extends RuntimeException {
+import com.fasttime.global.exception.ApplicationException;
+import org.springframework.http.HttpStatus;
+
+public class AlreadyDeletedPostException extends ApplicationException {
 
     public AlreadyDeletedPostException(String message) {
-        super(message);
+        super(HttpStatus.BAD_REQUEST, message);
     }
 }

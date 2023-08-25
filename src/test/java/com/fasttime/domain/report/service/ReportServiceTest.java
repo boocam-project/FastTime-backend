@@ -9,11 +9,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.fasttime.domain.comment.exception.NotFoundException;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.repository.MemberRepository;
+import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.report.dto.ReportDTO;
 import com.fasttime.domain.report.dto.request.CreateReportRequest;
@@ -48,7 +49,7 @@ public class ReportServiceTest {
     private PostRepository postRepository;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberService memberService;
 
     @Nested
     @DisplayName("createReport()는 ")
@@ -61,11 +62,13 @@ public class ReportServiceTest {
             CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Optional<Member> member = Optional.of(Member.builder().id(0L).build());
-            Report report = Report.builder().id(0L).member(member.get()).post(post.get()).build();
+            Member member = Member.builder().id(0L).build();
+            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
+            Optional<List<Report>> reports = Optional.of(new ArrayList<>());
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
-            given(memberRepository.findById(any(Long.class))).willReturn(member);
+            given(memberService.getMember(any(Long.class))).willReturn(member);
+            given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
             given(reportRepository.save(any(Report.class))).willReturn(report);
 
             // when
@@ -75,7 +78,8 @@ public class ReportServiceTest {
             assertThat(reportDto).extracting("id", "postId", "memberId")
                 .containsExactly(0L, 0L, 0L);
             verify(postRepository, times(1)).findById(any(Long.class));
-            verify(memberRepository, times(1)).findById(any(Long.class));
+            verify(memberService, times(1)).getMember(any(Long.class));
+            verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
 
@@ -86,16 +90,15 @@ public class ReportServiceTest {
             CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Optional<Member> member = Optional.of(Member.builder().id(0L).build());
-            Report report = Report.builder().id(0L).member(member.get()).post(post.get()).build();
-            List<Report> reportList = new ArrayList<>();
-            Optional<List<Report>> reports = Optional.of(reportList);
+            Member member = Member.builder().id(0L).build();
+            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
+            Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 10L; i++) {
                 reports.get().add(Report.builder().id(i).build());
             }
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
-            given(memberRepository.findById(any(Long.class))).willReturn(member);
+            given(memberService.getMember(any(Long.class))).willReturn(member);
             given(reportRepository.save(any(Report.class))).willReturn(report);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
@@ -106,7 +109,7 @@ public class ReportServiceTest {
             assertThat(reportDto).extracting("id", "postId", "memberId")
                 .containsExactly(0L, 0L, 0L);
             verify(postRepository, times(2)).findById(any(Long.class));
-            verify(memberRepository, times(1)).findById(any(Long.class));
+            verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
@@ -118,15 +121,14 @@ public class ReportServiceTest {
             CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Optional<Member> member = Optional.of(Member.builder().id(0L).build());
-            Report report = Report.builder().id(0L).member(member.get()).post(post.get()).build();
-            List<Report> reportList = new ArrayList<>();
-            Optional<List<Report>> reports = Optional.of(reportList);
+            Member member = Member.builder().id(0L).build();
+            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
+            Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 10L; i++) {
                 reports.get().add(Report.builder().id(i).build());
             }
             given(postRepository.findById(any(Long.class))).willReturn(post);
-            given(memberRepository.findById(any(Long.class))).willReturn(member);
+            given(memberService.getMember(any(Long.class))).willReturn(member);
             given(reportRepository.save(any(Report.class))).willReturn(report);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
@@ -137,7 +139,7 @@ public class ReportServiceTest {
             assertThat(reportDto).extracting("id", "postId", "memberId")
                 .containsExactly(0L, 0L, 0L);
             verify(postRepository, times(2)).findById(any(Long.class));
-            verify(memberRepository, times(1)).findById(any(Long.class));
+            verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
@@ -153,7 +155,7 @@ public class ReportServiceTest {
             given(postRepository.findById(any(Long.class))).willReturn(post);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(PostNotFoundException.class, () -> {
                 reportService.createReport(request);
             });
             assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
@@ -195,16 +197,17 @@ public class ReportServiceTest {
             Optional<Member> member = Optional.empty();
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
-            given(memberRepository.findById(any(Long.class))).willReturn(member);
+            given(memberService.getMember(any(Long.class))).willThrow(
+                new UserNotFoundException("User not found with id: 0L"));
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(UserNotFoundException.class, () -> {
                 reportService.createReport(request);
             });
-            assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
+            assertEquals("User not found with id: 0L", exception.getMessage());
 
             verify(postRepository, times(1)).findById(any(Long.class));
-            verify(memberRepository, times(1)).findById(any(Long.class));
+            verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, never()).findAllByPost(any(Post.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
@@ -216,13 +219,12 @@ public class ReportServiceTest {
             CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Optional<Member> member = Optional.of(Member.builder().id(0L).build());
-            List<Report> reportList = new ArrayList<>();
-            reportList.add(Report.builder().post(post.get()).member(member.get()).build());
-            Optional<List<Report>> reports = Optional.of(reportList);
+            Member member = Member.builder().id(0L).build();
+            Optional<List<Report>> reports = Optional.of(new ArrayList<>());
+            reports.get().add(Report.builder().post(post.get()).member(member).build());
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
-            given(memberRepository.findById(any(Long.class))).willReturn(member);
+            given(memberService.getMember(any(Long.class))).willReturn(member);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
             // when, then
@@ -232,7 +234,7 @@ public class ReportServiceTest {
             assertEquals("이미 신고한 게시글입니다.", exception.getMessage());
 
             verify(postRepository, times(1)).findById(any(Long.class));
-            verify(memberRepository, times(1)).findById(any(Long.class));
+            verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
@@ -255,10 +257,10 @@ public class ReportServiceTest {
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
             // when
-            Optional<List<Report>> result = reportService.getReportsByPost(post);
+            List<Report> result = reportService.getReportsByPost(post);
 
             // then
-            assertThat(result).isEqualTo(reports);
+            assertThat(result).isEqualTo(reports.get());
 
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
         }

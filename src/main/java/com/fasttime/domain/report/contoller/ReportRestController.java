@@ -22,7 +22,7 @@ public class ReportRestController {
     private final ReportService reportService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDTO> create(
+    public ResponseEntity<ResponseDTO<Object>> create(
         @Valid @RequestBody CreateReportRequest createReportRequest) {
         log.info("CreateReportRequest: " + createReportRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
