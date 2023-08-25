@@ -5,11 +5,13 @@ import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
 import com.fasttime.domain.comment.entity.Comment;
-import com.fasttime.domain.comment.exception.NotFoundException;
+import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -34,15 +36,15 @@ public class CommentService {
         if (req.getParentCommentId() != null) {
             Optional<Comment> Comment = commentRepository.findById(req.getParentCommentId());
             if (Comment.isEmpty()) {
-                throw new NotFoundException("존재하지 않는 댓글입니다.");
+                throw new CommentNotFoundException();
             } else {
                 parentComment = Comment.get();
             }
         }
         if (post.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 게시글입니다.");
+            throw new PostNotFoundException();
         } else if (member.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 회원입니다.");
+            throw new UserNotFoundException("존재하지 않는 회원입니다.");
         } else {
             return commentRepository.save(
                 Comment.builder().post(post.get()).member(member.get()).content(req.getContent())
@@ -53,7 +55,7 @@ public class CommentService {
     public CommentDTO getComment(Long id) {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 댓글입니다.");
+            throw new CommentNotFoundException();
         } else {
             return comment.get().toDTO();
         }
@@ -62,7 +64,7 @@ public class CommentService {
     public CommentDTO deleteComment(DeleteCommentRequest req) {
         Optional<Comment> comment = commentRepository.findById(req.getId());
         if (comment.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 댓글입니다.");
+            throw new CommentNotFoundException();
         } else {
             comment.get().deleteComment();
             return comment.get().toDTO();
@@ -72,7 +74,7 @@ public class CommentService {
     public CommentDTO updateComment(UpdateCommentRequest req) {
         Optional<Comment> comment = commentRepository.findById(req.getId());
         if (comment.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 댓글입니다.");
+            throw new CommentNotFoundException();
         } else {
             comment.get().updateContent(req.getContent());
         }

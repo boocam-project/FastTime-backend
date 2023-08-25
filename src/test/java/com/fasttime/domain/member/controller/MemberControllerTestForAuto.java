@@ -2,36 +2,29 @@ package com.fasttime.domain.member.controller;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.interceptor.LoginCheckInterceptor;
-import org.apache.juli.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,7 +102,7 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").exists())
                 .andDo(print());
         }
         @DisplayName("비밀번호가 달라 실패한다.")
@@ -123,7 +116,7 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").value("Not match password!"))
+                .andExpect(jsonPath("$.data.error").value("Not match password!"))
                 .andDo(print());
         }
 
@@ -206,7 +199,7 @@ public class MemberControllerTestForAuto {
             mockMvc.perform(post("/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.data.error").exists())
                 .andDo(print());
         }
     }

@@ -14,11 +14,13 @@ import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
 import com.fasttime.domain.comment.entity.Comment;
-import com.fasttime.domain.comment.exception.NotFoundException;
+import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -176,7 +178,7 @@ public class CommentServiceTest {
             given(postRepository.findById(any(Long.class))).willReturn(post);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(PostNotFoundException.class, () -> {
                 commentService.createComment(request);
             });
             assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
@@ -200,7 +202,7 @@ public class CommentServiceTest {
             given(memberRepository.findById(any(Long.class))).willReturn(member);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(UserNotFoundException.class, () -> {
                 commentService.createComment(request);
             });
             assertEquals("존재하지 않는 회원입니다.", exception.getMessage());
@@ -226,7 +228,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(parentComment);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
                 commentService.createComment(request);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
@@ -272,7 +274,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
                 commentService.getComment(0L);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
@@ -319,7 +321,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
                 commentService.updateComment(request);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
@@ -364,7 +366,7 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when, then
-            Throwable exception = assertThrows(NotFoundException.class, () -> {
+            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
                 commentService.deleteComment(request);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
