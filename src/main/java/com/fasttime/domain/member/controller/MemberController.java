@@ -12,6 +12,7 @@ import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.util.ResponseDTO;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
@@ -97,7 +98,7 @@ public class MemberController {
     }
 
     @PostMapping("/v1/login")
-    public ResponseEntity<Map<String, Object>> LogIn(@Validated @RequestBody LoginRequestDTO dto
+    public ResponseEntity<ResponseDTO> LogIn(@Validated @RequestBody LoginRequestDTO dto
         , BindingResult bindingResult, HttpSession session)
         throws UserNotFoundException, BindException {
         if (bindingResult.hasErrors()) {
@@ -105,37 +106,32 @@ public class MemberController {
         }
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getEmail());
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", response);
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
+            (HttpStatus.OK, "로그인이 완료되었습니다.",response));
     }
 
     @GetMapping("/v1/logout")
-    public ResponseEntity<Map<String, Object>> LogOut(HttpSession session) {
+    public ResponseEntity<ResponseDTO> LogOut(HttpSession session) {
         if (session.getAttribute("ADMIN") != null) {
             session.removeAttribute("ADMIN");
         }
         if (session.getAttribute("MEMBER") != null) {
             session.removeAttribute("MEMBER");
         }
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
+            (HttpStatus.OK,"로그아웃이 완료되었습니다."));
     }
 
     @PostMapping("/v1/RePassword")
-    public ResponseEntity<Map<String, Object>> RePassword
+    public ResponseEntity<ResponseDTO> RePassword
         (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
         throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
         MemberResponse response = memberService.RePassword(request);
-        Map<String, Object> message = new HashMap<>();
-        message.put("status", 200);
-        message.put("data", response);
-        return ResponseEntity.status(HttpStatus.OK).body(message);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
+            (HttpStatus.OK,"패스워드 재설정이 완료되었습니다",response));
     }
 }
 
