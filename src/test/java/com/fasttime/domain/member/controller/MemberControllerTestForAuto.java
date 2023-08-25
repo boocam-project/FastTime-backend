@@ -128,9 +128,8 @@ public class MemberControllerTestForAuto {
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message")
+                .andExpect(jsonPath("$.data.error")
                     .value("Not match password!"))
-                .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
 
@@ -214,8 +213,7 @@ public class MemberControllerTestForAuto {
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("Not Match RePassword!"))
-                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.data.error").value("Not Match RePassword!"))
                 .andDo(print());
 
         }
