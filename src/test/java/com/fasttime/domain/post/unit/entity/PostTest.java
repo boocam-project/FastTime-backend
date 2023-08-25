@@ -160,4 +160,64 @@ class PostTest {
         }
     }
 
+    @DisplayName("delete()는")
+    @Nested
+    class Context_delete{
+
+        @DisplayName("게시글을 삭제할 수 있다.")
+        @Test
+        void post_deletedAt_willSetNow(){
+            // given
+            LocalDateTime deletedAt = LocalDateTime.now();
+            Post testPost = Post.builder()
+                .build();
+
+            // when
+            testPost.delete(deletedAt);
+
+            // then
+            assertThat(testPost.getDeletedAt()).isEqualTo(deletedAt);
+            assertThat(testPost.isDeleted()).isTrue();
+        }
+
+        @DisplayName("이미 삭제된 게시글은 삭제 시간을 갱신할 수 없다.")
+        @Test
+        void alreadyDeletedPost_deletedAt_willNotSettingNow(){
+            // given
+            LocalDateTime deletedAt = LocalDateTime.now();
+            Post testPost = Post.builder()
+                .build();
+            testPost.delete(deletedAt);
+
+            // when
+            LocalDateTime newDeletedAt = LocalDateTime.now();
+            testPost.delete(newDeletedAt);
+
+            // then
+            assertThat(testPost.getDeletedAt()).isEqualTo(deletedAt);
+            assertThat(testPost.getDeletedAt()).isNotEqualTo(newDeletedAt);
+            assertThat(testPost.isDeleted()).isTrue();
+        }
+    }
+
+    @DisplayName("restore()는")
+    @Nested
+    class Context_restore{
+
+        @DisplayName("게시글을 복원할 수 있다.")
+        @Test
+        void post_deletedAt_willRemove(){
+            // given
+            LocalDateTime deletedAt = LocalDateTime.now();
+            Post testPost = Post.builder()
+                .build();
+
+            // when
+            testPost.delete(deletedAt);
+            testPost.restore();
+
+            // then
+            assertThat(testPost.getDeletedAt()).isNull();
+        }
+    }
 }
