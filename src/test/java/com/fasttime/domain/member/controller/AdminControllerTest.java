@@ -4,7 +4,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.AdminService;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostResponseDto;
 import com.fasttime.domain.post.entity.Post;
@@ -14,6 +17,7 @@ import com.fasttime.domain.post.service.PostCommandService;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,6 +37,15 @@ public class AdminControllerTest {
     private PostCommandService postCommandService;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @BeforeEach
+    void addMember(){
+        memberService.save(new MemberDto("test","test","test"));
+    }
 
     @DisplayName("신고된 게시물들을(이)")
     @Nested
@@ -42,9 +55,10 @@ public class AdminControllerTest {
         void _willSuccess() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostCreateServiceDto dto2 = new PostCreateServiceDto
-                (1L, "testTitle2", "testContent2", false);
+                (memberRepository.findByEmail("test").get().getId(), "testTitle2", "testContent2", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             PostResponseDto postResponseDto2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
@@ -64,9 +78,11 @@ public class AdminControllerTest {
         void _willFail() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostCreateServiceDto dto2 = new PostCreateServiceDto
-                (1L, "testTitle2", "testContent2", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle2", "testContent2", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             PostResponseDto postResponseDto2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
@@ -84,8 +100,10 @@ public class AdminControllerTest {
         @Test
         void _willSuccess() throws Exception {
             //given
+
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             post1.report();
@@ -102,7 +120,8 @@ public class AdminControllerTest {
         void _willFail() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             post1.report();
@@ -120,7 +139,8 @@ public class AdminControllerTest {
         void Access_willFail() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             //when, then
@@ -136,7 +156,8 @@ public class AdminControllerTest {
         void Delete_willSuccess() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             post1.report();
@@ -153,7 +174,8 @@ public class AdminControllerTest {
         void Pass_willSuccess() throws Exception {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (0L, "testTitle1", "testContent1", false);
+                (memberRepository.findByEmail("test").get().getId(),
+                    "testTitle1", "testContent1", false);
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             post1.report();
