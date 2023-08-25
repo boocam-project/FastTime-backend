@@ -77,6 +77,16 @@ public class Post extends BaseTimeEntity {
         return content.getContent();
     }
 
+    @Override
+    public void delete(LocalDateTime currentTime) {
+        super.delete(currentTime);
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
+    }
+
     public void report() {
         if (this.reportStatus == ReportStatus.NORMAL) {
             this.reportStatus = ReportStatus.REPORTED;
