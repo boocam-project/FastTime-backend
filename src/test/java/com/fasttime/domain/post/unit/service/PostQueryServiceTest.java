@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
@@ -56,7 +56,7 @@ public class PostQueryServiceTest {
                     .build()));
 
             // when
-            PostResponseDto response = postQueryService.searchById(id);
+            PostDetailResponseDto response = postQueryService.searchById(id);
 
             // then
             assertThat(response)

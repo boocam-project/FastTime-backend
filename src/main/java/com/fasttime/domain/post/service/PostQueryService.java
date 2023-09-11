@@ -1,7 +1,7 @@
 package com.fasttime.domain.post.service;
 
-import com.fasttime.domain.post.dto.service.response.PostListResponseDto;
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
@@ -20,17 +20,30 @@ public class PostQueryService {
         this.postRepository = postRepository;
     }
 
-    public PostResponseDto searchById(Long id) {
+    public PostDetailResponseDto searchById(Long id) {
         Post findPost = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
 
-        return PostResponseDto.of(findPost);
+        return PostDetailResponseDto.builder()
+            .id(findPost.getId())
+            .title(findPost.getTitle())
+            .content(findPost.getContent())
+            .anonymity(findPost.isAnonymity())
+            .likeCount(findPost.getLikeCount())
+            .hateCount(findPost.getHateCount())
+            .build();
     }
 
-    public List<PostListResponseDto> searchPosts(Pageable pageable) {
+    public List<PostsResponseDto> searchPosts(Pageable pageable) {
         return postRepository.findAll(pageable)
             .stream()
-            .map(PostListResponseDto::of)
+            .map(post -> PostsResponseDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .anonymity(post.isAnonymity())
+                .likeCount(post.getLikeCount())
+                .hateCount(post.getHateCount())
+                .build())
             .collect(Collectors.toList());
     }
 }
