@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
@@ -34,7 +34,7 @@ public class PostQueryServiceTest {
     @Nested
     class Context_searchById {
 
-        @DisplayName("key를 넘기면 PostResponse를 반환한다.")
+        @DisplayName("key를 넘기면 PostDetailResponse를 반환한다.")
         @CsvSource(value = {
             "1, 제목1, 내용1, true, 10, 20",
             "2, 제목2, 내용2, false, 15, 30",
@@ -56,7 +56,7 @@ public class PostQueryServiceTest {
                     .build()));
 
             // when
-            PostResponseDto response = postQueryService.searchById(id);
+            PostDetailResponseDto response = postQueryService.searchById(id);
 
             // then
             assertThat(response)

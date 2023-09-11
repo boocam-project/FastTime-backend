@@ -1,11 +1,10 @@
 package com.fasttime.domain.post.service;
 
-import com.fasttime.domain.post.dto.service.response.PostListResponseDto;
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +19,21 @@ public class PostQueryService {
         this.postRepository = postRepository;
     }
 
-    public PostResponseDto searchById(Long id) {
+    public PostDetailResponseDto searchById(Long id) {
         Post findPost = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
 
-        return PostResponseDto.of(findPost);
+        return PostDetailResponseDto.builder()
+            .id(findPost.getId())
+            .title(findPost.getTitle())
+            .content(findPost.getContent())
+            .anonymity(findPost.isAnonymity())
+            .likeCount(findPost.getLikeCount())
+            .hateCount(findPost.getHateCount())
+            .build();
     }
 
-    public List<PostListResponseDto> searchPosts(Pageable pageable) {
-        return postRepository.findAll(pageable)
-            .stream()
-            .map(PostListResponseDto::of)
-            .collect(Collectors.toList());
+    public List<PostsResponseDto> searchPosts(Pageable pageable) {
+        throw new UnsupportedOperationException();
     }
 }

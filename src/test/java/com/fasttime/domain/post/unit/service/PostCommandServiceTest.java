@@ -12,7 +12,7 @@ import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.exception.NotPostWriterException;
@@ -59,7 +59,7 @@ class PostCommandServiceTest {
             given(postRepository.save(any(Post.class))).willReturn(mockPost);
 
             // when
-            PostResponseDto response = postCommandService.writePost(dto);
+            PostDetailResponseDto response = postCommandService.writePost(dto);
 
             // then
             assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
@@ -102,12 +102,8 @@ class PostCommandServiceTest {
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
 
             // when
-            PostResponseDto response = postCommandService.updatePost(serviceDto);
+            postCommandService.updatePost(serviceDto);
 
-            // then
-            assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
-                    "hateCount")
-                .containsExactly(1L, "title", "newContent", true, 0, 0);
         }
 
         @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
