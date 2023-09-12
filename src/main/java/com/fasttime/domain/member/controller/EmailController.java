@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -51,7 +52,7 @@ public class EmailController {
     }
 
     // 인증번호 발송 버튼 누르면 메일 가는 메소드 (Response에 이메일 추가를 위해 다시만들었습니다.)
-    @PostMapping("v1/Repassword/emailconfirm")
+    @PostMapping("/api/v1/Repassword/emailconfirm")
     public ResponseEntity<ResponseDTO> mailConfirmForRePassword
     (@RequestBody EmailRequest emailRequest) throws Exception {
         String code = emailService.sendSimpleMessage(emailRequest.getEmail());
@@ -60,9 +61,9 @@ public class EmailController {
             (HttpStatus.OK,"이메일을 성공적으로 보냈습니다.",emailRequest.getEmail()));
     }
 
-    @PostMapping("v1/RePassword/verify") // 비밀번호 재설정을 위한 코드 받기
+    @PostMapping("/api/v1/RePassword/verify") // 비밀번호 재설정을 위한 코드 받기
     public ResponseEntity<ResponseDTO> verifyMember(@RequestBody CodeRequest request
-        , HttpSession session) throws AuthenticationException {
+        , HttpSession session) throws BadCredentialsException {
 
         session.setMaxInactiveInterval(30 * 60);
         String sessionCode = (String) session.getAttribute("emailCode");
@@ -72,7 +73,8 @@ public class EmailController {
                 (HttpStatus.OK, "코드 검증이 완료되었습니다.", request.getEmail()));
         } else {
             // 인증 실패
-            throw new AuthenticationException();
+            throw new BadCredentialsException("Not match Code");
+
         }
     }
 }
