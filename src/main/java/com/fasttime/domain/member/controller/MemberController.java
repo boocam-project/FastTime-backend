@@ -97,7 +97,7 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/v1/login")
+    @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> LogIn(@Validated @RequestBody LoginRequestDTO dto
         , BindingResult bindingResult, HttpSession session)
         throws UserNotFoundException, BindException {
@@ -110,7 +110,7 @@ public class MemberController {
             (HttpStatus.OK, "로그인이 완료되었습니다.",response));
     }
 
-    @GetMapping("/v1/logout")
+    @GetMapping("/api/v1/logout")
     public ResponseEntity<ResponseDTO> LogOut(HttpSession session) {
         if (session.getAttribute("ADMIN") != null) {
             session.removeAttribute("ADMIN");
@@ -122,7 +122,7 @@ public class MemberController {
             (HttpStatus.OK,"로그아웃이 완료되었습니다."));
     }
 
-    @PostMapping("/v1/RePassword")
+    @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> RePassword
         (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
         throws BindException {
