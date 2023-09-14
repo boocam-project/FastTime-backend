@@ -72,7 +72,7 @@ public class MemberControllerTestForAuto {
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
             //when,then
             String s = om.writeValueAsString(dto);
-            mockMvc.perform(post("/v1/login")
+            mockMvc.perform(post("/api/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON)
                     .with(csrf()))
@@ -91,7 +91,7 @@ public class MemberControllerTestForAuto {
             LoginRequestDTO dto = new LoginRequestDTO(" ", "testPassword");
             //when,then
             String s = om.writeValueAsString(dto);
-            mockMvc.perform(post("/v1/login")
+            mockMvc.perform(post("/api/v1/login")
                     .with(csrf())
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +107,7 @@ public class MemberControllerTestForAuto {
             LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
             //when,then
             String s = om.writeValueAsString(dto);
-            mockMvc.perform(post("/v1/login")
+            mockMvc.perform(post("/api/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
@@ -124,11 +124,11 @@ public class MemberControllerTestForAuto {
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
             //when,then
             String s = om.writeValueAsString(dto);
-            mockMvc.perform(post("/v1/login")
+            mockMvc.perform(post("/api/v1/login")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.data.error")
+                .andExpect(jsonPath("$.message")
                     .value("Not match password!"))
                 .andDo(print());
         }
@@ -144,7 +144,7 @@ public class MemberControllerTestForAuto {
         void _willSuccess() throws Exception {
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", "test@naver.com");
-            mockMvc.perform(get("/v1/logout")
+            mockMvc.perform(get("/api/v1/logout")
                     .session(session))
                 .andExpect(status().isOk());
         }
@@ -157,7 +157,7 @@ public class MemberControllerTestForAuto {
                 .addInterceptors(new LoginCheckInterceptor()).build();
 
             //when, then
-            mockMvc.perform(get("/v1/logout"))
+            mockMvc.perform(get("/api/v1/logout"))
                 .andExpect(redirectedUrl("/v1/login"));
         }
     }
@@ -178,7 +178,7 @@ public class MemberControllerTestForAuto {
                 ("testEmail", "newPassword", "newPassword");
             //when, the
             String s = om.writeValueAsString(request);
-            mockMvc.perform(post("/v1/RePassword")
+            mockMvc.perform(post("/api/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -194,7 +194,7 @@ public class MemberControllerTestForAuto {
                 ("testEmail", " ", "newPassword");
             //when, the
             String s = om.writeValueAsString(request);
-            mockMvc.perform(post("/v1/RePassword")
+            mockMvc.perform(post("/api/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("must not be blank"))
@@ -209,11 +209,11 @@ public class MemberControllerTestForAuto {
                 ("testEmail", "newPassword", "new");
             //when, the
             String s = om.writeValueAsString(request);
-            mockMvc.perform(post("/v1/RePassword")
+            mockMvc.perform(post("/api/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.data.error").value("Not Match RePassword!"))
+                .andExpect(jsonPath("$.message").value("Not Match RePassword!"))
                 .andDo(print());
 
         }

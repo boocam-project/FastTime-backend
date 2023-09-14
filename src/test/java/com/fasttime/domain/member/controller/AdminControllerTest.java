@@ -68,7 +68,7 @@ public class AdminControllerTest {
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
             // when, then
-            mockMvc.perform(get("/v1/admin"))
+            mockMvc.perform(get("/api/v1/admin"))
                 .andExpect(jsonPath("$.data").exists())
                 .andDo(print());
 
@@ -88,7 +88,7 @@ public class AdminControllerTest {
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             Post post2 = postRepository.findById(postResponseDto2.getId()).get();
             // when, then
-            mockMvc.perform(get("/v1/admin"))
+            mockMvc.perform(get("/api/v1/admin"))
                 .andExpect(jsonPath("$.data").isEmpty())
                 .andDo(print());
         }
@@ -109,7 +109,7 @@ public class AdminControllerTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
-            mockMvc.perform(get("/v1/admin/{post_id}", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}", post1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andDo(print());
@@ -127,7 +127,7 @@ public class AdminControllerTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
-            mockMvc.perform(get("/v1/admin/{post_id}", 1000L))
+            mockMvc.perform(get("/api/v1/admin/{post_id}", 1000L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("게시글이 없습니다."))
                 .andExpect(jsonPath("$.data").isEmpty())
@@ -144,7 +144,7 @@ public class AdminControllerTest {
             PostResponseDto postResponseDto1 = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(postResponseDto1.getId()).get();
             //when, then
-            mockMvc.perform(get("/v1/admin/{post_id}",  post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}",  post1.getId()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("잘못된 접근입니다."))
                 .andExpect(jsonPath("$.data").isEmpty())
@@ -163,7 +163,7 @@ public class AdminControllerTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
-            mockMvc.perform(get("/v1/admin/{post_id}/delete", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}/delete", post1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 삭제합니다."))
@@ -181,7 +181,7 @@ public class AdminControllerTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
-            mockMvc.perform(get("/v1/admin/{post_id}/pass", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}/pass", post1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 복구합니다."))
