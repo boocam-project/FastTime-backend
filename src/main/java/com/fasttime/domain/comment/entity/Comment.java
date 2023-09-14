@@ -67,6 +67,7 @@ public class Comment extends BaseTimeEntity {
         }
         return CommentDTO.builder().id(this.id).postId(this.post.getId())
             .memberId(this.member.getId()).content(this.content).anonymity(this.anonymity)
-            .parentCommentId(parentCommentId).build();
+            .parentCommentId(parentCommentId).createdAt(this.getCreatedAt())
+            .updatedAt(this.getUpdatedAt()).deletedAt(this.getDeletedAt()).build();
     }
 }
