@@ -14,7 +14,7 @@ public class CommentDTO {
     private String content;
     private boolean anonymity;
     private Long parentCommentId;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
+    private String createdAt;
+    private String updatedAt;
+    private String deletedAt;
 }

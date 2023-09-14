@@ -5,6 +5,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.global.common.BaseTimeEntity;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -67,7 +68,12 @@ public class Comment extends BaseTimeEntity {
         }
         return CommentDTO.builder().id(this.id).postId(this.post.getId())
             .memberId(this.member.getId()).content(this.content).anonymity(this.anonymity)
-            .parentCommentId(parentCommentId).createdAt(this.getCreatedAt())
-            .updatedAt(this.getUpdatedAt()).deletedAt(this.getDeletedAt()).build();
+            .parentCommentId(parentCommentId).createdAt(dateTimeParse(this.getCreatedAt()))
+            .updatedAt(dateTimeParse(this.getUpdatedAt()))
+            .deletedAt(dateTimeParse(this.getDeletedAt())).build();
+    }
+
+    private String dateTimeParse(LocalDateTime dateTime) {
+        return (dateTime != null) ? dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
     }
 }
