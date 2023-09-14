@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
-import com.fasttime.domain.member.repository.MemberRepository;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
@@ -37,7 +37,7 @@ class PostCommandServiceTest {
     private PostCommandService postCommandService;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberService memberService;
 
     @Mock
     private PostRepository postRepository;
@@ -55,16 +55,16 @@ class PostCommandServiceTest {
             PostCreateServiceDto dto = new PostCreateServiceDto(1L, "title",
                 "content", true);
 
-            given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+            given(memberService.getMember(1L)).willReturn(member);
             given(postRepository.save(any(Post.class))).willReturn(mockPost);
 
             // when
-            PostResponseDto response = postCommandService.writePost(dto);
+            Post post = postCommandService.writePost(dto);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
-                    "hateCount")
-                .containsExactly(1L, "title", "content", true, 0, 0);
+            assertThat(post).extracting("id", "title", "content", "anonymity", "likeCount", "hateCount",
+                    "reportStatus")
+                .containsExactly(1L, "title", "content", true, 0, 0, ReportStatus.NORMAL);
         }
 
         @DisplayName("회원 정보가 DB에 없는 경우 UserNotFoundException을 던진다.")
@@ -75,13 +75,12 @@ class PostCommandServiceTest {
             PostCreateServiceDto dto = new PostCreateServiceDto(1L, "title",
                 "content", true);
 
-            given(memberRepository.findById(anyLong())).willReturn(Optional.empty());
+            given(memberService.getMember(1L)).willThrow(UserNotFoundException.class);
             given(postRepository.save(any(Post.class))).willReturn(mockPost);
 
             // when then
             assertThatThrownBy(() -> postCommandService.writePost(dto))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("회원 정보가 없습니다.");
+                .isInstanceOf(UserNotFoundException.class);
         }
     }
 
@@ -98,7 +97,7 @@ class PostCommandServiceTest {
             PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, 1L,
                 "newContent");
 
-            given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+            given(memberService.getMember(1L)).willReturn(member);
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
 
             // when
@@ -129,17 +128,18 @@ class PostCommandServiceTest {
         @Test
         void member_validateFail_throwIllArgumentException() {
             // given
-            Member member = Member.builder().id(1L).build();
-            Post mockPost = createMockPost(member, "title", "content");
-            PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, 2L,
+            Member writer = Member.builder().id(1L).build();
+            Member notAuthorizedMember = Member.builder().id(100L).build();
+            Post mockPost = createMockPost(writer, "title", "content");
+            PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, notAuthorizedMember.getId(),
                 "newContent");
 
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
+            given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
             assertThatThrownBy(() -> postCommandService.updatePost(serviceDto))
-                .isInstanceOf(NotPostWriterException.class)
-                .hasMessage("해당 게시글에 대한 권한이 없습니다.");
+                .isInstanceOf(NotPostWriterException.class);
         }
     }
 
@@ -167,10 +167,13 @@ class PostCommandServiceTest {
         void member_validateFail_throwIllArgumentException() {
             // given
             LocalDateTime deletedAt = LocalDateTime.now();
-            Member member = Member.builder().id(1L).build();
-            PostDeleteServiceDto serviceDto = new PostDeleteServiceDto(1L, 100L, deletedAt);
-            Post mockPost = createMockPost(member, "title", "content");
+            Member writer = Member.builder().id(1L).build();
+            Member notAuthorizedMember = Member.builder().id(100L).build();
+
+            PostDeleteServiceDto serviceDto = new PostDeleteServiceDto(1L, notAuthorizedMember.getId(), deletedAt);
+            Post mockPost = createMockPost(writer, "title", "content");
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
+            given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
             assertThatThrownBy(() -> postCommandService.deletePost(serviceDto))

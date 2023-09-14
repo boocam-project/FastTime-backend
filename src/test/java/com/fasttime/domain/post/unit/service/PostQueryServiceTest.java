@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
 import java.util.Optional;
@@ -53,15 +53,18 @@ public class PostQueryServiceTest {
                     .anonymity(anonymity)
                     .likeCount(likeCount)
                     .hateCount(hateCount)
+                    .reportStatus(ReportStatus.NORMAL)
                     .build()));
 
             // when
-            PostResponseDto response = postQueryService.searchById(id);
+            Post postEntity = postQueryService.findById(id);
 
             // then
-            assertThat(response)
-                .extracting("id", "title", "content", "anonymity", "likeCount", "hateCount")
-                .containsExactly(id, title, content, anonymity, likeCount, hateCount);
+            assertThat(postEntity)
+                .extracting("id", "title", "content", "anonymity", "likeCount", "hateCount",
+                    "reportStatus")
+                .containsExactly(id, title, content, anonymity, likeCount, hateCount,
+                    ReportStatus.NORMAL);
         }
 
         @DisplayName("DB에 해당 id 를 가지는 게시글이 없다면 IllegalArgumentException을 던진다.")
@@ -72,9 +75,8 @@ public class PostQueryServiceTest {
             given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
             // when then
-            assertThatThrownBy(() -> postQueryService.searchById(1L))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("게시글이 없습니다.");
+            assertThatThrownBy(() -> postQueryService.findById(1L))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 }
