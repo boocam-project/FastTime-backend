@@ -1,5 +1,6 @@
 package com.fasttime.domain.comment.controller;
 
+import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
@@ -24,7 +25,7 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDTO> create(
+    public ResponseEntity<ResponseDTO<CommentDTO>> create(
         @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         log.info("CreateCommentRequest: " + createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -32,21 +33,21 @@ public class CommentRestController {
                 commentService.createComment(createCommentRequest)));
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<ResponseDTO> delete(
-        @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
-        log.info("DeleteCommentRequest: " + deleteCommentRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(
-            ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
-                commentService.deleteComment(deleteCommentRequest)));
-    }
-
     @PostMapping("/update")
-    public ResponseEntity<ResponseDTO> update(
+    public ResponseEntity<ResponseDTO<CommentDTO>> update(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
                 commentService.updateComment(updateCommentRequest)));
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<ResponseDTO<CommentDTO>> delete(
+        @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
+        log.info("DeleteCommentRequest: " + deleteCommentRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
+                commentService.deleteComment(deleteCommentRequest)));
     }
 }

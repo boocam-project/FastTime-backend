@@ -32,15 +32,6 @@ public class CommentController {
         return "registerCommentSuccess";
     }
 
-    @PostMapping("/delete")
-    @ResponseStatus(HttpStatus.OK)
-    public String delete(@Valid @RequestBody DeleteCommentRequest deleteCommentRequest,
-        Model model) {
-        log.info("DeleteCommentRequest: " + deleteCommentRequest);
-        model.addAttribute(commentService.deleteComment(deleteCommentRequest));
-        return "removeCommentSuccess";
-    }
-
     @PostMapping("/update")
     @ResponseStatus(HttpStatus.OK)
     public String update(@Valid @RequestBody UpdateCommentRequest updateCommentRequest,
@@ -48,5 +39,14 @@ public class CommentController {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
         model.addAttribute(commentService.updateComment(updateCommentRequest));
         return "updateCommentSuccess";
+    }
+
+    @PostMapping("/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public String delete(@Valid @RequestBody DeleteCommentRequest deleteCommentRequest,
+        Model model) {
+        log.info("DeleteCommentRequest: " + deleteCommentRequest);
+        model.addAttribute(commentService.deleteComment(deleteCommentRequest));
+        return "removeCommentSuccess";
     }
 }
