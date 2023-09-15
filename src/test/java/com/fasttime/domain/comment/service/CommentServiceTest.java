@@ -237,51 +237,6 @@ public class CommentServiceTest {
     }
 
     @Nested
-    @DisplayName("getComment()는 ")
-    class Context_getComment {
-
-        @Test
-        @DisplayName("댓글을 가져올 수 있다.")
-        void _willSuccess() {
-            // given
-            Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
-            Optional<Comment> comment = Optional.of(
-                Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
-                    .parentComment(null).build());
-
-            given(commentRepository.findById(any(Long.class))).willReturn(comment);
-
-            // when
-            Comment result = commentService.getComment(0L);
-
-            // then
-            assertThat(result).extracting("id", "post", "member", "content", "anonymity",
-                "parentComment").containsExactly(0L, post, member, "test", false, null);
-
-            verify(commentRepository, times(1)).findById(any(Long.class));
-        }
-
-        @Test
-        @DisplayName("댓글을 찾을 수 없으면 댓글을 가져올 수 없다.")
-        void CommentNotFound_willFail() {
-            // given
-            Optional<Comment> comment = Optional.empty();
-
-            given(commentRepository.findById(any(Long.class))).willReturn(comment);
-
-            // when, then
-            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
-                commentService.getComment(0L);
-            });
-            assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
-
-            verify(commentRepository, times(1)).findById(any(Long.class));
-
-        }
-    }
-
-    @Nested
     @DisplayName("updateComment()는 ")
     class Context_updateComment {
 
@@ -375,6 +330,51 @@ public class CommentServiceTest {
     }
 
     @Nested
+    @DisplayName("getComment()는 ")
+    class Context_getComment {
+
+        @Test
+        @DisplayName("댓글을 가져올 수 있다.")
+        void _willSuccess() {
+            // given
+            Post post = Post.builder().id(0L).build();
+            Member member = Member.builder().id(0L).build();
+            Optional<Comment> comment = Optional.of(
+                Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
+                    .parentComment(null).build());
+
+            given(commentRepository.findById(any(Long.class))).willReturn(comment);
+
+            // when
+            Comment result = commentService.getComment(0L);
+
+            // then
+            assertThat(result).extracting("id", "post", "member", "content", "anonymity",
+                "parentComment").containsExactly(0L, post, member, "test", false, null);
+
+            verify(commentRepository, times(1)).findById(any(Long.class));
+        }
+
+        @Test
+        @DisplayName("댓글을 찾을 수 없으면 댓글을 가져올 수 없다.")
+        void CommentNotFound_willFail() {
+            // given
+            Optional<Comment> comment = Optional.empty();
+
+            given(commentRepository.findById(any(Long.class))).willReturn(comment);
+
+            // when, then
+            Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
+                commentService.getComment(0L);
+            });
+            assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
+
+            verify(commentRepository, times(1)).findById(any(Long.class));
+
+        }
+    }
+
+    @Nested
     @DisplayName("getCommentsByPost()는 ")
     class Context_getCommentsByPost {
 
@@ -389,14 +389,17 @@ public class CommentServiceTest {
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toDTO());
 
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<Comment> result = commentService.getCommentsByPost(post);
+            List<CommentDTO> result = commentService.getCommentsByPost(post);
 
             // then
-            assertThat(result).isEqualTo(comments.get());
+            assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
+            assertThat(result.get(0).getContent().equals(commentDTOList.get(0).getContent())).isTrue();
 
             verify(commentRepository, times(1)).findAllByPost(any(Post.class));
         }
@@ -411,7 +414,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<Comment> result = commentService.getCommentsByPost(post);
+            List<CommentDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result).isEmpty();
@@ -432,17 +435,23 @@ public class CommentServiceTest {
             Member member = Member.builder().id(0L).build();
             Comment comment = Comment.builder().id(0L).post(post).member(member).content("test")
                 .anonymity(false).parentComment(null).build();
+
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
 
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toDTO());
+
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
+
             // when
-            List<Comment> result = commentService.getCommentsByMember(member);
+            List<CommentDTO> result = commentService.getCommentsByMember(member);
 
             // then
-            assertThat(result).isEqualTo(comments.get());
+            assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
+            assertThat(result.get(0).getContent().equals(commentDTOList.get(0).getContent())).isTrue();
 
             verify(commentRepository, times(1)).findAllByMember(any(Member.class));
         }
@@ -457,7 +466,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
             // when
-            List<Comment> result = commentService.getCommentsByMember(member);
+            List<CommentDTO> result = commentService.getCommentsByMember(member);
 
             // then
             assertThat(result).isEmpty();
