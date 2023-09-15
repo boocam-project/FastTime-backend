@@ -52,6 +52,7 @@ public class AdminServiceTest {
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
+          
             Post newPost1 = postCommandService.writePost(dto1);
             Post newPost2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(newPost1.getId()).get();
@@ -77,10 +78,12 @@ public class AdminServiceTest {
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
+
             Post newPost1 = postCommandService.writePost(dto1);
             Post newPost2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(newPost1.getId()).get();
             Post post2 = postRepository.findById(newPost2.getId()).get();
+
             // when
             List<Post> postList = adminService.FindReportedPost();
             //then
@@ -97,8 +100,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
@@ -113,8 +118,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
@@ -132,8 +139,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
         }
@@ -145,8 +154,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
         }

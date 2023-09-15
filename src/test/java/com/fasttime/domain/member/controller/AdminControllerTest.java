@@ -56,6 +56,7 @@ public class AdminControllerTest {
                     "testTitle1", "testContent1", false);
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(), "testTitle2", "testContent2", false);
+
             Post result1 = postCommandService.writePost(dto1);
             Post result2 = postCommandService.writePost(dto2);
             Post postFromDB1 = postRepository.findById(result1.getId()).get();
@@ -81,6 +82,7 @@ public class AdminControllerTest {
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
+          
             Post savedPost1 = postCommandService.writePost(dto1);
             Post savedPost2 = postCommandService.writePost(dto2);
             Post postFromDB1 = postRepository.findById(savedPost1.getId()).get();
@@ -103,8 +105,10 @@ public class AdminControllerTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
@@ -121,8 +125,10 @@ public class AdminControllerTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
@@ -140,8 +146,10 @@ public class AdminControllerTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}",  post1.getId()))
                 .andExpect(status().isBadRequest())
@@ -157,8 +165,10 @@ public class AdminControllerTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then
@@ -175,8 +185,10 @@ public class AdminControllerTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
+
             Post newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when, then

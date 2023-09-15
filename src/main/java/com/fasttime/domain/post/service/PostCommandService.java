@@ -5,7 +5,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.NotPostWriterException;
 import com.fasttime.domain.post.exception.PostNotFoundException;
@@ -46,7 +46,14 @@ public class PostCommandService implements PostCommandUseCase {
 
         post.update(serviceDto.getContent());
 
-        return PostResponseDto.of(post);
+        return PostDetailResponseDto.builder()
+            .id(post.getId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .anonymity(post.isAnonymity())
+            .likeCount(post.getLikeCount())
+            .hateCount(post.getHateCount())
+            .build();
     }
 
     @Override

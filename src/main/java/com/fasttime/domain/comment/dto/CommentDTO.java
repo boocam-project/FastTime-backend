@@ -1,5 +1,6 @@
 package com.fasttime.domain.comment.dto;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,4 +14,7 @@ public class CommentDTO {
     private String content;
     private boolean anonymity;
     private Long parentCommentId;
+    private String createdAt;
+    private String updatedAt;
+    private String deletedAt;
 }
