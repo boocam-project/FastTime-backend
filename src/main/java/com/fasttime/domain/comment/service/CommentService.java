@@ -12,6 +12,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -27,73 +28,91 @@ public class CommentService {
     private final PostRepository postRepository;
     private final MemberService memberService;
 
+    /**
+     * 댓글을 등록하는 메서드
+     * @param req 등록할 댓글 정보가 담긴 객체
+     * @return 등록한 댓글 DTO
+     */
     public CommentDTO createComment(CreateCommentRequest req) {
-        // TODO : post, member 각각 postService, memberService 를 통해 읽어 온다.
-        Optional<Post> post = postRepository.findById(req.getPostId());
-        Member member = memberService.getMember(req.getMemberId());
         Comment parentComment = null;
         // 대댓글인 경우
         if (req.getParentCommentId() != null) {
-            Optional<Comment> Comment = commentRepository.findById(req.getParentCommentId());
-            if (Comment.isEmpty()) {
-                throw new CommentNotFoundException();
-            } else {
-                parentComment = Comment.get();
-            }
+            parentComment = getComment(req.getParentCommentId());
         }
-        if (post.isEmpty()) {
-            throw new PostNotFoundException();
-        } else {
-            return commentRepository.save(
-                Comment.builder().post(post.get()).member(member).content(req.getContent())
-                    .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDTO();
-        }
+        // TODO : post를 postService를 통해 읽어 온다.
+        return commentRepository.save(Comment.builder()
+            .post(postRepository.findById(req.getPostId()).orElseThrow(PostNotFoundException::new))
+            .member(memberService.getMember(req.getMemberId())).content(req.getContent())
+            .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDTO();
     }
 
-    public Comment getComment(Long id) {
-        Optional<Comment> comment = commentRepository.findById(id);
-        if (comment.isEmpty()) {
-            return null;
-        } else {
-            return comment.get();
-        }
+    /**
+     * 회원 ID로 회원이 등록한 댓글 리스트를 조회하는 메서드
+     * @param memberId 댓글 리스트 조회의 기준이 될 회원 ID
+     * @return 회원이 등록한 댓글 DTO 리스트
+     */
+    public List<CommentDTO> getCommentByMemberId(long memberId){
+        return getCommentsByMember(memberService.getMember(memberId));
     }
 
-    public CommentDTO deleteComment(DeleteCommentRequest req) {
-        Optional<Comment> comment = commentRepository.findById(req.getId());
-        if (comment.isEmpty()) {
-            throw new CommentNotFoundException();
-        } else {
-            comment.get().deleteComment();
-            return comment.get().toDTO();
-        }
-    }
-
+    /**
+     * 댓글을 수정하는 메서드
+     * @param req 수정할 댓글 정보와 수정 내용이 담긴 객체
+     * @return 수정한 댓글 DTO
+     */
     public CommentDTO updateComment(UpdateCommentRequest req) {
-        Optional<Comment> comment = commentRepository.findById(req.getId());
-        if (comment.isEmpty()) {
-            throw new CommentNotFoundException();
-        } else {
-            comment.get().updateContent(req.getContent());
-        }
-        return comment.get().toDTO();
+        Comment comment = commentRepository.findById(req.getId())
+            .orElseThrow(CommentNotFoundException::new);
+        comment.updateContent(req.getContent());
+        return comment.toDTO();
     }
 
-    public List<Comment> getCommentsByPost(Post post) {
-        Optional<List<Comment>> comments = commentRepository.findAllByPost(post);
-        if (comments.isEmpty()) {
-            return null;
-        } else {
-            return comments.get();
-        }
+    /**
+     * 댓글을 삭제하는 메서드
+     * @param req 삭제할 댓글 ID가 담긴 객체
+     * @return 삭제한 댓글 DTO
+     */
+    public CommentDTO deleteComment(DeleteCommentRequest req) {
+        Comment comment = commentRepository.findById(req.getId())
+            .orElseThrow(CommentNotFoundException::new);
+        comment.deleteComment();
+        return comment.toDTO();
     }
 
-    public List<Comment> getCommentsByMember(Member member) {
-        Optional<List<Comment>> comments = commentRepository.findAllByMember(member);
-        if (comments.isEmpty()) {
-            return null;
-        } else {
-            return comments.get();
+    /**
+     * 댓글 ID로 댓글 정보를 조회하는 메서드
+     * @param id 조회할 댓글의 ID
+     * @return 댓글 ID로 조회한 댓글 Entity
+     */
+    public Comment getComment(Long id) {
+        return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+    }
+
+    /**
+     * 게시글에 등록된 댓글 리스트를 조회하는 메서드
+     * @param post 댓글 리스트를 조회할 게시글 Entity
+     * @return 게시글에 등록된 댓글 Entity 리스트
+     */
+    public List<CommentDTO> getCommentsByPost(Post post) {
+        List<CommentDTO> comments = new ArrayList<>();
+        List<Comment> list = commentRepository.findAllByPost(post).orElseGet(ArrayList::new);
+        for(Comment comment : list){
+            comments.add(comment.toDTO());
         }
+        return comments;
+    }
+
+    /**
+     * 회원이 등록한 댓글 리스트를 조회하는 메서드
+     * @param member 댓글 리스트 조회의 기준이 될 회원 Entity
+     * @return 회원이 등록한 댓글 Entity 리스트
+     */
+    public List<CommentDTO> getCommentsByMember(Member member) {
+        List<CommentDTO> comments = new ArrayList<>();
+        List<Comment> list = commentRepository.findAllByMember(member).orElseGet(ArrayList::new);
+        for(Comment comment : list){
+            comments.add(comment.toDTO());
+        }
+        return comments;
     }
 }
