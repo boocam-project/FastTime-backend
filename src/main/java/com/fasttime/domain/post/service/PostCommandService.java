@@ -1,8 +1,7 @@
 package com.fasttime.domain.post.service;
 
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
-import com.fasttime.domain.member.repository.MemberRepository;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
@@ -16,41 +15,34 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @Service
-public class PostCommandService {
+public class PostCommandService implements PostCommandUseCase {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final PostRepository postRepository;
 
-    public PostCommandService(MemberRepository memberRepository, PostRepository postRepository) {
-        this.memberRepository = memberRepository;
+    public PostCommandService(MemberService memberService, PostRepository postRepository) {
+        this.memberService = memberService;
         this.postRepository = postRepository;
     }
 
-    public PostDetailResponseDto writePost(PostCreateServiceDto serviceDto) {
+    @Override
+    public Post writePost(PostCreateServiceDto serviceDto) {
 
-        Member member = memberRepository.findById(serviceDto.getMemberId())
-            .orElseThrow(() -> new UserNotFoundException("회원 정보가 없습니다."));
-
-        Post createdPost = Post.createNewPost(member, serviceDto.getTitle(), serviceDto.getContent(),
+        final Member writeMember = memberService.getMember(serviceDto.getMemberId());
+        final Post createdPost = Post.createNewPost(writeMember, serviceDto.getTitle(),
+            serviceDto.getContent(),
             false);
 
-        Post savedPost = postRepository.save(createdPost);
-
-        return PostDetailResponseDto.builder()
-            .id(savedPost.getId())
-            .title(savedPost.getTitle())
-            .content(savedPost.getContent())
-            .anonymity(savedPost.isAnonymity())
-            .likeCount(savedPost.getLikeCount())
-            .hateCount(savedPost.getHateCount())
-            .build();
+        return postRepository.save(createdPost);
     }
 
-    public PostDetailResponseDto updatePost(PostUpdateServiceDto serviceDto) {
+    @Override
+    public PostResponseDto updatePost(PostUpdateServiceDto serviceDto) {
 
+        final Member updateRequestMember = memberService.getMember(serviceDto.getMemberId());
         Post post = findPostById(serviceDto);
 
-        validateMemberAuthority(serviceDto.getMemberId(), post.getMember().getId());
+        validateAuthority(updateRequestMember, post);
 
         post.update(serviceDto.getContent());
 
@@ -64,12 +56,14 @@ public class PostCommandService {
             .build();
     }
 
+    @Override
     public void deletePost(PostDeleteServiceDto serviceDto) {
 
-        Post post = postRepository.findById(serviceDto.getPostId())
+        final Member deleteRequestMember = memberService.getMember(serviceDto.getMemberId());
+        final Post post = postRepository.findById(serviceDto.getPostId())
             .orElseThrow(PostNotFoundException::new);
 
-        validateMemberAuthority(serviceDto.getMemberId(), post.getMember().getId());
+        validateAuthority(deleteRequestMember, post);
 
         post.delete(serviceDto.getDeletedAt());
     }
@@ -79,9 +73,19 @@ public class PostCommandService {
             .orElseThrow(PostNotFoundException::new);
     }
 
-    private static void validateMemberAuthority(Long requesterId, Long writerId) {
-        if (!requesterId.equals(writerId)) {
+    private void validateAuthority(Member requestUser, Post post) {
+        isAdmin(requestUser);
+        isWriter(requestUser, post);
+    }
+
+    private static void isAdmin(Member targetUser) {
+        // TODO Admin 정보를 가져와 Admin 유저인지 확인해야 함.
+    }
+
+    private void isWriter(Member targetUser, Post post) {
+        if (!targetUser.getId().equals(post.getMember().getId())) {
             throw new NotPostWriterException();
         }
     }
+
 }

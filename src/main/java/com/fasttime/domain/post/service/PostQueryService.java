@@ -1,49 +1,34 @@
 package com.fasttime.domain.post.service;
 
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(readOnly = true)
 @Service
-public class PostQueryService {
+public class PostQueryService implements PostQueryUseCase {
 
+    private static final int DEFAULT_PAGE_SIZE = 10;
     private final PostRepository postRepository;
 
     public PostQueryService(PostRepository postRepository) {
         this.postRepository = postRepository;
     }
 
-    public PostDetailResponseDto searchById(Long id) {
-        Post findPost = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
-
-        return PostDetailResponseDto.builder()
-            .id(findPost.getId())
-            .title(findPost.getTitle())
-            .content(findPost.getContent())
-            .anonymity(findPost.isAnonymity())
-            .likeCount(findPost.getLikeCount())
-            .hateCount(findPost.getHateCount())
-            .build();
+    @Override
+    public Post findById(Long id) {
+        return postRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("There is no Post which has id " + id));
     }
 
-    public List<PostsResponseDto> searchPosts(Pageable pageable) {
-        return postRepository.findAll(pageable)
-            .stream()
-            .map(post -> PostsResponseDto.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .anonymity(post.isAnonymity())
-                .likeCount(post.getLikeCount())
-                .hateCount(post.getHateCount())
-                .build())
-            .collect(Collectors.toList());
+    @Override
+    public List<Post> findByPageForTitle(String title, int page) {
+        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE);
+
+        return postRepository.findAll(pageable).getContent();
     }
 }

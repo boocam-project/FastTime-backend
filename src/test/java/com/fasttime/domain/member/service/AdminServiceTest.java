@@ -3,7 +3,6 @@ package com.fasttime.domain.member.service;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
@@ -53,10 +52,11 @@ public class AdminServiceTest {
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
-            PostDetailResponseDto postResponseDto1 = postCommandService.writePost(dto1);
-            PostDetailResponseDto postResponseDto2 = postCommandService.writePost(dto2);
-            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            Post post2 = postRepository.findById(postResponseDto2.getId()).get();
+          
+            Post newPost1 = postCommandService.writePost(dto1);
+            Post newPost2 = postCommandService.writePost(dto2);
+            Post post1 = postRepository.findById(newPost1.getId()).get();
+            Post post2 = postRepository.findById(newPost2.getId()).get();
             post1.report();
             post2.report();
             post1.approveReport(LocalDateTime.now());
@@ -78,10 +78,12 @@ public class AdminServiceTest {
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
-            PostDetailResponseDto postResponseDto1 = postCommandService.writePost(dto1);
-            PostDetailResponseDto postResponseDto2 = postCommandService.writePost(dto2);
-            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
-            Post post2 = postRepository.findById(postResponseDto2.getId()).get();
+
+            Post newPost1 = postCommandService.writePost(dto1);
+            Post newPost2 = postCommandService.writePost(dto2);
+            Post post1 = postRepository.findById(newPost1.getId()).get();
+            Post post2 = postRepository.findById(newPost2.getId()).get();
+
             // when
             List<Post> postList = adminService.FindReportedPost();
             //then
@@ -98,14 +100,16 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostDetailResponseDto dto = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(dto.getId()).get();
+
+            Post newPost = postCommandService.writePost(dto1);
+            Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
-            adminService.DeletePost(dto.getId());
+            adminService.DeletePost(newPost.getId());
             //then
-            Assertions.assertThat(postRepository.findById(dto.getId()).isEmpty()).isTrue();
+            Assertions.assertThat(postRepository.findById(newPost.getId()).isEmpty()).isTrue();
         }
         @DisplayName("검토완료로 바꿀 수 있다.")
         @Test
@@ -114,8 +118,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostDetailResponseDto postResponseDto1 = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
+
+            Post newPost = postCommandService.writePost(dto1);
+            Post post1 = postRepository.findById(newPost.getId()).get();
+
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
@@ -133,8 +139,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostDetailResponseDto postResponseDto1 = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
+
+            Post newPost = postCommandService.writePost(dto1);
+            Post post1 = postRepository.findById(newPost.getId()).get();
+
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
         }
@@ -146,8 +154,10 @@ public class AdminServiceTest {
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostDetailResponseDto postResponseDto1 = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(postResponseDto1.getId()).get();
+
+            Post newPost = postCommandService.writePost(dto1);
+            Post post1 = postRepository.findById(newPost.getId()).get();
+
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
         }
