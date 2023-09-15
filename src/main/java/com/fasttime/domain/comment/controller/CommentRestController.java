@@ -6,11 +6,14 @@ import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.global.util.ResponseDTO;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,12 +36,21 @@ public class CommentRestController {
                 commentService.createComment(createCommentRequest)));
     }
 
+    @GetMapping("/my-page/{memberId}")
+    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentByMemberId(
+        @PathVariable long memberId) {
+        log.info("getCommentByMemberId: " + memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 조회했습니다.",
+                commentService.getCommentByMemberId(memberId)));
+    }
+
     @PostMapping("/update")
     public ResponseEntity<ResponseDTO<CommentDTO>> update(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
                 commentService.updateComment(updateCommentRequest)));
     }
 
