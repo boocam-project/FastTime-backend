@@ -37,7 +37,7 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public PostResponseDto updatePost(PostUpdateServiceDto serviceDto) {
+    public PostDetailResponseDto updatePost(PostUpdateServiceDto serviceDto) {
 
         final Member updateRequestMember = memberService.getMember(serviceDto.getMemberId());
         Post post = findPostById(serviceDto);
