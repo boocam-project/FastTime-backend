@@ -6,7 +6,7 @@ import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
-import com.fasttime.domain.post.dto.service.response.PostResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.NotPostWriterException;
 import com.fasttime.domain.post.exception.PostNotFoundException;
@@ -26,7 +26,7 @@ public class PostCommandService {
         this.postRepository = postRepository;
     }
 
-    public PostResponseDto writePost(PostCreateServiceDto serviceDto) {
+    public PostDetailResponseDto writePost(PostCreateServiceDto serviceDto) {
 
         Member member = memberRepository.findById(serviceDto.getMemberId())
             .orElseThrow(() -> new UserNotFoundException("회원 정보가 없습니다."));
@@ -36,10 +36,17 @@ public class PostCommandService {
 
         Post savedPost = postRepository.save(createdPost);
 
-        return PostResponseDto.of(savedPost);
+        return PostDetailResponseDto.builder()
+            .id(savedPost.getId())
+            .title(savedPost.getTitle())
+            .content(savedPost.getContent())
+            .anonymity(savedPost.isAnonymity())
+            .likeCount(savedPost.getLikeCount())
+            .hateCount(savedPost.getHateCount())
+            .build();
     }
 
-    public PostResponseDto updatePost(PostUpdateServiceDto serviceDto) {
+    public PostDetailResponseDto updatePost(PostUpdateServiceDto serviceDto) {
 
         Post post = findPostById(serviceDto);
 
@@ -47,7 +54,14 @@ public class PostCommandService {
 
         post.update(serviceDto.getContent());
 
-        return PostResponseDto.of(post);
+        return PostDetailResponseDto.builder()
+            .id(post.getId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .anonymity(post.isAnonymity())
+            .likeCount(post.getLikeCount())
+            .hateCount(post.getHateCount())
+            .build();
     }
 
     public void deletePost(PostDeleteServiceDto serviceDto) {
