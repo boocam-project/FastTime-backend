@@ -47,6 +47,15 @@ public class CommentService {
     }
 
     /**
+     * 회원 ID로 회원이 등록한 댓글 리스트를 조회하는 메서드
+     * @param memberId 댓글 리스트 조회의 기준이 될 회원 ID
+     * @return 회원이 등록한 댓글 DTO 리스트
+     */
+    public List<CommentDTO> getCommentByMemberId(long memberId){
+        return getCommentsByMember(memberService.getMember(memberId));
+    }
+
+    /**
      * 댓글을 수정하는 메서드
      * @param req 수정할 댓글 정보와 수정 내용이 담긴 객체
      * @return 수정한 댓글 DTO
@@ -84,8 +93,13 @@ public class CommentService {
      * @param post 댓글 리스트를 조회할 게시글 Entity
      * @return 게시글에 등록된 댓글 Entity 리스트
      */
-    public List<Comment> getCommentsByPost(Post post) {
-        return commentRepository.findAllByPost(post).orElseGet(ArrayList::new);
+    public List<CommentDTO> getCommentsByPost(Post post) {
+        List<CommentDTO> comments = new ArrayList<>();
+        List<Comment> list = commentRepository.findAllByPost(post).orElseGet(ArrayList::new);
+        for(Comment comment : list){
+            comments.add(comment.toDTO());
+        }
+        return comments;
     }
 
     /**
@@ -93,7 +107,12 @@ public class CommentService {
      * @param member 댓글 리스트 조회의 기준이 될 회원 Entity
      * @return 회원이 등록한 댓글 Entity 리스트
      */
-    public List<Comment> getCommentsByMember(Member member) {
-        return commentRepository.findAllByMember(member).orElseGet(ArrayList::new);
+    public List<CommentDTO> getCommentsByMember(Member member) {
+        List<CommentDTO> comments = new ArrayList<>();
+        List<Comment> list = commentRepository.findAllByMember(member).orElseGet(ArrayList::new);
+        for(Comment comment : list){
+            comments.add(comment.toDTO());
+        }
+        return comments;
     }
 }
