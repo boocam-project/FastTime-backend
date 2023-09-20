@@ -19,7 +19,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
         if (session == null || (session.getAttribute("MEMBER") == null
             && session.getAttribute("ADMIN") == null)) {
-            response.sendRedirect("/v1/login");
+            response.sendRedirect("/api/v1/login");
             log.info("접근 거부");
             return false;
 
