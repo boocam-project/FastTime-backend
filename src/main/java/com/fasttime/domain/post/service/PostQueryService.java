@@ -1,6 +1,7 @@
 package com.fasttime.domain.post.service;
 
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,7 @@ public class PostQueryService implements PostQueryUseCase {
     @Override
     public Post findById(Long id) {
         return postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("There is no Post which has id " + id));
+            .orElseThrow(PostNotFoundException::new);
     }
 
     @Override
