@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
+import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
 import java.util.Optional;
@@ -76,7 +77,7 @@ public class PostQueryServiceTest {
 
             // when then
             assertThatThrownBy(() -> postQueryService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(PostNotFoundException.class);
         }
     }
 }
