@@ -30,7 +30,7 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> create(
+    public ResponseEntity<ResponseDTO<CommentDTO>> createComment(
         @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         log.info("CreateCommentRequest: " + createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -57,7 +57,7 @@ public class CommentRestController {
     }
 
     @PatchMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> update(
+    public ResponseEntity<ResponseDTO<CommentDTO>> updateComment(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -66,7 +66,7 @@ public class CommentRestController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> delete(
+    public ResponseEntity<ResponseDTO<CommentDTO>> deleteComment(
         @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
         log.info("DeleteCommentRequest: " + deleteCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
