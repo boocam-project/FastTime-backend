@@ -10,11 +10,9 @@ import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.exception.PostNotFoundException;
-import com.fasttime.domain.post.repository.PostRepository;
+import com.fasttime.domain.post.service.PostQueryService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,11 +23,12 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final PostQueryService postQueryService;
     private final MemberService memberService;
 
     /**
      * 댓글을 등록하는 메서드
+     *
      * @param req 등록할 댓글 정보가 담긴 객체
      * @return 등록한 댓글 DTO
      */
@@ -39,24 +38,35 @@ public class CommentService {
         if (req.getParentCommentId() != null) {
             parentComment = getComment(req.getParentCommentId());
         }
-        // TODO : post를 postService를 통해 읽어 온다.
-        return commentRepository.save(Comment.builder()
-            .post(postRepository.findById(req.getPostId()).orElseThrow(PostNotFoundException::new))
-            .member(memberService.getMember(req.getMemberId())).content(req.getContent())
-            .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDTO();
+        return commentRepository.save(
+            Comment.builder().post(postQueryService.findById(req.getPostId()))
+                .member(memberService.getMember(req.getMemberId())).content(req.getContent())
+                .anonymity(req.getAnonymity()).parentComment(parentComment).build()).toDTO();
     }
 
     /**
      * 회원 ID로 회원이 등록한 댓글 리스트를 조회하는 메서드
+     *
      * @param memberId 댓글 리스트 조회의 기준이 될 회원 ID
      * @return 회원이 등록한 댓글 DTO 리스트
      */
-    public List<CommentDTO> getCommentByMemberId(long memberId){
+    public List<CommentDTO> getCommentsByMemberId(long memberId) {
         return getCommentsByMember(memberService.getMember(memberId));
     }
 
     /**
+     * 게시글 ID로 해당 게시글에 등록된 댓글 리스트를 조회하는 메서드
+     *
+     * @param postId 댓글 리스트 조회의 기준이 될 게시글 ID
+     * @return 게시글에 등록된 댓글 DTO 리스트
+     */
+    public List<CommentDTO> getCommentsByPostId(long postId) {
+        return getCommentsByPost(postQueryService.findById(postId));
+    }
+
+    /**
      * 댓글을 수정하는 메서드
+     *
      * @param req 수정할 댓글 정보와 수정 내용이 담긴 객체
      * @return 수정한 댓글 DTO
      */
@@ -69,6 +79,7 @@ public class CommentService {
 
     /**
      * 댓글을 삭제하는 메서드
+     *
      * @param req 삭제할 댓글 ID가 담긴 객체
      * @return 삭제한 댓글 DTO
      */
@@ -81,6 +92,7 @@ public class CommentService {
 
     /**
      * 댓글 ID로 댓글 정보를 조회하는 메서드
+     *
      * @param id 조회할 댓글의 ID
      * @return 댓글 ID로 조회한 댓글 Entity
      */
@@ -90,13 +102,14 @@ public class CommentService {
 
     /**
      * 게시글에 등록된 댓글 리스트를 조회하는 메서드
+     *
      * @param post 댓글 리스트를 조회할 게시글 Entity
      * @return 게시글에 등록된 댓글 Entity 리스트
      */
     public List<CommentDTO> getCommentsByPost(Post post) {
         List<CommentDTO> comments = new ArrayList<>();
         List<Comment> list = commentRepository.findAllByPost(post).orElseGet(ArrayList::new);
-        for(Comment comment : list){
+        for (Comment comment : list) {
             comments.add(comment.toDTO());
         }
         return comments;
@@ -104,13 +117,14 @@ public class CommentService {
 
     /**
      * 회원이 등록한 댓글 리스트를 조회하는 메서드
+     *
      * @param member 댓글 리스트 조회의 기준이 될 회원 Entity
      * @return 회원이 등록한 댓글 Entity 리스트
      */
     public List<CommentDTO> getCommentsByMember(Member member) {
         List<CommentDTO> comments = new ArrayList<>();
         List<Comment> list = commentRepository.findAllByMember(member).orElseGet(ArrayList::new);
-        for(Comment comment : list){
+        for (Comment comment : list) {
             comments.add(comment.toDTO());
         }
         return comments;
