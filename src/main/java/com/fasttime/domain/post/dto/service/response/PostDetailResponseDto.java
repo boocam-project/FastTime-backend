@@ -1,5 +1,6 @@
 package com.fasttime.domain.post.dto.service.response;
 
+import com.fasttime.domain.post.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,5 +23,16 @@ public class PostDetailResponseDto {
         this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
+    }
+
+    public static PostDetailResponseDto entityToDto(Post post) {
+        return PostDetailResponseDto.builder()
+            .id(post.getId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .anonymity(post.isAnonymity())
+            .likeCount(post.getLikeCount())
+            .hateCount(post.getHateCount())
+            .build();
     }
 }
