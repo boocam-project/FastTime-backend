@@ -40,8 +40,8 @@ public class CommentRestControllerTest {
     CommentService commentService;
 
     @Nested
-    @DisplayName("create()은")
-    class Context_create {
+    @DisplayName("createComment()은")
+    class Context_createComment {
 
         @Test
         @DisplayName("댓글을 등록할 수 있다.")
@@ -195,8 +195,8 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("getCommentByMemberId()은 ")
-    class Context_getCommentByMemberId {
+    @DisplayName("getCommentsByMemberId()은 ")
+    class Context_getCommentsByMemberId {
 
         @Test
         @DisplayName("해당 회원의 댓글을 조회할 수 있다.")
@@ -222,7 +222,7 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("getCommentByPostId()은 ")
+    @DisplayName("getCommentsByPostId()은 ")
     class Context_getCommentByPostId {
 
         @Test
@@ -249,8 +249,8 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("update()는 ")
-    class Context_update {
+    @DisplayName("updateComment()는 ")
+    class Context_updateComment {
 
         @Test
         @DisplayName("댓글을 수정할 수 있다.")
@@ -352,8 +352,8 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("delete()은 ")
-    class Context_delete {
+    @DisplayName("deleteComment()은 ")
+    class Context_deleteComment {
 
         @Test
         @DisplayName("댓글을 삭제할 수 있다.")
