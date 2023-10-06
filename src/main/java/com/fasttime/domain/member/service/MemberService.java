@@ -78,7 +78,7 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         } else {
-            return new MemberResponse(member.getEmail(),
+            return new MemberResponse(member.getId(),member.getEmail(),
                 member.getNickname());
         }
     }
@@ -87,7 +87,7 @@ public class MemberService {
         if (request.getPassword().equals(request.getRePassword())) {
             Member member = memberRepository.findByEmail(request.getEmail()).get();
             member.setPassword(passwordEncoder.encode(request.getPassword()));
-            return new MemberResponse(member.getEmail(), member.getNickname());
+            return new MemberResponse(member.getId(),member.getEmail(), member.getNickname());
         } else {
             throw new BadCredentialsException("Not Match RePassword!");
         }
