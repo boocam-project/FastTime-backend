@@ -77,7 +77,7 @@ public class MemberControllerTestForAuto {
                     .contentType(MediaType.APPLICATION_JSON)
                     .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.email").exists())
+                .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
                 .andDo(print());
 
@@ -182,7 +182,7 @@ public class MemberControllerTestForAuto {
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.email").exists())
+                .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
                 .andDo(print());
         }
