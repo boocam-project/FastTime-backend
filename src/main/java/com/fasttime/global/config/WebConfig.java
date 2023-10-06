@@ -19,6 +19,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LoginCheckInterceptor())
             .order(2)
             .addPathPatterns("/api/v1/comment/**",
-                "v1/retouch-member", "api/v1/logout", "v1/delete");
+                "/api/v1/retouch-member", "/api/v1/logout", "/api/v1/delete");
     }
 }
