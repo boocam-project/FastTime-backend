@@ -62,7 +62,7 @@ public class AdminServiceTest {
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
             // when
-            List<Post> postList = adminService.FindReportedPost();
+            List<Post> postList = adminService.findReportedPost();
 
             //then
             Assertions.assertThat(postList.get(0)).isEqualTo(post1);
@@ -85,7 +85,7 @@ public class AdminServiceTest {
             Post post2 = postRepository.findById(newPost2.getId()).get();
 
             // when
-            List<Post> postList = adminService.FindReportedPost();
+            List<Post> postList = adminService.findReportedPost();
             //then
             Assertions.assertThat(postList.isEmpty()).isTrue();
         }
@@ -107,7 +107,7 @@ public class AdminServiceTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
-            adminService.DeletePost(newPost.getId());
+            adminService.deletePost(newPost.getId());
             //then
             Assertions.assertThat(postRepository.findById(newPost.getId()).isEmpty()).isTrue();
         }
@@ -125,7 +125,7 @@ public class AdminServiceTest {
             post1.report();
             post1.approveReport(LocalDateTime.now());
             //when
-            adminService.PassPost(post1.getId());
+            adminService.passPost(post1.getId());
 
             //then
             Assertions.assertThat(postRepository.findById(post1.getId()).get().getReportStatus())
@@ -144,7 +144,7 @@ public class AdminServiceTest {
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
+            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
         }
         //AccessException
         @DisplayName("신고가 되지 않는 게시물에 접근하여 바꿀 수 없다.")
@@ -159,7 +159,7 @@ public class AdminServiceTest {
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.PassPost(post1.getId()));
+            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
         }
     }
 

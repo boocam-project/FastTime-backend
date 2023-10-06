@@ -5,7 +5,6 @@ import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
 import java.time.LocalDateTime;
-import javax.naming.AuthenticationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -84,7 +83,7 @@ public class MemberService {
         }
     }
 
-    public MemberResponse RePassword(RePasswordRequest request) {
+    public MemberResponse rePassword(RePasswordRequest request) {
         if (request.getPassword().equals(request.getRePassword())) {
             Member member = memberRepository.findByEmail(request.getEmail()).get();
             member.setPassword(passwordEncoder.encode(request.getPassword()));

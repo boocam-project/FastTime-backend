@@ -13,8 +13,6 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -98,7 +96,7 @@ public class MemberController {
     }
 
     @PostMapping("/api/v1/login")
-    public ResponseEntity<ResponseDTO> LogIn(@Validated @RequestBody LoginRequestDTO dto
+    public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
         , BindingResult bindingResult, HttpSession session)
         throws UserNotFoundException, BindException {
         if (bindingResult.hasErrors()) {
@@ -111,7 +109,7 @@ public class MemberController {
     }
 
     @GetMapping("/api/v1/logout")
-    public ResponseEntity<ResponseDTO> LogOut(HttpSession session) {
+    public ResponseEntity<ResponseDTO> logOut(HttpSession session) {
         if (session.getAttribute("ADMIN") != null) {
             session.removeAttribute("ADMIN");
         }
@@ -123,13 +121,13 @@ public class MemberController {
     }
 
     @PostMapping("/api/v1/RePassword")
-    public ResponseEntity<ResponseDTO> RePassword
+    public ResponseEntity<ResponseDTO> rePassword
         (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
         throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
-        MemberResponse response = memberService.RePassword(request);
+        MemberResponse response = memberService.rePassword(request);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK,"패스워드 재설정이 완료되었습니다",response));
     }

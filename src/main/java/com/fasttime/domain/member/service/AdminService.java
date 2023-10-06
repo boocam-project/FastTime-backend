@@ -5,7 +5,6 @@ import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.rmi.AccessException;
 import java.util.List;
-import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,11 +16,11 @@ public class AdminService {
 
     private final PostRepository postRepository;
 
-    public List<Post> FindReportedPost(){
+    public List<Post> findReportedPost(){
         return postRepository.findAllByReportStatus(ReportStatus.REPORTED);
     }
 
-    public Post FindOneReportedPost(Long id) throws AccessException {
+    public Post findOneReportedPost(Long id) throws AccessException {
         Post post = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         System.out.println(post.getReportStatus());
@@ -30,7 +29,7 @@ public class AdminService {
         }
         return post;
     }
-    public void DeletePost(Long id) throws AccessException {
+    public void deletePost(Long id) throws AccessException {
         Post post = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         if (!post.getReportStatus().equals(ReportStatus.REPORTED)){
@@ -38,7 +37,7 @@ public class AdminService {
         }
         postRepository.delete(post);
     }
-    public void PassPost(Long id) throws AccessException {
+    public void passPost(Long id) throws AccessException {
         Post post = postRepository.findById(id).
             orElseThrow(()-> new IllegalArgumentException("게시글이 없습니다."));
         if (!post.getReportStatus().equals(ReportStatus.REPORTED)){
