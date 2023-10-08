@@ -103,7 +103,7 @@ public class MemberController {
             throw new BindException(bindingResult);
         }
         MemberResponse response = memberService.loginMember(dto);
-        session.setAttribute("MEMBER", response.getEmail());
+        session.setAttribute("MEMBER", response.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "로그인이 완료되었습니다.",response));
     }

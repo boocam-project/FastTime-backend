@@ -46,7 +46,7 @@ public class MemberServiceTestForAuto {
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
             //when
             MemberResponse response = memberService.loginMember(dto);
-            Member byEmail = memberRepository.findByEmail(response.getEmail()).get();
+            Member byEmail = memberRepository.findByNickname(response.getNickname()).get();
             //then
             Assertions.assertThat(response.getNickname()).isEqualTo(byEmail.getNickname());
         }
@@ -92,7 +92,7 @@ public class MemberServiceTestForAuto {
                 ("testEmail", "newPassword", "newPassword");
             //when
             MemberResponse response = memberService.rePassword(request);
-            Member member = memberRepository.findByEmail(response.getEmail()).get();
+            Member member = memberRepository.findByNickname(response.getNickname()).get();
             //then
             Assertions.assertThat(response.getNickname()).isEqualTo(member.getNickname());
         }
