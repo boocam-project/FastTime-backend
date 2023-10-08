@@ -22,30 +22,30 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/admin")
-    public ResponseEntity<ResponseDTO> PostList() {
+    public ResponseEntity<ResponseDTO> postList() {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
-            ,"신고가 10번이상된 게시글들을 보여줍니다.",adminService.FindReportedPost()));
+            ,"신고가 10번이상된 게시글들을 보여줍니다.",adminService.findReportedPost()));
     }
 
     @GetMapping("/admin/{post_id}")
-    public ResponseEntity<ResponseDTO> PostDetail
+    public ResponseEntity<ResponseDTO> postDetail
         (@PathVariable("post_id") Long post_id) throws AccessException {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
-            ,"신고가 10번이상된 게시글을 보여줍니다.",adminService.FindOneReportedPost(post_id)));
+            ,"신고가 10번이상된 게시글을 보여줍니다.",adminService.findOneReportedPost(post_id)));
     }
 
     @GetMapping("/admin/{post_id}/delete") // 문제가 있는 Post를 삭제
-    public ResponseEntity<ResponseDTO> DeletePost
+    public ResponseEntity<ResponseDTO> deletePost
         (@PathVariable("post_id") Long post_id) throws AccessException {
-        adminService.DeletePost(post_id);
+        adminService.deletePost(post_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 삭제합니다."));
     }
 
     @GetMapping("/admin/{post_id}/pass") // 문제가 없는 Post 검토완료로 변경
-    public ResponseEntity<ResponseDTO> PassPost
+    public ResponseEntity<ResponseDTO> passPost
         (@PathVariable("post_id") Long post_id) throws AccessException {
-        adminService.PassPost(post_id);
+        adminService.passPost(post_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 복구합니다."));
     }

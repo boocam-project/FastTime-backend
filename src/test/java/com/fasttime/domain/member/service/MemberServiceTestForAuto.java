@@ -91,7 +91,7 @@ public class MemberServiceTestForAuto {
             RePasswordRequest request = new RePasswordRequest
                 ("testEmail", "newPassword", "newPassword");
             //when
-            MemberResponse response = memberService.RePassword(request);
+            MemberResponse response = memberService.rePassword(request);
             Member member = memberRepository.findByEmail(response.getEmail()).get();
             //then
             Assertions.assertThat(response.getNickname()).isEqualTo(member.getNickname());
@@ -105,7 +105,7 @@ public class MemberServiceTestForAuto {
             //when
 
             //then
-            Assertions.assertThatThrownBy(() -> memberService.RePassword(request))
+            Assertions.assertThatThrownBy(() -> memberService.rePassword(request))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Not Match RePassword!");
 
