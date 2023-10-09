@@ -1,11 +1,11 @@
 package com.fasttime.domain.post.service;
 
+import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PostQueryService implements PostQueryUseCase {
 
-    private static final int DEFAULT_PAGE_SIZE = 10;
     private final PostRepository postRepository;
 
     public PostQueryService(PostRepository postRepository) {
@@ -27,9 +26,17 @@ public class PostQueryService implements PostQueryUseCase {
     }
 
     @Override
-    public List<Post> findByPageForTitle(String title, int page) {
-        Pageable pageable = PageRequest.of(page, DEFAULT_PAGE_SIZE);
-
-        return postRepository.findAll(pageable).getContent();
+    public List<PostsResponseDto> searchPost(PostSearchCondition postSearchCondition) {
+        return postRepository.search(postSearchCondition)
+            .stream()
+            .map(repositoryDto -> PostsResponseDto.builder()
+                .id(repositoryDto.getId())
+                .title(repositoryDto.getTitle())
+                .nickname(repositoryDto.getNickname())
+                .anonymity(repositoryDto.isAnonymity())
+                .likeCount(repositoryDto.getLikeCount())
+                .hateCount(repositoryDto.getHateCount())
+                .build())
+            .collect(Collectors.toList());
     }
 }

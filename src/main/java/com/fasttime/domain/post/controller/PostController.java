@@ -7,9 +7,9 @@ import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostCommandService;
 import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
 import com.fasttime.global.util.ResponseDTO;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,8 @@ public class PostController {
     private final PostCommandService postCommandService;
     private final PostQueryService postQueryService;
 
-    public PostController(PostCommandService postCommandService, PostQueryService postQueryService) {
+    public PostController(PostCommandService postCommandService,
+        PostQueryService postQueryService) {
         this.postCommandService = postCommandService;
         this.postQueryService = postQueryService;
     }
@@ -60,15 +61,22 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<ResponseDTO<List<PostsResponseDto>>> getPosts(
-        @RequestParam(defaultValue = "") String title,
-        @RequestParam(defaultValue = "1") int page) {
+        @RequestParam(required = false) String title,
+        @RequestParam(required = false) String nickname,
+        @RequestParam(defaultValue = "0") int likeCount,
+        @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(defaultValue = "0") int page) {
 
-        List<PostsResponseDto> responses = postQueryService.findByPageForTitle(title, page)
-            .stream()
-            .map(PostsResponseDto::entityToDto)
-            .collect(Collectors.toList());
+        List<PostsResponseDto> serviceResponse = postQueryService.searchPost(
+            PostSearchCondition.builder()
+                .title(title)
+                .nickname(nickname)
+                .likeCount(likeCount)
+                .pageSize(pageSize)
+                .page(page)
+                .build());
 
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseDTO.res(HttpStatus.CREATED, responses));
+            .body(ResponseDTO.res(HttpStatus.OK, serviceResponse));
     }
 }
