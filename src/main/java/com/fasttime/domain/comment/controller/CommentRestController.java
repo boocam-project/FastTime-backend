@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +29,8 @@ public class CommentRestController {
 
     private final CommentService commentService;
 
-    @PostMapping("/create")
-    public ResponseEntity<ResponseDTO<CommentDTO>> create(
+    @PostMapping
+    public ResponseEntity<ResponseDTO<CommentDTO>> createComment(
         @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         log.info("CreateCommentRequest: " + createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -37,16 +39,25 @@ public class CommentRestController {
     }
 
     @GetMapping("/my-page/{memberId}")
-    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentByMemberId(
+    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentsByMemberId(
         @PathVariable long memberId) {
-        log.info("getCommentByMemberId: " + memberId);
+        log.info("getCommentsByMemberId: " + memberId);
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 조회했습니다.",
-                commentService.getCommentByMemberId(memberId)));
+                commentService.getCommentsByMemberId(memberId)));
     }
 
-    @PostMapping("/update")
-    public ResponseEntity<ResponseDTO<CommentDTO>> update(
+    @GetMapping("/{postId}")
+    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentsByPostId(
+        @PathVariable long postId) {
+        log.info("getCommentsByPostId: " + postId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 조회했습니다.",
+                commentService.getCommentsByPostId(postId)));
+    }
+
+    @PatchMapping
+    public ResponseEntity<ResponseDTO<CommentDTO>> updateComment(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -54,8 +65,8 @@ public class CommentRestController {
                 commentService.updateComment(updateCommentRequest)));
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<ResponseDTO<CommentDTO>> delete(
+    @DeleteMapping
+    public ResponseEntity<ResponseDTO<CommentDTO>> deleteComment(
         @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
         log.info("DeleteCommentRequest: " + deleteCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(

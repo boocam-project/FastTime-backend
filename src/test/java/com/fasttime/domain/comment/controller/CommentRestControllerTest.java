@@ -5,7 +5,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,8 +40,8 @@ public class CommentRestControllerTest {
     CommentService commentService;
 
     @Nested
-    @DisplayName("create()은")
-    class Context_create {
+    @DisplayName("createComment()은")
+    class Context_createComment {
 
         @Test
         @DisplayName("댓글을 등록할 수 있다.")
@@ -54,9 +56,9 @@ public class CommentRestControllerTest {
             String json = new ObjectMapper().writeValueAsString(request);
 
             // when, then
-            mockMvc.perform(post("/api/v1/comment/create").content(json)
-                    .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.id").exists())
+            mockMvc.perform(
+                    post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.postId").exists())
                 .andExpect(jsonPath("$.data.memberId").exists())
                 .andExpect(jsonPath("$.data.content").exists())
@@ -83,9 +85,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
@@ -108,9 +111,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
@@ -133,9 +137,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // whCreate
-                mockMvc.perform(post("/api/v1/comment/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
@@ -153,9 +158,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
@@ -178,9 +184,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).createComment(any(CreateCommentRequest.class));
             }
@@ -188,8 +195,8 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("getCommentByMemberId()은 ")
-    class Context_getCommentByMemberId {
+    @DisplayName("getCommentsByMemberId()은 ")
+    class Context_getCommentsByMemberId {
 
         @Test
         @DisplayName("해당 회원의 댓글을 조회할 수 있다.")
@@ -199,7 +206,7 @@ public class CommentRestControllerTest {
             commentDTOList.add(
                 CommentDTO.builder().id(0L).postId(0L).memberId(0L).content("test").anonymity(false)
                     .parentCommentId(null).build());
-            given(commentService.getCommentByMemberId(any(long.class))).willReturn(commentDTOList);
+            given(commentService.getCommentsByMemberId(any(long.class))).willReturn(commentDTOList);
 
             // when, then
             mockMvc.perform(get("/api/v1/comment/my-page/0")).andExpect(status().isOk())
@@ -210,13 +217,40 @@ public class CommentRestControllerTest {
                 .andExpect(jsonPath("$.data[0].anonymity").exists())
                 .andExpect(jsonPath("$.data[0].parentCommentId").isEmpty()).andDo(print());
 
-            verify(commentService, times(1)).getCommentByMemberId(any(long.class));
+            verify(commentService, times(1)).getCommentsByMemberId(any(long.class));
         }
     }
 
     @Nested
-    @DisplayName("update()는 ")
-    class Context_update {
+    @DisplayName("getCommentsByPostId()은 ")
+    class Context_getCommentByPostId {
+
+        @Test
+        @DisplayName("해당 게시물의 댓글을 조회할 수 있다.")
+        void _willSuccess() throws Exception {
+            // given
+            List<CommentDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(
+                CommentDTO.builder().id(0L).postId(0L).memberId(0L).content("test").anonymity(false)
+                    .parentCommentId(null).build());
+            given(commentService.getCommentsByPostId(any(long.class))).willReturn(commentDTOList);
+
+            // when, then
+            mockMvc.perform(get("/api/v1/comment/0")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].id").exists())
+                .andExpect(jsonPath("$.data[0].postId").exists())
+                .andExpect(jsonPath("$.data[0].memberId").exists())
+                .andExpect(jsonPath("$.data[0].content").exists())
+                .andExpect(jsonPath("$.data[0].anonymity").exists())
+                .andExpect(jsonPath("$.data[0].parentCommentId").isEmpty()).andDo(print());
+
+            verify(commentService, times(1)).getCommentsByPostId(any(long.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("updateComment()는 ")
+    class Context_updateComment {
 
         @Test
         @DisplayName("댓글을 수정할 수 있다.")
@@ -231,9 +265,9 @@ public class CommentRestControllerTest {
             String json = new ObjectMapper().writeValueAsString(request);
 
             // when, then
-            mockMvc.perform(post("/api/v1/comment/update").content(json)
-                    .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").exists())
+            mockMvc.perform(
+                    patch("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.postId").exists())
                 .andExpect(jsonPath("$.data.memberId").exists())
                 .andExpect(jsonPath("$.data.content").exists())
@@ -260,9 +294,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/update").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        patch("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
@@ -285,9 +320,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/update").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        patch("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
@@ -305,9 +341,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/update").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        patch("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).updateComment(any(UpdateCommentRequest.class));
             }
@@ -315,8 +352,8 @@ public class CommentRestControllerTest {
     }
 
     @Nested
-    @DisplayName("delete()은 ")
-    class Context_delete {
+    @DisplayName("deleteComment()은 ")
+    class Context_deleteComment {
 
         @Test
         @DisplayName("댓글을 삭제할 수 있다.")
@@ -330,9 +367,9 @@ public class CommentRestControllerTest {
             String json = new ObjectMapper().writeValueAsString(request);
 
             // when, then
-            mockMvc.perform(post("/api/v1/comment/delete").content(json)
-                    .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").exists())
+            mockMvc.perform(
+                    delete("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.postId").exists())
                 .andExpect(jsonPath("$.data.memberId").exists())
                 .andExpect(jsonPath("$.data.content").exists())
@@ -358,9 +395,10 @@ public class CommentRestControllerTest {
                 String json = new ObjectMapper().writeValueAsString(request);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/comment/delete").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        delete("/api/v1/comment").content(json).contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
+                    .andDo(print());
 
                 verify(commentService, never()).deleteComment(any(DeleteCommentRequest.class));
             }
