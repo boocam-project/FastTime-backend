@@ -1,9 +1,9 @@
 package com.fasttime.domain.comment.controller;
 
-import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
+import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.global.util.ResponseDTO;
 import java.util.List;
@@ -30,7 +30,7 @@ public class CommentRestController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> createComment(
+    public ResponseEntity<ResponseDTO<CommentResponseDTO>> createComment(
         @Valid @RequestBody CreateCommentRequest createCommentRequest) {
         log.info("CreateCommentRequest: " + createCommentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -39,7 +39,7 @@ public class CommentRestController {
     }
 
     @GetMapping("/my-page/{memberId}")
-    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentsByMemberId(
+    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getCommentsByMemberId(
         @PathVariable long memberId) {
         log.info("getCommentsByMemberId: " + memberId);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -48,7 +48,7 @@ public class CommentRestController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponseDTO<List<CommentDTO>>> getCommentsByPostId(
+    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getCommentsByPostId(
         @PathVariable long postId) {
         log.info("getCommentsByPostId: " + postId);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -57,7 +57,7 @@ public class CommentRestController {
     }
 
     @PatchMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> updateComment(
+    public ResponseEntity<ResponseDTO<CommentResponseDTO>> updateComment(
         @Valid @RequestBody UpdateCommentRequest updateCommentRequest) {
         log.info("UpdateCommentRequest: " + updateCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -66,7 +66,7 @@ public class CommentRestController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO<CommentDTO>> deleteComment(
+    public ResponseEntity<ResponseDTO<CommentResponseDTO>> deleteComment(
         @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
         log.info("DeleteCommentRequest: " + deleteCommentRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
