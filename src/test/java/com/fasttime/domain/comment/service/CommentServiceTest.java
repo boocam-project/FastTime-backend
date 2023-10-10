@@ -13,6 +13,7 @@ import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
+import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
@@ -61,7 +62,7 @@ public class CommentServiceTest {
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Comment comment = Comment.builder().id(0L).post(post).member(member).content("test")
                 .anonymity(false).parentComment(null).build();
 
@@ -70,11 +71,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDTO CommentDto = commentService.createComment(request);
+            CommentResponseDTO commentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(0L, 0L, 0L, "test", false, null);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, 0L, "testNickname", "test", false, null);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -89,7 +91,7 @@ public class CommentServiceTest {
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(true).parentCommentId(null).build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Comment comment = Comment.builder().id(0L).post(post).member(member).content("test")
                 .anonymity(true).parentComment(null).build();
 
@@ -98,11 +100,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDTO CommentDto = commentService.createComment(request);
+            CommentResponseDTO commentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(0L, 0L, 0L, "test", true, null);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, 0L, "testNickname", "test", true, null);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -117,7 +120,7 @@ public class CommentServiceTest {
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(0L).build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Optional<Comment> parentComment = Optional.of(
                 Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
@@ -129,11 +132,12 @@ public class CommentServiceTest {
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
             // when
-            CommentDTO CommentDto = commentService.createComment(request);
+            CommentResponseDTO commentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(1L, 0L, 0L, "test", false, 0L);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(1L, 0L, 0L, "testNickname", "test", false, 0L);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -148,7 +152,7 @@ public class CommentServiceTest {
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(true).parentCommentId(0L).build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Optional<Comment> parentComment = Optional.of(
                 Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
@@ -161,11 +165,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentDTO CommentDto = commentService.createComment(request);
+            CommentResponseDTO commentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(1L, 0L, 0L, "test", true, 0L);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(1L, 0L, 0L, "testNickname", "test", true, 0L);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -247,18 +252,19 @@ public class CommentServiceTest {
             UpdateCommentRequest request = UpdateCommentRequest.builder().id(0L).content("modified")
                 .build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Optional<Comment> comment = Optional.of(
                 Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentDTO CommentDto = commentService.updateComment(request);
+            CommentResponseDTO commentResponseDto = commentService.updateComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(0L, 0L, 0L, "modified", false, null);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, 0L, "testNickname", "modified", false, null);
 
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
@@ -293,7 +299,7 @@ public class CommentServiceTest {
             // given
             DeleteCommentRequest request = DeleteCommentRequest.builder().id(0L).build();
             Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
+            Member member = Member.builder().id(0L).nickname("testNickname").build();
             Optional<Comment> comment = Optional.of(
                 Comment.builder().id(0L).post(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
@@ -301,11 +307,12 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentDTO CommentDto = commentService.deleteComment(request);
+            CommentResponseDTO commentResponseDto = commentService.deleteComment(request);
 
             // then
-            assertThat(CommentDto).extracting("id", "postId", "memberId", "content", "anonymity",
-                "parentCommentId").containsExactly(0L, 0L, 0L, "test", false, null);
+            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
+                    "content", "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, 0L, "testNickname", "test", false, null);
 
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
@@ -395,7 +402,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<CommentDTO> result = commentService.getCommentsByPost(post);
+            List<CommentResponseDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
@@ -415,7 +422,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<CommentDTO> result = commentService.getCommentsByPost(post);
+            List<CommentResponseDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result).isEmpty();
@@ -447,7 +454,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
             // when
-            List<CommentDTO> result = commentService.getCommentsByMember(member);
+            List<CommentResponseDTO> result = commentService.getCommentsByMember(member);
 
             // then
             assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
@@ -467,7 +474,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
             // when
-            List<CommentDTO> result = commentService.getCommentsByMember(member);
+            List<CommentResponseDTO> result = commentService.getCommentsByMember(member);
 
             // then
             assertThat(result).isEmpty();
