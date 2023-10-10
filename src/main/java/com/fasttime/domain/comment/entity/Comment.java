@@ -1,6 +1,7 @@
 package com.fasttime.domain.comment.entity;
 
 import com.fasttime.domain.comment.dto.CommentDTO;
+import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.global.common.BaseTimeEntity;
@@ -73,7 +74,21 @@ public class Comment extends BaseTimeEntity {
             .deletedAt(dateTimeParse(this.getDeletedAt())).build();
     }
 
+    public CommentResponseDTO toResponseDTO() {
+        Long parentCommentId = null;
+        if (this.parentComment != null) {
+            parentCommentId = this.parentComment.getId();
+        }
+        return CommentResponseDTO.builder().id(this.id).postId(this.post.getId())
+            .memberId(this.member.getId()).nickname(this.member.getNickname()).content(this.content)
+            .anonymity(this.anonymity).parentCommentId(parentCommentId)
+            .createdAt(dateTimeParse(this.getCreatedAt()))
+            .updatedAt(dateTimeParse(this.getUpdatedAt()))
+            .deletedAt(dateTimeParse(this.getDeletedAt())).build();
+    }
+
     private String dateTimeParse(LocalDateTime dateTime) {
-        return (dateTime != null) ? dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
+        return (dateTime != null) ? dateTime.format(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : null;
     }
 }
