@@ -9,7 +9,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
@@ -396,8 +395,8 @@ public class CommentServiceTest {
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
-            List<CommentDTO> commentDTOList = new ArrayList<>();
-            commentDTOList.add(comment.toDTO());
+            List<CommentResponseDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toResponseDTO());
 
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
@@ -448,8 +447,8 @@ public class CommentServiceTest {
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
 
-            List<CommentDTO> commentDTOList = new ArrayList<>();
-            commentDTOList.add(comment.toDTO());
+            List<CommentResponseDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toResponseDTO());
 
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
