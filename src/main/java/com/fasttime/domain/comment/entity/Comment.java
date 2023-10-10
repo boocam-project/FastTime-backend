@@ -1,6 +1,5 @@
 package com.fasttime.domain.comment.entity;
 
-import com.fasttime.domain.comment.dto.CommentDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
@@ -60,18 +59,6 @@ public class Comment extends BaseTimeEntity {
 
     public void updateContent(String content) {
         this.content = content;
-    }
-
-    public CommentDTO toDTO() {
-        Long parentCommentId = null;
-        if (this.parentComment != null) {
-            parentCommentId = this.parentComment.getId();
-        }
-        return CommentDTO.builder().id(this.id).postId(this.post.getId())
-            .memberId(this.member.getId()).content(this.content).anonymity(this.anonymity)
-            .parentCommentId(parentCommentId).createdAt(dateTimeParse(this.getCreatedAt()))
-            .updatedAt(dateTimeParse(this.getUpdatedAt()))
-            .deletedAt(dateTimeParse(this.getDeletedAt())).build();
     }
 
     public CommentResponseDTO toResponseDTO() {
