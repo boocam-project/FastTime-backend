@@ -158,7 +158,7 @@ public class MemberControllerTestForAuto {
 
             //when, then
             mockMvc.perform(get("/api/v1/logout"))
-                .andExpect(redirectedUrl("/api/v1/login"));
+                .andExpect(status().isForbidden());
         }
     }
     @DisplayName("비밀번호 재설정을")
