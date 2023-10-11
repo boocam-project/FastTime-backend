@@ -12,7 +12,8 @@ import static org.mockito.Mockito.verify;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;
-import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
+import com.fasttime.domain.comment.dto.response.MyPageCommentResponseDTO;
+import com.fasttime.domain.comment.dto.response.PostCommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
@@ -70,12 +71,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentResponseDTO commentResponseDto = commentService.createComment(request);
+            PostCommentResponseDTO postCommentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(0L, 0L, 0L, "testNickname", "test", false, null);
+            assertThat(postCommentResponseDto).extracting("id", "memberId", "nickname", "content",
+                    "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, "testNickname", "test", false, null);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -99,12 +100,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentResponseDTO commentResponseDto = commentService.createComment(request);
+            PostCommentResponseDTO postCommentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(0L, 0L, 0L, "testNickname", "test", true, null);
+            assertThat(postCommentResponseDto).extracting("id", "memberId", "nickname", "content",
+                    "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, "testNickname", "test", true, null);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -131,12 +132,12 @@ public class CommentServiceTest {
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
             // when
-            CommentResponseDTO commentResponseDto = commentService.createComment(request);
+            PostCommentResponseDTO postCommentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(1L, 0L, 0L, "testNickname", "test", false, 0L);
+            assertThat(postCommentResponseDto).extracting("id", "memberId", "nickname", "content",
+                    "anonymity", "parentCommentId")
+                .containsExactly(1L, 0L, "testNickname", "test", false, 0L);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -164,12 +165,12 @@ public class CommentServiceTest {
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
             // when
-            CommentResponseDTO commentResponseDto = commentService.createComment(request);
+            PostCommentResponseDTO postCommentResponseDto = commentService.createComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(1L, 0L, 0L, "testNickname", "test", true, 0L);
+            assertThat(postCommentResponseDto).extracting("id", "memberId", "nickname", "content",
+                    "anonymity", "parentCommentId")
+                .containsExactly(1L, 0L, "testNickname", "test", true, 0L);
 
             verify(postQueryService, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -258,12 +259,12 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentResponseDTO commentResponseDto = commentService.updateComment(request);
+            PostCommentResponseDTO postCommentResponseDto = commentService.updateComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(0L, 0L, 0L, "testNickname", "modified", false, null);
+            assertThat(postCommentResponseDto).extracting("id", "memberId", "nickname", "content",
+                    "anonymity", "parentCommentId")
+                .containsExactly(0L, 0L, "testNickname", "modified", false, null);
 
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
@@ -306,13 +307,9 @@ public class CommentServiceTest {
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
             // when
-            CommentResponseDTO commentResponseDto = commentService.deleteComment(request);
+            commentService.deleteComment(request);
 
             // then
-            assertThat(commentResponseDto).extracting("id", "postId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId")
-                .containsExactly(0L, 0L, 0L, "testNickname", "test", false, null);
-
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
 
@@ -395,13 +392,13 @@ public class CommentServiceTest {
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
-            List<CommentResponseDTO> commentDTOList = new ArrayList<>();
-            commentDTOList.add(comment.toResponseDTO());
+            List<PostCommentResponseDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toPostCommentResponseDTO());
 
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<CommentResponseDTO> result = commentService.getCommentsByPost(post);
+            List<PostCommentResponseDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
@@ -421,7 +418,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
 
             // when
-            List<CommentResponseDTO> result = commentService.getCommentsByPost(post);
+            List<PostCommentResponseDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result).isEmpty();
@@ -447,13 +444,13 @@ public class CommentServiceTest {
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
 
-            List<CommentResponseDTO> commentDTOList = new ArrayList<>();
-            commentDTOList.add(comment.toResponseDTO());
+            List<MyPageCommentResponseDTO> commentDTOList = new ArrayList<>();
+            commentDTOList.add(comment.toMyPageCommentResponseDTO());
 
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
             // when
-            List<CommentResponseDTO> result = commentService.getCommentsByMember(member);
+            List<MyPageCommentResponseDTO> result = commentService.getCommentsByMember(member);
 
             // then
             assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
@@ -473,7 +470,7 @@ public class CommentServiceTest {
             given(commentRepository.findAllByMember(any(Member.class))).willReturn(comments);
 
             // when
-            List<CommentResponseDTO> result = commentService.getCommentsByMember(member);
+            List<MyPageCommentResponseDTO> result = commentService.getCommentsByMember(member);
 
             // then
             assertThat(result).isEmpty();
