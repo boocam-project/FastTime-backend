@@ -1,16 +1,15 @@
-package com.fasttime.domain.comment.dto;
+package com.fasttime.domain.comment.dto.response;
 
-import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class CommentDTO {
+public class MyPageCommentResponseDTO {
 
     private Long id;
     private Long postId;
-    private Long memberId;
+    private String nickname;
     private String content;
     private boolean anonymity;
     private Long parentCommentId;
