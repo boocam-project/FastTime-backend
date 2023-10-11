@@ -1,6 +1,7 @@
 package com.fasttime.domain.comment.entity;
 
-import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
+import com.fasttime.domain.comment.dto.response.MyPageCommentResponseDTO;
+import com.fasttime.domain.comment.dto.response.PostCommentResponseDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.global.common.BaseTimeEntity;
@@ -61,15 +62,26 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
     }
 
-    public CommentResponseDTO toResponseDTO() {
+    public PostCommentResponseDTO toPostCommentResponseDTO() {
         Long parentCommentId = null;
         if (this.parentComment != null) {
             parentCommentId = this.parentComment.getId();
         }
-        return CommentResponseDTO.builder().id(this.id).postId(this.post.getId())
-            .memberId(this.member.getId()).nickname(this.member.getNickname()).content(this.content)
-            .anonymity(this.anonymity).parentCommentId(parentCommentId)
-            .createdAt(dateTimeParse(this.getCreatedAt()))
+        return PostCommentResponseDTO.builder().id(this.id).memberId(this.member.getId())
+            .nickname(this.member.getNickname()).content(this.content).anonymity(this.anonymity)
+            .parentCommentId(parentCommentId).createdAt(dateTimeParse(this.getCreatedAt()))
+            .updatedAt(dateTimeParse(this.getUpdatedAt()))
+            .deletedAt(dateTimeParse(this.getDeletedAt())).build();
+    }
+
+    public MyPageCommentResponseDTO toMyPageCommentResponseDTO() {
+        Long parentCommentId = null;
+        if (this.parentComment != null) {
+            parentCommentId = this.parentComment.getId();
+        }
+        return MyPageCommentResponseDTO.builder().id(this.id).postId(this.post.getId())
+            .nickname(this.member.getNickname()).content(this.content).anonymity(this.anonymity)
+            .parentCommentId(parentCommentId).createdAt(dateTimeParse(this.getCreatedAt()))
             .updatedAt(dateTimeParse(this.getUpdatedAt()))
             .deletedAt(dateTimeParse(this.getDeletedAt())).build();
     }
