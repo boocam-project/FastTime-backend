@@ -5,11 +5,10 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class CommentResponseDTO {
+public class MyPageCommentResponseDTO {
 
     private Long id;
     private Long postId;
-    private Long memberId;
     private String nickname;
     private String content;
     private boolean anonymity;
