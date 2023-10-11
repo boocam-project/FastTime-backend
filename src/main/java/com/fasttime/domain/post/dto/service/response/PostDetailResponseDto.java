@@ -10,16 +10,18 @@ public class PostDetailResponseDto {
     private final Long id;
     private final String title;
     private final String content;
+    private final String nickname;
     private final boolean anonymity;
     private final int likeCount;
     private final int hateCount;
 
     @Builder
-    private PostDetailResponseDto(Long id, String title, String content, boolean anonymity,
+    private PostDetailResponseDto(Long id, String title, String content, String nickname, boolean anonymity,
         int likeCount, int hateCount) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.nickname = nickname;
         this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
@@ -30,6 +32,7 @@ public class PostDetailResponseDto {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
+            .nickname(post.getMember().getNickname())
             .anonymity(post.isAnonymity())
             .likeCount(post.getLikeCount())
             .hateCount(post.getHateCount())

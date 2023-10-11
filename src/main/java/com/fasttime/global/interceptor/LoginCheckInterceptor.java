@@ -19,10 +19,8 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
 
         if (session == null || (session.getAttribute("MEMBER") == null
             && session.getAttribute("ADMIN") == null)) {
-            response.sendRedirect("/api/v1/login");
-            log.info("접근 거부");
+            response.sendError(403,"로그인 후 이용가능합니다.");
             return false;
-
         }
         return true;
     }
