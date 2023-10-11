@@ -1,5 +1,7 @@
 package com.fasttime.domain.post.dto.controller.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
@@ -18,20 +20,16 @@ public class PostCreateRequestDto {
 
     private final boolean anonymity;
 
-    public PostCreateRequestDto(Long memberId, String title, String content, boolean anonymity) {
+    @JsonCreator
+    public PostCreateRequestDto(
+        @JsonProperty(value = "memberId") Long memberId,
+        @JsonProperty(value = "title") String title,
+        @JsonProperty(value = "content") String content,
+        @JsonProperty(value = "anonymity") boolean anonymity) {
+
         this.memberId = memberId;
         this.title = title;
         this.content = content;
         this.anonymity = anonymity;
-    }
-
-    @Override
-    public String toString() {
-        return "PostCreateRequestDto{" +
-            "memberId=" + memberId +
-            ", title='" + title + '\'' +
-            ", content='" + content + '\'' +
-            ", anonymity=" + anonymity +
-            '}';
     }
 }

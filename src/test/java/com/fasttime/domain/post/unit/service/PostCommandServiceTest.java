@@ -95,7 +95,7 @@ class PostCommandServiceTest {
             Member member = Member.builder().id(1L).build();
             Post mockPost = createMockPost(member, "title", "content");
             PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, 1L,
-                "newContent");
+                "new title", "newContent");
 
             given(memberService.getMember(1L)).willReturn(member);
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
@@ -114,7 +114,7 @@ class PostCommandServiceTest {
         void post_notExist_throwIllArgumentException() {
             // given
             PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, 1L,
-                "newContent");
+                "newTitle", "newContent");
 
             given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -132,7 +132,7 @@ class PostCommandServiceTest {
             Member notAuthorizedMember = Member.builder().id(100L).build();
             Post mockPost = createMockPost(writer, "title", "content");
             PostUpdateServiceDto serviceDto = new PostUpdateServiceDto(1L, notAuthorizedMember.getId(),
-                "newContent");
+                "newTitle", "newContent");
 
             given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);

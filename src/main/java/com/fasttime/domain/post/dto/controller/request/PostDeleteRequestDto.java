@@ -2,12 +2,11 @@ package com.fasttime.domain.post.dto.controller.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class PostUpdateRequestDto {
+public class PostDeleteRequestDto {
 
     @NotNull
     private final Long postId;
@@ -15,21 +14,11 @@ public class PostUpdateRequestDto {
     @NotNull
     private final Long memberId;
 
-    @NotBlank
-    private final String title;
-
-    @NotBlank
-    private final String content;
-
     @JsonCreator
-    public PostUpdateRequestDto(
+    public PostDeleteRequestDto(
         @JsonProperty("postId") Long postId,
-        @JsonProperty("memberId") Long memberId,
-        @JsonProperty("title") String title,
-        @JsonProperty("content") String content) {
+        @JsonProperty("memberId") Long memberId) {
         this.postId = postId;
         this.memberId = memberId;
-        this.title = title;
-        this.content = content;
     }
 }

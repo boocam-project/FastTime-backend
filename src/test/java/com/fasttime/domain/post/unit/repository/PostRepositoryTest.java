@@ -1,10 +1,11 @@
-package com.fasttime.domain.post.repository;
+package com.fasttime.domain.post.unit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.repository.PostRepositoryCustom.PostsRepositoryResponseDto;
 import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
 import java.util.List;
@@ -56,8 +57,8 @@ class PostRepositoryTest {
             // then
             assertThat(result)
                 .hasSize(1)
-                .extracting("memberId", "title")
-                .contains(Tuple.tuple(1L, "제목입니다."));
+                .extracting("title", "nickname")
+                .contains(Tuple.tuple("제목입니다.", "nickname1"));
         }
 
         @DisplayName("검색 닉네임을 포함하는 게시글들을 찾아낼 수 있다.")
@@ -82,8 +83,8 @@ class PostRepositoryTest {
             // then
             assertThat(result)
                 .hasSize(1)
-                .extracting("memberId", "title")
-                .contains(Tuple.tuple(1L, "title1"));
+                .extracting("title", "nickname")
+                .contains(Tuple.tuple("title1", "nickname1"));
         }
 
         @DisplayName("좋아요 수보다 큰 게시물들을 찾을 수 있다.")
