@@ -1,6 +1,7 @@
 package com.fasttime.domain.post.dto.service.response;
 
 import com.fasttime.domain.post.entity.Post;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,10 +15,12 @@ public class PostDetailResponseDto {
     private final boolean anonymity;
     private final int likeCount;
     private final int hateCount;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime lastModifiedAt;
 
     @Builder
     private PostDetailResponseDto(Long id, String title, String content, String nickname, boolean anonymity,
-        int likeCount, int hateCount) {
+        int likeCount, int hateCount, LocalDateTime createdAt, LocalDateTime lastModifiedAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -25,6 +28,8 @@ public class PostDetailResponseDto {
         this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
+        this.createdAt = createdAt;
+        this.lastModifiedAt = lastModifiedAt;
     }
 
     public static PostDetailResponseDto entityToDto(Post post) {
@@ -36,6 +41,9 @@ public class PostDetailResponseDto {
             .anonymity(post.isAnonymity())
             .likeCount(post.getLikeCount())
             .hateCount(post.getHateCount())
+            .createdAt(post.getCreatedAt())
+            .lastModifiedAt(post.getUpdatedAt())
             .build();
     }
+
 }
