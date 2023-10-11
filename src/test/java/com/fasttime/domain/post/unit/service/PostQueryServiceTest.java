@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.exception.PostNotFoundException;
@@ -37,19 +39,20 @@ public class PostQueryServiceTest {
 
         @DisplayName("key를 넘기면 PostResponse를 반환한다.")
         @CsvSource(value = {
-            "1, 제목1, 내용1, true, 10, 20",
-            "2, 제목2, 내용2, false, 15, 30",
-            "3, 제목3, 내용3, true, 23, 35"
+            "1, 제목1, 내용1, 패캠러1, true, 10, 20",
+            "2, 제목2, 내용2, 패캠러2, false, 15, 30",
+            "3, 제목3, 내용3, 패캠러3, true, 23, 35"
         })
         @ParameterizedTest
         void inputKey_postResponse_willReturn(long id, String title, String content,
-            boolean anonymity, int likeCount, int hateCount) {
+            String nickname, boolean anonymity, int likeCount, int hateCount) {
 
             // given
             given(postRepository.findById(anyLong()))
                 .willReturn(Optional.of(Post.builder()
                     .id(id)
                     .title(title)
+                    .member(Member.builder().nickname(nickname).build())
                     .content(content)
                     .anonymity(anonymity)
                     .likeCount(likeCount)
@@ -58,14 +61,12 @@ public class PostQueryServiceTest {
                     .build()));
 
             // when
-            Post postEntity = postQueryService.findById(id);
+            PostDetailResponseDto response = postQueryService.findById(id);
 
             // then
-            assertThat(postEntity)
-                .extracting("id", "title", "content", "anonymity", "likeCount", "hateCount",
-                    "reportStatus")
-                .containsExactly(id, title, content, anonymity, likeCount, hateCount,
-                    ReportStatus.NORMAL);
+            assertThat(response)
+                .extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
+                .containsExactly(id, title, content, nickname, anonymity, likeCount, hateCount);
         }
 
         @DisplayName("DB에 해당 id 를 가지는 게시글이 없다면 IllegalArgumentException을 던진다.")

@@ -20,6 +20,7 @@ import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.service.PostQueryService;
@@ -61,12 +62,11 @@ public class CommentServiceTest {
             // given
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
-            Post post = Post.builder().id(0L).build();
             Member member = Member.builder().id(0L).nickname("testNickname").build();
-            Comment comment = Comment.builder().id(0L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(0L).post(Post.builder().id(0L).build()).member(member).content("test")
                 .anonymity(false).parentComment(null).build();
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.findById(any(Long.class))).willReturn(PostDetailResponseDto.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -95,7 +95,7 @@ public class CommentServiceTest {
             Comment comment = Comment.builder().id(0L).post(post).member(member).content("test")
                 .anonymity(true).parentComment(null).build();
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.findById(any(Long.class))).willReturn(PostDetailResponseDto.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -128,7 +128,7 @@ public class CommentServiceTest {
                 .anonymity(false).parentComment(parentComment.get()).build();
 
             given(commentRepository.findById(any(Long.class))).willReturn(parentComment);
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.findById(any(Long.class))).willReturn(PostDetailResponseDto.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
             // when
@@ -160,7 +160,7 @@ public class CommentServiceTest {
                 .anonymity(true).parentComment(parentComment.get()).build();
 
             given(commentRepository.findById(any(Long.class))).willReturn(parentComment);
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.findById(any(Long.class))).willReturn(PostDetailResponseDto.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -205,7 +205,7 @@ public class CommentServiceTest {
             CreateCommentRequest request = CreateCommentRequest.builder().postId(0L).memberId(0L)
                 .content("test").anonymity(false).parentCommentId(null).build();
             Post post = Post.builder().id(0L).build();
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.findById(any(Long.class))).willReturn(PostDetailResponseDto.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willThrow(
                 new UserNotFoundException("User not found with id: 0L"));
 

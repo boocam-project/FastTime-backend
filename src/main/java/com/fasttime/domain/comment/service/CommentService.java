@@ -10,6 +10,7 @@ import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostQueryService;
 import java.util.ArrayList;
@@ -39,8 +40,11 @@ public class CommentService {
         if (req.getParentCommentId() != null) {
             parentComment = getComment(req.getParentCommentId());
         }
+
+        PostDetailResponseDto postResponse = postQueryService.findById(req.getPostId());
+
         return commentRepository.save(
-                Comment.builder().post(postQueryService.findById(req.getPostId()))
+                Comment.builder().post(Post.builder().id(postResponse.getId()).build())
                     .member(memberService.getMember(req.getMemberId())).content(req.getContent())
                     .anonymity(req.getAnonymity()).parentComment(parentComment).build())
             .toPostCommentResponseDTO();
@@ -63,7 +67,8 @@ public class CommentService {
      * @return 게시글에 등록된 댓글 DTO 리스트
      */
     public List<PostCommentResponseDTO> getCommentsByPostId(long postId) {
-        return getCommentsByPost(postQueryService.findById(postId));
+        PostDetailResponseDto postResponse = postQueryService.findById(postId);
+        return getCommentsByPost(Post.builder().id(postResponse.getId()).build());
     }
 
     /**

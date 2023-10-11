@@ -1,7 +1,7 @@
 package com.fasttime.domain.post.service;
 
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
@@ -20,9 +20,9 @@ public class PostQueryService implements PostQueryUseCase {
     }
 
     @Override
-    public Post findById(Long id) {
-        return postRepository.findById(id)
-            .orElseThrow(PostNotFoundException::new);
+    public PostDetailResponseDto findById(Long id) {
+        return PostDetailResponseDto.entityToDto(postRepository.findById(id)
+            .orElseThrow(PostNotFoundException::new));
     }
 
     @Override
@@ -36,6 +36,8 @@ public class PostQueryService implements PostQueryUseCase {
                 .anonymity(repositoryDto.isAnonymity())
                 .likeCount(repositoryDto.getLikeCount())
                 .hateCount(repositoryDto.getHateCount())
+                .createdAt(repositoryDto.getCreatedAt())
+                .createdAt(repositoryDto.getLastModifiedAt())
                 .build())
             .collect(Collectors.toList());
     }

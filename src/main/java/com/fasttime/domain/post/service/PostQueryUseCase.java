@@ -1,14 +1,14 @@
 package com.fasttime.domain.post.service;
 
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.Post;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 public interface PostQueryUseCase {
 
-    Post findById(Long id);
+    PostDetailResponseDto findById(Long id);
 
     List<PostsResponseDto> searchPost(PostSearchCondition postSearchCondition);
 

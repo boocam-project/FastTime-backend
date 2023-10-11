@@ -8,7 +8,6 @@ import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostCommandUseCase;
 import com.fasttime.domain.post.service.PostQueryUseCase;
 import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
@@ -46,14 +45,13 @@ public class PostController {
     @PostMapping
     public ResponseEntity<ResponseDTO<PostDetailResponseDto>> writePost(
         @RequestBody @Valid PostCreateRequestDto requestDto) {
-        Post result = postCommandUseCase.writePost(
-            new PostCreateServiceDto(requestDto.getMemberId(),
-                requestDto.getTitle(),
-                requestDto.getContent(),
-                requestDto.isAnonymity()));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDTO.res(HttpStatus.CREATED, PostDetailResponseDto.entityToDto(result)));
+            .body(ResponseDTO.res(HttpStatus.CREATED, postCommandUseCase.writePost(
+                new PostCreateServiceDto(requestDto.getMemberId(),
+                    requestDto.getTitle(),
+                    requestDto.getContent(),
+                    requestDto.isAnonymity()))));
     }
 
     @PatchMapping
@@ -85,11 +83,10 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<ResponseDTO<PostDetailResponseDto>> getPost(@PathVariable long postId) {
-        Post result = postQueryUseCase.findById(postId);
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK,
-                PostDetailResponseDto.entityToDto(result)));
+                postQueryUseCase.findById(postId)));
     }
 
     @GetMapping

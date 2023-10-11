@@ -23,7 +23,6 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasttime.docs.RestDocsSupport;
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.controller.PostController;
 import com.fasttime.domain.post.dto.controller.request.PostDeleteRequestDto;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
@@ -31,10 +30,10 @@ import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
 import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostCommandUseCase;
 import com.fasttime.domain.post.service.PostQueryUseCase;
 import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -61,12 +60,14 @@ class PostControllerDocsTest extends RestDocsSupport {
             "게시글 본문입니다.", false);
 
         when(postCommandUseCase.writePost(any(PostCreateServiceDto.class)))
-            .thenReturn(Post.builder()
+            .thenReturn(PostDetailResponseDto.builder()
                 .id(1L)
-                .member(Member.builder().id(1L).nickname("패캠러").build())
+                .nickname("패캠러")
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .anonymity(requestDto.isAnonymity())
+                .createdAt(LocalDateTime.now())
+                .lastModifiedAt(null)
                 .build());
 
         // when then
@@ -94,7 +95,9 @@ class PostControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                     fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN).description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수")
+                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.NULL).description("최종 수정 일시")
                 )
             ));
     }
@@ -115,11 +118,11 @@ class PostControllerDocsTest extends RestDocsSupport {
         when(postQueryUseCase.searchPost(any(PostSearchCondition.class)))
             .thenReturn(List.of(
                 PostsResponseDto.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
-                    .nickname("패캠러").anonymity(false).build(),
+                    .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build(),
                 PostsResponseDto.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
-                    .nickname("패캠러123").anonymity(false).build(),
+                    .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build(),
                 PostsResponseDto.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
-                    .nickname("패컴러1").anonymity(false).build()
+                    .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build()
             ));
 
         // when then
@@ -154,7 +157,9 @@ class PostControllerDocsTest extends RestDocsSupport {
                         .description("익명 여부"),
                     fieldWithPath("data[].commentCounts").type(JsonFieldType.NUMBER).description("댓글 수"),
                     fieldWithPath("data[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data[].hateCount").type(JsonFieldType.NUMBER).description("싫어요 수")
+                    fieldWithPath("data[].hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 일시"),
+                    fieldWithPath("data[].lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
                 )
             ));
     }
@@ -168,12 +173,14 @@ class PostControllerDocsTest extends RestDocsSupport {
             "게시글 본문입니다.", false);
 
         when(postQueryUseCase.findById(anyLong()))
-            .thenReturn(Post.builder()
+            .thenReturn(PostDetailResponseDto.builder()
                 .id(1L)
-                .member(Member.builder().id(1L).nickname("패캠러").build())
+                .nickname("패캠러")
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .anonymity(requestDto.isAnonymity())
+                .createdAt(LocalDateTime.now())
+                .lastModifiedAt(LocalDateTime.now())
                 .build());
 
         // when then
@@ -198,7 +205,9 @@ class PostControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수")
+                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
                 )
             ));
     }
@@ -220,6 +229,8 @@ class PostControllerDocsTest extends RestDocsSupport {
                 .anonymity(false)
                 .likeCount(5)
                 .hateCount(1)
+                .createdAt(LocalDateTime.now())
+                .lastModifiedAt(LocalDateTime.now())
                 .build());
 
         // when then
@@ -249,7 +260,9 @@ class PostControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수")
+                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
                 )
             ));
     }

@@ -3,6 +3,7 @@ package com.fasttime.domain.member.service;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
+import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
@@ -53,8 +54,8 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
           
-            Post newPost1 = postCommandService.writePost(dto1);
-            Post newPost2 = postCommandService.writePost(dto2);
+            PostDetailResponseDto newPost1 = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(newPost1.getId()).get();
             Post post2 = postRepository.findById(newPost2.getId()).get();
             post1.report();
@@ -79,8 +80,8 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
 
-            Post newPost1 = postCommandService.writePost(dto1);
-            Post newPost2 = postCommandService.writePost(dto2);
+            PostDetailResponseDto newPost1 = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost2 = postCommandService.writePost(dto2);
             Post post1 = postRepository.findById(newPost1.getId()).get();
             Post post2 = postRepository.findById(newPost2.getId()).get();
 
@@ -101,7 +102,7 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            Post newPost = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
@@ -119,7 +120,7 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            Post newPost = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
@@ -140,7 +141,7 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            Post newPost = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
@@ -155,7 +156,7 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            Post newPost = postCommandService.writePost(dto1);
+            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
