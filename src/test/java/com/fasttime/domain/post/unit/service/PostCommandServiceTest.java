@@ -50,8 +50,8 @@ class PostCommandServiceTest {
         @Test
         void _willSuccess() {
             // given
-            Post mockPost = createMockPost("title", "content");
-            Member member = Member.builder().id(1L).build();
+            Member member = Member.builder().id(1L).nickname("패캠러").build();
+            Post mockPost = createMockPost("title", "content", member);
             PostCreateServiceDto dto = new PostCreateServiceDto(1L, "title",
                 "content", true);
 
@@ -59,19 +59,18 @@ class PostCommandServiceTest {
             given(postRepository.save(any(Post.class))).willReturn(mockPost);
 
             // when
-            Post post = postCommandService.writePost(dto);
+            PostDetailResponseDto response = postCommandService.writePost(dto);
 
             // then
-            assertThat(post).extracting("id", "title", "content", "anonymity", "likeCount", "hateCount",
-                    "reportStatus")
-                .containsExactly(1L, "title", "content", true, 0, 0, ReportStatus.NORMAL);
+            assertThat(response).extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
+                .containsExactly(1L, "title", "content", "패캠러", true, 0, 0);
         }
 
         @DisplayName("회원 정보가 DB에 없는 경우 UserNotFoundException을 던진다.")
         @Test
         void member_notExist_throwIllArgumentException() {
             // given
-            Post mockPost = createMockPost("title", "content");
+            Post mockPost = createMockPost("title", "content", null);
             PostCreateServiceDto dto = new PostCreateServiceDto(1L, "title",
                 "content", true);
 
@@ -182,10 +181,11 @@ class PostCommandServiceTest {
         }
     }
 
-    private Post createMockPost(String title, String content) {
+    private Post createMockPost(String title, String content, Member member) {
         return Post.builder()
             .id(1L)
             .title(title)
+            .member(member)
             .content(content)
             .anonymity(true)
             .likeCount(0)

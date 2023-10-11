@@ -1,6 +1,7 @@
 package com.fasttime.domain.post.repository;
 
 import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 
@@ -18,5 +19,7 @@ public interface PostRepositoryCustom {
         private boolean anonymity;
         private int likeCount;
         private int hateCount;
+        private LocalDateTime createdAt;
+        private LocalDateTime lastModifiedAt;
     }
 }

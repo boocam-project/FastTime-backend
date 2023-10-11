@@ -26,14 +26,14 @@ public class PostCommandService implements PostCommandUseCase {
     }
 
     @Override
-    public Post writePost(PostCreateServiceDto serviceDto) {
+    public PostDetailResponseDto writePost(PostCreateServiceDto serviceDto) {
 
         final Member writeMember = memberService.getMember(serviceDto.getMemberId());
         final Post createdPost = Post.createNewPost(writeMember, serviceDto.getTitle(),
             serviceDto.getContent(),
             false);
 
-        return postRepository.save(createdPost);
+        return PostDetailResponseDto.entityToDto(postRepository.save(createdPost));
     }
 
     @Override
