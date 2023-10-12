@@ -1,7 +1,8 @@
-package com.fasttime.domain.comment.entity;
+package com.fasttime.domain.comment.unit.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasttime.domain.comment.entity.Comment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

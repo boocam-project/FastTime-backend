@@ -1,4 +1,4 @@
-package com.fasttime.domain.comment.controller;
+package com.fasttime.domain.comment.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasttime.domain.comment.controller.CommentRestController;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequest;
 import com.fasttime.domain.comment.dto.request.DeleteCommentRequest;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequest;

@@ -1,4 +1,4 @@
-package com.fasttime.domain.comment.service;
+package com.fasttime.domain.comment.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +17,7 @@ import com.fasttime.domain.comment.dto.response.PostCommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
+import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
