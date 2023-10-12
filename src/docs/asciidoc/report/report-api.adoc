@@ -1,0 +1,21 @@
+= Report REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Report-Create]]
+== 신고 등록
+
+회원이 게시글을 신고하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/report-create/http-request.adoc[]
+include::{snippets}/report-create/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/report-create/http-response.adoc[]
+include::{snippets}/report-create/response-fields.adoc[]
