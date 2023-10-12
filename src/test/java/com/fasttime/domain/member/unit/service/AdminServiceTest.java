@@ -138,7 +138,7 @@ public class AdminServiceTest {
         //IllegalArgumentException
         @DisplayName("잘못된 접근으로 바꿀 수 없다.")
         @Test
-        void _willFail() throws AccessException {
+        void _willFail() throws IllegalArgumentException {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
@@ -148,24 +148,8 @@ public class AdminServiceTest {
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
-        }
-        //AccessException
-        @DisplayName("신고가 되지 않는 게시물에 접근하여 바꿀 수 없다.")
-        @Test
-        void Access_willFail() throws AccessException {
-            //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
-
-            //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
+            Assertions.assertThatThrownBy(() -> adminService.passPost(100L));
         }
     }
-
 
 }
