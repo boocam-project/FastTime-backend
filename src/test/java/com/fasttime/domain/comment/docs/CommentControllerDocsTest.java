@@ -14,6 +14,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -40,6 +42,13 @@ public class CommentControllerDocsTest extends RestDocsSupport {
     public Object initController() {
         return new CommentRestController(commentService);
     }
+
+    ConstraintDescriptions CreateCommentRequestConstraints = new ConstraintDescriptions(
+        CreateCommentRequest.class);
+    ConstraintDescriptions UpdateCommentRequestConstraints = new ConstraintDescriptions(
+        UpdateCommentRequest.class);
+    ConstraintDescriptions DeleteCommentRequestConstraints = new ConstraintDescriptions(
+        DeleteCommentRequest.class);
 
     @DisplayName("댓글 등록 API 문서화")
     @Test
@@ -60,10 +69,18 @@ public class CommentControllerDocsTest extends RestDocsSupport {
             .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated()).andDo(
             document("comment-create", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
-                    fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글 식별자"),
-                    fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자"),
-                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부"),
+                    fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글 식별자")
+                        .attributes(key("constraints").value(
+                            CreateCommentRequestConstraints.descriptionsForProperty("postId"))),
+                    fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자")
+                        .attributes(key("constraints").value(
+                            CreateCommentRequestConstraints.descriptionsForProperty("memberId"))),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
+                        .attributes(key("constraints").value(
+                            CreateCommentRequestConstraints.descriptionsForProperty("content"))),
+                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
+                        .attributes(key("constraints").value(
+                            CreateCommentRequestConstraints.descriptionsForProperty("anonymity"))),
                     fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).optional()
                         .description("부모 댓글 식별자")), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
@@ -184,9 +201,13 @@ public class CommentControllerDocsTest extends RestDocsSupport {
                 patch("/api/v1/comment").contentType(MediaType.APPLICATION_JSON).content(json))
             .andExpect(status().isOk()).andDo(
                 document("comment-update", preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint()),
-                    requestFields(fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자"),
-                        fieldWithPath("content").type(JsonFieldType.STRING).description("내용")),
+                    preprocessResponse(prettyPrint()), requestFields(
+                        fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자").attributes(
+                            key("constraints").value(
+                                UpdateCommentRequestConstraints.descriptionsForProperty("id"))),
+                        fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
+                            .attributes(key("constraints").value(
+                                UpdateCommentRequestConstraints.descriptionsForProperty("content")))),
                     responseFields(
                         fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                         fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
@@ -218,8 +239,10 @@ public class CommentControllerDocsTest extends RestDocsSupport {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/comment").content(json)
             .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(
             document("comment-delete", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자")),
+                preprocessResponse(prettyPrint()), requestFields(
+                    fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자").attributes(
+                        key("constraints").value(
+                            DeleteCommentRequestConstraints.descriptionsForProperty("id")))),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
