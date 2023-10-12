@@ -40,7 +40,7 @@ include::{snippets}/reportedPost-search/response-fields.adoc[]
 [[ReportedPost-Delete]]
 == 신고 게시글 삭제
 
-회원이 게시글 정보를 삭제하는 API 입니다.
+회원이 게시글을 삭제하는 API 입니다.
 
 === HttpRequest
 
@@ -52,9 +52,9 @@ include::{snippets}/reportedPost-delete/path-parameters.adoc[]
 include::{snippets}/reportedPost-delete/http-response.adoc[]
 
 [[ReportedPost-Pass]]
-== 신고 게시글 수정
+== 신고 게시글 복구
 
-회원이 게시글 정보를 삭제하는 API 입니다.
+회원이 게시글을 복구하는 API 입니다.
 
 === HttpRequest
 
