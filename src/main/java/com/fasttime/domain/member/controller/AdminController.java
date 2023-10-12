@@ -21,7 +21,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<ResponseDTO> postList() {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             ,"신고가 10번이상된 게시글들을 보여줍니다.",adminService.findReportedPost()));
