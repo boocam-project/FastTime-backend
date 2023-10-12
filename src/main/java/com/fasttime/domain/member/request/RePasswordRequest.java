@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RePasswordRequest {
-    String email;
     @NotBlank
     String password;
     @NotBlank
