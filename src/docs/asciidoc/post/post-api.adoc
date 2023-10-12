@@ -1,57 +1,82 @@
+= Post REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
 [[Post-Create]]
 == 게시글 등록
+
 회원이 게시글을 등록하는 API 입니다.
 현재 회원 식별자(memberId)를 json field로 받고 있지만, 추후 header로 받을 예정입니다.
 
-==== HttpRequest
+=== HttpRequest
+
 include::{snippets}/post-create/http-request.adoc[]
 include::{snippets}/post-create/request-fields.adoc[]
 
-==== HttpResponse
+=== HttpResponse
+
 include::{snippets}/post-create/http-response.adoc[]
 include::{snippets}/post-create/response-fields.adoc[]
 
+[[Posts-Search]]
 == 게시글 목록 조회
+
 회원이 게시글을 조회하는 API 입니다.
 여러가지 필터링 조건을 사용해 조회를 할 수 있습니다.
 
-==== HttpRequest
+=== HttpRequest
+
 include::{snippets}/posts-search/http-request.adoc[]
 include::{snippets}/posts-search/request-parameters.adoc[]
 
-==== HttpResponse
+=== HttpResponse
+
 include::{snippets}/posts-search/http-response.adoc[]
 include::{snippets}/posts-search/response-fields.adoc[]
 
+[[Post-Search]]
 == 게시글 상세 조회
+
 회원이 게시글 상세 정보를 조회하는 API 입니다.
 
-==== HttpRequest
+=== HttpRequest
+
 include::{snippets}/post-search/http-request.adoc[]
 include::{snippets}/post-search/path-parameters.adoc[]
 
-==== HttpResponse
+=== HttpResponse
+
 include::{snippets}/post-search/http-response.adoc[]
 include::{snippets}/post-search/response-fields.adoc[]
 
+[[Post-Update]]
 == 게시글 수정
+
 회원이 게시글 정보를 수정하는 API 입니다.
 
-==== HttpRequest
+=== HttpRequest
+
 include::{snippets}/post-update/http-request.adoc[]
 include::{snippets}/post-update/request-fields.adoc[]
 
-==== HttpResponse
+=== HttpResponse
+
 include::{snippets}/post-update/http-response.adoc[]
 include::{snippets}/post-update/response-fields.adoc[]
 
-
+[[Post-Delete]]
 == 게시글 삭제
+
 회원이 게시글 정보를 삭제하는 API 입니다.
 
-==== HttpRequest
+=== HttpRequest
+
 include::{snippets}/post-delete/http-request.adoc[]
 include::{snippets}/post-delete/request-fields.adoc[]
 
-==== HttpResponse
+=== HttpResponse
+
 include::{snippets}/post-delete/http-response.adoc[]
