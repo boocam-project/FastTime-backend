@@ -20,20 +20,6 @@ include::{snippets}/comment-create/request-fields.adoc[]
 include::{snippets}/comment-create/http-response.adoc[]
 include::{snippets}/comment-create/response-fields.adoc[]
 
-[[Comment-Search-Post]]
-== 게시글 페이지 댓글 목록 조회
-
-게시글 상세 페이지에서 댓글을 조회하는 API 입니다.
-
-=== HttpRequest
-
-include::{snippets}/comments-search-post/http-request.adoc[]
-
-=== HttpResponse
-
-include::{snippets}/comments-search-post/http-response.adoc[]
-include::{snippets}/comments-search-post/response-fields.adoc[]
-
 [[Comment-Search-MyPage]]
 == 마이 페이지 댓글 목록 조회
 
@@ -42,11 +28,27 @@ include::{snippets}/comments-search-post/response-fields.adoc[]
 === HttpRequest
 
 include::{snippets}/comments-search-mypage/http-request.adoc[]
+include::{snippets}/comments-search-mypage/path-parameters.adoc[]
 
 === HttpResponse
 
 include::{snippets}/comments-search-mypage/http-response.adoc[]
 include::{snippets}/comments-search-mypage/response-fields.adoc[]
+
+[[Comment-Search-Post]]
+== 게시글 페이지 댓글 목록 조회
+
+게시글 상세 페이지에서 댓글을 조회하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/comments-search-post/http-request.adoc[]
+include::{snippets}/comments-search-post/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/comments-search-post/http-response.adoc[]
+include::{snippets}/comments-search-post/response-fields.adoc[]
 
 [[Comment-Update]]
 == 댓글 수정
