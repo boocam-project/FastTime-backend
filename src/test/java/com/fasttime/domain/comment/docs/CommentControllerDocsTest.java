@@ -14,6 +14,8 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -120,7 +122,8 @@ public class CommentControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(get("/api/v1/comment/my-page/{memberId}", 1)).andExpect(status().isOk())
             .andDo(document("comments-search-mypage", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()), responseFields(
+                preprocessResponse(prettyPrint()),
+                pathParameters(parameterWithName("memberId").description("회원 식별자")), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.ARRAY).description("응답데이터"),
@@ -160,7 +163,8 @@ public class CommentControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(get("/api/v1/comment/{postId}", 1)).andExpect(status().isOk()).andDo(
             document("comments-search-post", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()), responseFields(
+                preprocessResponse(prettyPrint()),
+                pathParameters(parameterWithName("postId").description("게시글 식별자")), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.ARRAY).description("응답데이터"),
