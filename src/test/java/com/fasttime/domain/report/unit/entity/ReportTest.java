@@ -1,9 +1,10 @@
-package com.fasttime.domain.report.entity;
+package com.fasttime.domain.report.unit.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.report.entity.Report;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
