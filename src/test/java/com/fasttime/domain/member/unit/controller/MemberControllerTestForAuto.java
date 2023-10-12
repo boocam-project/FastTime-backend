@@ -14,7 +14,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.interceptor.LoginCheckInterceptor;
 import org.apache.juli.logging.Log;
@@ -46,6 +48,9 @@ public class MemberControllerTestForAuto {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Autowired
     private ObjectMapper om;
@@ -180,7 +185,8 @@ public class MemberControllerTestForAuto {
             //when, the
             String s = om.writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", 1L);
+            session.setAttribute("MEMBER",
+                memberRepository.findByNickname("testNickname").get().getId());
             mockMvc.perform(post("/api/v1/RePassword")
                     .content(s)
                     .contentType(MediaType.APPLICATION_JSON)

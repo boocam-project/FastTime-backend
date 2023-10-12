@@ -92,7 +92,8 @@ public class MemberServiceTestForAuto {
             RePasswordRequest request = new RePasswordRequest
                 ("newPassword", "newPassword");
             //when
-            MemberResponse response = memberService.rePassword(request,1L);
+            Member loginMember = memberRepository.findByNickname("testNickname").get();
+            MemberResponse response = memberService.rePassword(request, loginMember.getId());
             Member member = memberRepository.findByNickname(response.getNickname()).get();
             //then
             Assertions.assertThat(response.getNickname()).isEqualTo(member.getNickname());
