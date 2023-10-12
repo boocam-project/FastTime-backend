@@ -1,5 +1,6 @@
 package com.fasttime.domain.report.contoller;
 
+import com.fasttime.domain.report.dto.ReportDTO;
 import com.fasttime.domain.report.dto.request.CreateReportRequest;
 import com.fasttime.domain.report.service.ReportService;
 import com.fasttime.global.util.ResponseDTO;
@@ -22,7 +23,7 @@ public class ReportRestController {
     private final ReportService reportService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDTO<Object>> create(
+    public ResponseEntity<ResponseDTO<ReportDTO>> create(
         @Valid @RequestBody CreateReportRequest createReportRequest) {
         log.info("CreateReportRequest: " + createReportRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(
