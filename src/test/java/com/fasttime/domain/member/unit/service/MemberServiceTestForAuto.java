@@ -1,4 +1,4 @@
-package com.fasttime.domain.member.service;
+package com.fasttime.domain.member.unit.service;
 
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.MemberDto;
@@ -7,6 +7,7 @@ import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.domain.member.service.MemberService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -89,9 +90,9 @@ public class MemberServiceTestForAuto {
         void _willSuccess(){
             //given
             RePasswordRequest request = new RePasswordRequest
-                ("testEmail", "newPassword", "newPassword");
+                ("newPassword", "newPassword");
             //when
-            MemberResponse response = memberService.rePassword(request);
+            MemberResponse response = memberService.rePassword(request,1L);
             Member member = memberRepository.findByNickname(response.getNickname()).get();
             //then
             Assertions.assertThat(response.getNickname()).isEqualTo(member.getNickname());
@@ -101,11 +102,11 @@ public class MemberServiceTestForAuto {
         void Re_willFail(){
             //given
             RePasswordRequest request = new RePasswordRequest
-                ("testEmail", "newPassword", "new");
+                ("newPassword", "new");
             //when
 
             //then
-            Assertions.assertThatThrownBy(() -> memberService.rePassword(request))
+            Assertions.assertThatThrownBy(() -> memberService.rePassword(request,1L))
                 .isInstanceOf(BadCredentialsException.class)
                 .hasMessage("Not Match RePassword!");
 
