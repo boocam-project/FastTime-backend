@@ -58,7 +58,7 @@ public class EmailController {
         String code = emailService.sendSimpleMessage(emailRequest.getEmail());
         session.setAttribute("emailCode", code);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK,"이메일을 성공적으로 보냈습니다.",emailRequest.getEmail()));
+            (HttpStatus.OK, "이메일을 성공적으로 보냈습니다.", emailRequest.getEmail()));
     }
 
     @PostMapping("/api/v1/RePassword/verify") // 비밀번호 재설정을 위한 코드 받기
@@ -70,7 +70,7 @@ public class EmailController {
 
         if (sessionCode != null && sessionCode.equals(request.getCode())) {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-                (HttpStatus.OK, "코드 검증이 완료되었습니다.", request.getEmail()));
+                (HttpStatus.OK, "코드 검증이 완료되었습니다."));
         } else {
             // 인증 실패
             throw new BadCredentialsException("Not match Code");
