@@ -1,4 +1,4 @@
-package com.fasttime.domain.report.service;
+package com.fasttime.domain.report.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +22,7 @@ import com.fasttime.domain.report.entity.Report;
 import com.fasttime.domain.report.exception.AlreadyDeletedPostException;
 import com.fasttime.domain.report.exception.DuplicateReportException;
 import com.fasttime.domain.report.repository.ReportRepository;
+import com.fasttime.domain.report.service.ReportService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

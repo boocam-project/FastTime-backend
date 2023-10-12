@@ -45,11 +45,11 @@ public class CommentControllerDocsTest extends RestDocsSupport {
         return new CommentRestController(commentService);
     }
 
-    ConstraintDescriptions CreateCommentRequestConstraints = new ConstraintDescriptions(
+    ConstraintDescriptions createCommentRequestConstraints = new ConstraintDescriptions(
         CreateCommentRequest.class);
-    ConstraintDescriptions UpdateCommentRequestConstraints = new ConstraintDescriptions(
+    ConstraintDescriptions updateCommentRequestConstraints = new ConstraintDescriptions(
         UpdateCommentRequest.class);
-    ConstraintDescriptions DeleteCommentRequestConstraints = new ConstraintDescriptions(
+    ConstraintDescriptions deleteCommentRequestConstraints = new ConstraintDescriptions(
         DeleteCommentRequest.class);
 
     @DisplayName("댓글 등록 API 문서화")
@@ -73,16 +73,16 @@ public class CommentControllerDocsTest extends RestDocsSupport {
                 preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글 식별자")
                         .attributes(key("constraints").value(
-                            CreateCommentRequestConstraints.descriptionsForProperty("postId"))),
+                            createCommentRequestConstraints.descriptionsForProperty("postId"))),
                     fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자")
                         .attributes(key("constraints").value(
-                            CreateCommentRequestConstraints.descriptionsForProperty("memberId"))),
+                            createCommentRequestConstraints.descriptionsForProperty("memberId"))),
                     fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
                         .attributes(key("constraints").value(
-                            CreateCommentRequestConstraints.descriptionsForProperty("content"))),
+                            createCommentRequestConstraints.descriptionsForProperty("content"))),
                     fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
                         .attributes(key("constraints").value(
-                            CreateCommentRequestConstraints.descriptionsForProperty("anonymity"))),
+                            createCommentRequestConstraints.descriptionsForProperty("anonymity"))),
                     fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER).optional()
                         .description("부모 댓글 식별자")), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
@@ -208,10 +208,10 @@ public class CommentControllerDocsTest extends RestDocsSupport {
                     preprocessResponse(prettyPrint()), requestFields(
                         fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자").attributes(
                             key("constraints").value(
-                                UpdateCommentRequestConstraints.descriptionsForProperty("id"))),
+                                updateCommentRequestConstraints.descriptionsForProperty("id"))),
                         fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
                             .attributes(key("constraints").value(
-                                UpdateCommentRequestConstraints.descriptionsForProperty("content")))),
+                                updateCommentRequestConstraints.descriptionsForProperty("content")))),
                     responseFields(
                         fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                         fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
@@ -246,7 +246,7 @@ public class CommentControllerDocsTest extends RestDocsSupport {
                 preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("id").type(JsonFieldType.NUMBER).description("댓글 식별자").attributes(
                         key("constraints").value(
-                            DeleteCommentRequestConstraints.descriptionsForProperty("id")))),
+                            deleteCommentRequestConstraints.descriptionsForProperty("id")))),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),

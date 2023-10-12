@@ -1,4 +1,4 @@
-package com.fasttime.domain.report.controller;
+package com.fasttime.domain.report.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
