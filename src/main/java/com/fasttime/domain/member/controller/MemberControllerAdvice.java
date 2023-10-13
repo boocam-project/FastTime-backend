@@ -28,4 +28,10 @@ public class MemberControllerAdvice {
             ResponseDTO.res(HttpStatus.BAD_REQUEST,
                 e.getMessage()));
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ResponseDTO.res(HttpStatus.NOT_FOUND, e.getMessage()));
+    }
 }
