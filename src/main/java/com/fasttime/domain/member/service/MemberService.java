@@ -82,9 +82,9 @@ public class MemberService {
         }
     }
 
-    public MemberResponse rePassword(RePasswordRequest request) {
+    public MemberResponse rePassword(RePasswordRequest request,Long id) {
         if (request.getPassword().equals(request.getRePassword())) {
-            Member member = memberRepository.findByEmail(request.getEmail()).get();
+            Member member = memberRepository.findById(id).get();
             member.setPassword(passwordEncoder.encode(request.getPassword()));
             return new MemberResponse(member.getId(), member.getNickname());
         } else {

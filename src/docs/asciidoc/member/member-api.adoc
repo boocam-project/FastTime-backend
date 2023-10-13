@@ -1,0 +1,56 @@
+= Member REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+
+[[Member-Login]]
+== 회원 로그인
+
+사용자가 로그인하는 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-login/http-request.adoc[]
+include::{snippets}/member-login/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/member-login/http-response.adoc[]
+include::{snippets}/member-login/response-fields.adoc[]
+
+[[Member-Logout]]
+== 회원 로그아웃
+
+사용자가 로그아웃하는 API 입니다.
+
+로그인된 사용자의 세션 데이터를 삭제해야 합니다.
+
+=== HttpRequest
+
+include::{snippets}/member-logout/http-request.adoc[]
+
+
+=== HttpResponse
+
+include::{snippets}/member-logout/http-response.adoc[]
+
+
+[[Member-RePassword]]
+== 회원 비밀번호 재설정
+
+사용자가 비밀번호를 재설정하는 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-rePassword/http-request.adoc[]
+include::{snippets}/member-rePassword/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/member-rePassword/http-response.adoc[]
+include::{snippets}/member-rePassword/response-fields.adoc[]

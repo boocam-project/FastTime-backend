@@ -14,15 +14,30 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) throws Exception {
-        String requestURI = request.getRequestURI();
+        if (isGetPost(request)) {
+            return true;
+        }
         HttpSession session = request.getSession(false);
 
-        if (session == null || (session.getAttribute("MEMBER") == null
-            && session.getAttribute("ADMIN") == null)) {
+        if (isNotLogin(session)) {
             response.sendError(403,"로그인 후 이용가능합니다.");
             return false;
         }
         return true;
+    }
+
+    private  boolean isGetPost(HttpServletRequest request) {
+        boolean contains = request.getRequestURI().contains("/api/v1/post");
+        boolean get = request.getMethod().equals("GET");
+        if (contains && get){
+                return true;
+        }
+        return false;
+    }
+
+    private  boolean isNotLogin(HttpSession session) {
+        return session == null || (session.getAttribute("MEMBER") == null
+            && session.getAttribute("ADMIN") == null);
     }
 }
 

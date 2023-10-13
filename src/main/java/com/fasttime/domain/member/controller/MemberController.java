@@ -122,12 +122,14 @@ public class MemberController {
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
+        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult
+            , HttpSession session)
         throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
-        MemberResponse response = memberService.rePassword(request);
+        MemberResponse response =
+            memberService.rePassword(request,(Long) session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK,"패스워드 재설정이 완료되었습니다",response));
     }
