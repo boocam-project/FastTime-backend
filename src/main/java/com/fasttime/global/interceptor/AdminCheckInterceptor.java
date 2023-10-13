@@ -17,7 +17,7 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
 
         if (session != null && session.getAttribute("ADMIN") == null) {
-            response.sendRedirect("/");
+            response.sendError(403,"Admin 권한이 없습니다.");
             return false;
         }
         return true;
