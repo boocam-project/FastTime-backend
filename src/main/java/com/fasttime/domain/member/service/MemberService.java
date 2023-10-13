@@ -92,4 +92,13 @@ public class MemberService {
         }
     }
 
+    public MemberDto getMyPageInfo(Member member) throws UserNotFoundException {
+        if (member != null) {
+            return new MemberDto(member.getNickname(), member.getEmail(), member.getImage());
+        } else {
+            throw new UserNotFoundException("User not found.");
+        }
+    }
+
+
 }

@@ -97,31 +97,20 @@ public class MemberController {
                 .body("알 수 없는 오류가 발생했습니다.");
         }
     }
+
     @GetMapping("/api/v1/mypage")
     public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
-        // 세션에서 현재 로그인한 사용자 정보 가져오기
         Member member = (Member) session.getAttribute("MEMBER");
 
-        if (member != null) {
-            // 회원의 닉네임, 이메일, 프로필 사진 URL 가져오기
-            String nickname = member.getNickname();
-            String email = member.getEmail();
-            String profileImageUrl = member.getImage(); // 엔터티에서 직접 이미지 URL 가져오기
-
-            // 사용자 정보를 포함한 응답 객체 생성
-            Map<String, String> userInfo = new HashMap<>();
-            userInfo.put("nickname", nickname);
-            userInfo.put("email", email);
-            userInfo.put("profileImageUrl", profileImageUrl);
-
-            // 사용자 정보를 응답으로 반환
-            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", userInfo));
-        } else {
-            // 로그인되어 있지 않은 경우 권한 없음 응답 반환
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
+        try {
+            MemberDto memberDto = memberService.getMyPageInfo(member);
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ResponseDTO.res(HttpStatus.NOT_FOUND, e.getMessage()));
         }
     }
-
 
 
     @PostMapping("/api/v1/login")
@@ -134,7 +123,7 @@ public class MemberController {
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "로그인이 완료되었습니다.",response));
+            (HttpStatus.OK, "로그인이 완료되었습니다.", response));
     }
 
     @GetMapping("/api/v1/logout")
@@ -146,19 +135,19 @@ public class MemberController {
             session.removeAttribute("MEMBER");
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK,"로그아웃이 완료되었습니다."));
+            (HttpStatus.OK, "로그아웃이 완료되었습니다."));
     }
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult)
+        (@Validated @RequestBody RePasswordRequest request, BindingResult bindingResult)
         throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
         MemberResponse response = memberService.rePassword(request);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK,"패스워드 재설정이 완료되었습니다",response));
+            (HttpStatus.OK, "패스워드 재설정이 완료되었습니다", response));
     }
 }
 
