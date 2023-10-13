@@ -97,18 +97,13 @@ public class MemberController {
     }
 
     @GetMapping("/api/v1/mypage")
-    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
+    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) throws UserNotFoundException {
         Member member = (Member) session.getAttribute("MEMBER");
-
-        try {
-            MemberDto memberDto = memberService.getMyPageInfo(member);
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseDTO.res(HttpStatus.NOT_FOUND, e.getMessage()));
-        }
+        MemberDto memberDto = memberService.getMyPageInfo(member);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
     }
+
 
 
     @PostMapping("/api/v1/login")
