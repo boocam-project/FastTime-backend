@@ -21,4 +21,8 @@ public class MemberDto {
 
     private String nickname; // 닉네임
 
+    private String image; // 닉네임
+
+    public MemberDto(String nickname, String email, String image) {
+    }
 }

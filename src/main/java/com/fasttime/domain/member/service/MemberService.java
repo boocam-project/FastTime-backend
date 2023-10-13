@@ -82,7 +82,7 @@ public class MemberService {
         }
     }
 
-    public MemberResponse rePassword(RePasswordRequest request,Long id) {
+    public MemberResponse rePassword(RePasswordRequest request, Long id) {
         if (request.getPassword().equals(request.getRePassword())) {
             Member member = memberRepository.findById(id).get();
             member.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -91,5 +91,14 @@ public class MemberService {
             throw new BadCredentialsException("Not Match RePassword!");
         }
     }
+
+    public MemberDto getMyPageInfo(Member member) throws UserNotFoundException {
+        if (member != null) {
+            return new MemberDto(member.getNickname(), member.getEmail(), member.getImage());
+        } else {
+            throw new UserNotFoundException("사용자를 찾을 수 없습니다."); // 예외 던지기
+        }
+    }
+
 
 }

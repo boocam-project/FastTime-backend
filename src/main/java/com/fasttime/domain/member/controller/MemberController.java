@@ -95,6 +95,16 @@ public class MemberController {
         }
     }
 
+    @GetMapping("/api/v1/mypage")
+    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session)
+        throws UserNotFoundException {
+        Member member = (Member) session.getAttribute("MEMBER");
+        MemberDto memberDto = memberService.getMyPageInfo(member);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
+    }
+
+
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
         , BindingResult bindingResult, HttpSession session)
@@ -105,7 +115,7 @@ public class MemberController {
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "로그인이 완료되었습니다.",response));
+            (HttpStatus.OK, "로그인이 완료되었습니다.", response));
     }
 
     @GetMapping("/api/v1/logout")
@@ -117,21 +127,21 @@ public class MemberController {
             session.removeAttribute("MEMBER");
         }
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK,"로그아웃이 완료되었습니다."));
+            (HttpStatus.OK, "로그아웃이 완료되었습니다."));
     }
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request,BindingResult bindingResult
+        (@Validated @RequestBody RePasswordRequest request, BindingResult bindingResult
             , HttpSession session)
         throws BindException {
         if (bindingResult.hasErrors()) {
             throw new BindException(bindingResult);
         }
         MemberResponse response =
-            memberService.rePassword(request,(Long) session.getAttribute("MEMBER"));
+            memberService.rePassword(request, (Long) session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK,"패스워드 재설정이 완료되었습니다",response));
+            (HttpStatus.OK, "패스워드 재설정이 완료되었습니다", response));
     }
 }
 
