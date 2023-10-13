@@ -1,4 +1,4 @@
-package com.fasttime.domain.member.controller;
+package com.fasttime.domain.member.unit.controller;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,9 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.interceptor.LoginCheckInterceptor;
 import org.apache.juli.logging.Log;
@@ -45,6 +48,9 @@ public class MemberControllerTestForAuto {
 
     @Autowired
     private MemberService memberService;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Autowired
     private ObjectMapper om;
@@ -175,12 +181,16 @@ public class MemberControllerTestForAuto {
         void _willSuccess() throws Exception {
             //given
             RePasswordRequest request = new RePasswordRequest
-                ("testEmail", "newPassword", "newPassword");
+                ("newPassword", "newPassword");
             //when, the
             String s = om.writeValueAsString(request);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER",
+                memberRepository.findByNickname("testNickname").get().getId());
             mockMvc.perform(post("/api/v1/RePassword")
                     .content(s)
-                    .contentType(MediaType.APPLICATION_JSON))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
@@ -191,7 +201,7 @@ public class MemberControllerTestForAuto {
         void validation_willFail() throws Exception {
             //given
             RePasswordRequest request = new RePasswordRequest
-                ("testEmail", " ", "newPassword");
+                (" ", "newPassword");
             //when, the
             String s = om.writeValueAsString(request);
             mockMvc.perform(post("/api/v1/RePassword")
@@ -206,7 +216,7 @@ public class MemberControllerTestForAuto {
         void Re_willFail() throws Exception {
             //given
             RePasswordRequest request = new RePasswordRequest
-                ("testEmail", "newPassword", "new");
+                ( "newPassword", "new");
             //when, the
             String s = om.writeValueAsString(request);
             mockMvc.perform(post("/api/v1/RePassword")

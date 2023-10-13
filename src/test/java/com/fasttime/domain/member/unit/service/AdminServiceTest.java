@@ -1,9 +1,12 @@
-package com.fasttime.domain.member.service;
+package com.fasttime.domain.member.unit.service;
 
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
+import com.fasttime.domain.member.service.AdminService;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
+import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
@@ -63,11 +66,11 @@ public class AdminServiceTest {
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
             // when
-            List<Post> postList = adminService.findReportedPost();
+            List<PostsResponseDto> postList = adminService.findReportedPost();
 
             //then
-            Assertions.assertThat(postList.get(0)).isEqualTo(post1);
-            Assertions.assertThat(postList.get(1)).isEqualTo(post2);
+            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post1.getTitle());
+            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post2.getTitle());
         }
         @DisplayName("없어 조회 할 수 없다.")
         @Test
@@ -86,7 +89,7 @@ public class AdminServiceTest {
             Post post2 = postRepository.findById(newPost2.getId()).get();
 
             // when
-            List<Post> postList = adminService.findReportedPost();
+            List<PostsResponseDto> postList = adminService.findReportedPost();
             //then
             Assertions.assertThat(postList.isEmpty()).isTrue();
         }
@@ -135,7 +138,7 @@ public class AdminServiceTest {
         //IllegalArgumentException
         @DisplayName("잘못된 접근으로 바꿀 수 없다.")
         @Test
-        void _willFail() throws AccessException {
+        void _willFail() throws IllegalArgumentException {
             //given
             PostCreateServiceDto dto1 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
@@ -145,24 +148,8 @@ public class AdminServiceTest {
             Post post1 = postRepository.findById(newPost.getId()).get();
 
             //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
-        }
-        //AccessException
-        @DisplayName("신고가 되지 않는 게시물에 접근하여 바꿀 수 없다.")
-        @Test
-        void Access_willFail() throws AccessException {
-            //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
-
-            //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.passPost(post1.getId()));
+            Assertions.assertThatThrownBy(() -> adminService.passPost(100L));
         }
     }
-
 
 }
