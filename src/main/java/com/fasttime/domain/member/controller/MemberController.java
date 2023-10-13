@@ -13,8 +13,6 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
-import java.util.HashMap;
-import java.util.Map;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
