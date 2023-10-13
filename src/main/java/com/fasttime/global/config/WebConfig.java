@@ -16,11 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AdminCheckInterceptor())
             .order(1)
-            .addPathPatterns("/v1/admin");
+            .addPathPatterns("/api/v1/admin");
         registry.addInterceptor(new LoginCheckInterceptor())
             .order(2)
-            .addPathPatterns("/api/v1/comment/**",
-                "/api/v1/retouch-member", "/api/v1/logout", "/api/v1/delete");
+            .addPathPatterns("/api/v1/comment", "/api/v1/my-page/**", "/api/v1/post",
+                "/api/v1/retouch-member", "/api/v1/logout", "/api/v1/delete","/api/v1/RePassword");
+
     }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
