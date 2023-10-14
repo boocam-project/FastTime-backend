@@ -94,6 +94,15 @@ public class MemberController {
                 .body("알 수 없는 오류가 발생했습니다.");
         }
     }
+    @GetMapping("/api/v1/mypage")
+    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session)
+        throws UserNotFoundException {
+        Member member = (Member) session.getAttribute("MEMBER");
+        MemberDto memberDto = memberService.getMyPageInfo(member);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
+    }
+
 
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
