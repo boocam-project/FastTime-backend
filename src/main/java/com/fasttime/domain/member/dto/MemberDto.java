@@ -23,9 +23,4 @@ public class MemberDto {
     private String nickname; // 닉네임
 
 
-
-
-
-
-
 }

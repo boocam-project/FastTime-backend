@@ -228,6 +228,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
     }
+
     @DisplayName("회원 정보 수정 API 문서화")
     @Test
     void updateMember() throws Exception {
@@ -259,17 +260,6 @@ public class MemberControllerDocsTest extends RestDocsSupport {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
