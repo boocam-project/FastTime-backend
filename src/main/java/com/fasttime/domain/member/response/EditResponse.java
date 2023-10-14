@@ -12,6 +12,7 @@ public class EditResponse {
 
     private String email;
     private String nickname;
+    private String image;
 
 
     private String message;
@@ -19,6 +20,7 @@ public class EditResponse {
     public EditResponse(Member member) {
         this.email = member.getEmail();
         this.nickname = member.getNickname();
+        this.image = member.getImage();
 
     }
 

@@ -67,7 +67,8 @@ public class MemberController {
                 return ResponseEntity.badRequest().body(new EditResponse("중복된 닉네임입니다."));
             }
 
-            // 이미지 업데이트
+            // 닉네임과 이미지 업데이트
+            member.setNickname(editRequest.getNickname());
             member.setImage(editRequest.getImage());
 
             // 업데이트된 Member 엔티티를 데이터베이스에 저장
@@ -78,10 +79,11 @@ public class MemberController {
         }
 
         EditResponse e = new EditResponse("로그인 상태가 아닙니다.");
-        return ResponseEntity.badRequest().body(e);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e);
     }
 
-    //패스워드 수정은 security적용 후 구현 가능합니다.
+
+
 
 
     @DeleteMapping("v1/delete") // 회원탈퇴 (soft delete 적용)
