@@ -94,7 +94,7 @@ public class MemberService {
 
     public MemberDto getMyPageInfo(Member member) throws UserNotFoundException {
         if (member != null) {
-            return new MemberDto(member.getNickname(), member.getEmail(), member.getImage());
+            return new MemberDto(member.getNickname(),member.getPassword(), member.getEmail(), member.getImage());
         } else {
             throw new UserNotFoundException("사용자를 찾을 수 없습니다."); // 예외 던지기
         }
