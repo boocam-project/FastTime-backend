@@ -13,6 +13,8 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -95,12 +97,30 @@ public class MemberController {
         }
     }
     @GetMapping("/api/v1/mypage")
-    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session)
-        throws UserNotFoundException {
+    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
+        // 세션에서 현재 로그인한 사용자 정보 가져오기
         Member member = (Member) session.getAttribute("MEMBER");
-        MemberDto memberDto = memberService.getMyPageInfo(member);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", memberDto));
+
+        if (member != null) {
+            // 회원의 닉네임, 이메일, 프로필 사진 URL 가져오기
+            String nickname = member.getNickname();
+            String email = member.getEmail();
+            String profileImageUrl = member.getImage(); // 엔터티에서 직접 이미지 URL 가져오기
+
+            // 사용자 정보를 포함한 응답 객체 생성
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("nickname", nickname);
+            userInfo.put("email", email);
+            userInfo.put("profileImageUrl", profileImageUrl);
+
+            // 사용자 정보를 응답으로 반환
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", userInfo));
+        } else {
+            // 로그인되어 있지 않은 경우 권한 없음 응답 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
+        }
     }
 
 

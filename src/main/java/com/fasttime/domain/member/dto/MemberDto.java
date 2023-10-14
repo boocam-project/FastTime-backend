@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Data
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 
 public class MemberDto {
@@ -21,23 +22,8 @@ public class MemberDto {
 
     private String nickname; // 닉네임
 
-    private String image; // 프로필사진url
 
 
-    // email, password, nickname을 받는 생성자
-    public MemberDto(String email, String password, String nickname) {
-        this.email = email;
-        this.password = password;
-        this.nickname = nickname;
-    }
-
-    // email, password, image를 받는 생성자
-    public MemberDto(String nickname, String password, String email, String image) {
-        this.email = email;
-        this.password = password;
-        this.image = image;
-        this.nickname = nickname;
-    }
 
 
 
