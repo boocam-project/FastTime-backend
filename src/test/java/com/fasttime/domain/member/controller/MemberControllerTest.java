@@ -269,41 +269,47 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.message").value("중복된 닉네임입니다."));
         }
     }
-    @Test
-    @DisplayName("사용자 정보 조회 성공")
-    public void testGetMyPageInfo() throws Exception {
-        // 가상의 회원 정보를 생성합니다.
-        Member member = new Member();
-        member.setId(1L);
-        member.setEmail("test@example.com");
-        member.setNickname("testuser");
-        member.setImage("testImage");
+    @Nested
+    @DisplayName("마이페이지 회원정보 조회")
+    class MyPage{
+        @Test
+        @DisplayName("성공한다. : 로그인된 사용자 정보 조회")
+        public void testGetMyPageInfoWhenLoggedIn () throws Exception {
+            // Create a mock session with a logged-in user
+            MockHttpSession session = new MockHttpSession();
+            Member loggedInMember = new Member();
+            loggedInMember.setNickname("testuser");
+            loggedInMember.setEmail("test@example.com");
+            loggedInMember.setImage("testImage");
+            session.setAttribute("MEMBER", loggedInMember);
 
-        // 가상의 세션을 생성하고 세션에 회원 정보를 설정합니다.
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", member);
+            // Perform GET request to /api/v1/mypage
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                    .value("사용자 정보를 성공적으로 조회하였습니다."))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath("$.data.profileImageUrl").value("testImage"));
+        }
 
-        // MemberService의 getMyPageInfo 메서드가 호출될 때 반환할 가상의 MemberDto를 생성합니다.
-        MemberDto memberDto = new MemberDto();
-        memberDto.setNickname("testuser");
-        memberDto.setEmail("test@example.com");
-        memberDto.setImage("testImage");
+        @Test
+        @DisplayName("실패한다. : 로그인하지 않은 사용자 정보 조회")
 
-        // MemberService의 getMyPageInfo 메서드가 호출될 때 mock 데이터를 반환하도록 설정합니다.
-        Mockito.when(memberService.getMyPageInfo(member)).thenReturn(memberDto);
 
-        // GET /api/v1/mypage 요청을 수행
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.data.image").value("testImage"));
+            public void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
+                // Create a mock session without a logged-in user
 
-        // MemberService의 getMyPageInfo 메서드가 session.getAttribute("MEMBER")를 인자로 호출되었는지 확인합니다.
-        Mockito.verify(memberService).getMyPageInfo(member);
+                MockHttpSession session = new MockHttpSession();
+
+                // Perform GET request to /api/v1/mypage
+                mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
+                    .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.message")
+                        .value("사용자가 로그인되어 있지 않습니다."));
+            }
+        }
     }
 
-}
 
