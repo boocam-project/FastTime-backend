@@ -12,14 +12,13 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostQueryService;
-import com.fasttime.domain.record.dto.request.CreateRecordRequest;
-import com.fasttime.domain.record.dto.request.DeleteRecordRequest;
+import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
+import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.entity.Record;
 import com.fasttime.domain.record.exception.DuplicateRecordException;
 import com.fasttime.domain.record.exception.RecordNotFoundException;
 import com.fasttime.domain.record.repository.RecordRepository;
 import com.fasttime.domain.record.service.RecordService;
-import com.fasttime.domain.report.exception.DuplicateReportException;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +53,7 @@ public class RecordServiceTest {
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() {
             // given
-            CreateRecordRequest request = CreateRecordRequest.builder().memberId(1L).postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
@@ -76,7 +75,7 @@ public class RecordServiceTest {
         @DisplayName("게시글을 싫어요 할 수 있다.")
         void hate_willSuccess() {
             // given
-            CreateRecordRequest request = CreateRecordRequest.builder().memberId(1L).postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
@@ -98,7 +97,7 @@ public class RecordServiceTest {
         @DisplayName("이미 좋아요(싫어요)를 한 게시글에 다시 좋아요(싫어요)를 등록할 수 없다.")
         void duplicateRecord1_willFail() {
             // given
-            CreateRecordRequest request = CreateRecordRequest.builder().memberId(1L).postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
@@ -121,7 +120,7 @@ public class RecordServiceTest {
         @DisplayName("좋아요와 싫어요를 중복으로 등록할 수 없다.")
         void duplicateRecord2_willFail() {
             // given
-            CreateRecordRequest request = CreateRecordRequest.builder().memberId(1L).postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
@@ -149,7 +148,7 @@ public class RecordServiceTest {
         @DisplayName("게시글 좋아요/싫어요를 취소할 수 있다.")
         void _willSuccess() {
             // given
-            DeleteRecordRequest request = DeleteRecordRequest.builder().memberId(1L).postId(1L)
+            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             Post post = Post.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
@@ -170,7 +169,7 @@ public class RecordServiceTest {
         @DisplayName("게시글 좋아요/싫어요 한 적이 없다면 좋아요/싫어요를 취소할 수 없다.")
         void recordNotFound_willSuccess() {
             // given
-            DeleteRecordRequest request = DeleteRecordRequest.builder().memberId(1L).postId(1L)
+            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().memberId(1L).postId(1L)
                 .build();
             Optional<Record> record = Optional.empty();
 
