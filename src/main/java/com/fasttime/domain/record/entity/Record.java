@@ -2,6 +2,7 @@ package com.fasttime.domain.record.entity;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.global.common.BaseTimeEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,5 +44,10 @@ public class Record extends BaseTimeEntity {
         this.member = member;
         this.post = post;
         this.isLike = isLike;
+    }
+
+    public RecordDTO toDTO() {
+        return RecordDTO.builder().id(this.id).postId(this.post.getId())
+            .memberId(this.member.getId()).isLike(this.isLike).build();
     }
 }
