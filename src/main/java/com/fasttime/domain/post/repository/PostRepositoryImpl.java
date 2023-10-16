@@ -28,7 +28,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 post.title,
                 post.anonymity,
                 post.likeCount,
-                post.hateCount
+                post.hateCount,
+                post.createdAt,
+                post.updatedAt,
+                post.deletedAt
             ))
             .from(post)
             .where(createSearchConditionBuilder(postSearchCondition))

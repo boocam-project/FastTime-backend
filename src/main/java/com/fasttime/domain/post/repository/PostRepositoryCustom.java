@@ -21,5 +21,6 @@ public interface PostRepositoryCustom {
         private int hateCount;
         private LocalDateTime createdAt;
         private LocalDateTime lastModifiedAt;
+        private LocalDateTime deletedAt;
     }
 }
