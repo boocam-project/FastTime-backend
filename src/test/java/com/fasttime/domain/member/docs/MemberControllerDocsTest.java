@@ -149,7 +149,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(memberDto);
 
         //then
-        mockMvc.perform(post("/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
+        mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
             .andExpect(jsonPath("$.message").value("가입 성공!")) // 메시지 확인
             .andExpect(jsonPath("$.data").value("가입 성공!")) // 응답 데이터 확인
@@ -178,7 +178,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(
-                delete("/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
+                delete("/api/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
             .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다.")) // 메시지 확인
             .andDo(document("member-delete", preprocessRequest(prettyPrint()),
@@ -249,7 +249,7 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 
         // When
         ResultActions result = mockMvc.perform(
-            put("/v1/retouch-member").contentType(MediaType.APPLICATION_JSON)
+            put("/api/v1/retouch-member").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(editRequest)).session(session));
 
         // Then

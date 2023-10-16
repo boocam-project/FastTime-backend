@@ -36,7 +36,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
 
-    @PostMapping("/v1/join")
+    @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
         try {
             if (memberService.isEmailExistsInFcmember(memberDto.getEmail())) {
@@ -61,7 +61,7 @@ public class MemberController {
         }
     }
 
-    @PutMapping("v1/retouch-member") // 회원 정보 수정
+    @PutMapping("/api/v1/retouch-member") // 회원 정보 수정
     public ResponseEntity<ResponseDTO<EditResponse>> updateMember(
         @RequestBody EditRequest editRequest,
         HttpSession session) {
@@ -99,7 +99,7 @@ public class MemberController {
     }
 
 
-    @DeleteMapping("v1/delete") // 회원탈퇴 (soft delete 적용)
+    @DeleteMapping("/api/v1/delete") // 회원탈퇴 (soft delete 적용)
     public ResponseEntity<ResponseDTO<Object>> deleteMember(HttpSession httpSession) {
         Long memberId = (Long) httpSession.getAttribute("MEMBER");
         if (memberId != null) {

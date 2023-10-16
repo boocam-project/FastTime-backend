@@ -33,7 +33,7 @@ public class EmailControllerTest {
 
         when(emailService.sendSimpleMessage(anyString())).thenReturn("123456");//인증번호 고정
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/v1/emailconfirm")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/emailconfirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\": \"" + email + "\"}"))
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -50,13 +50,13 @@ public class EmailControllerTest {
         session.setAttribute("emailCode", "123456");
 
         //발송된 이메일 인증번호와 입력된 인증번호가 일치할 때
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/verify/123456")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/verify/123456")
                 .session(session))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
 
         //발송된 이메일 인증번호와 입력된 인증번호가 일치하지 않을 때
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/verify/111111")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/verify/111111")
                 .session(session))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false));
