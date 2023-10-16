@@ -2,6 +2,7 @@ package com.fasttime.domain.member.response;
 
 import com.fasttime.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +25,8 @@ public class EditResponse {
 
     }
 
+
+    @Builder
     public EditResponse(String message) {
         this.message = message;
     }

@@ -1,5 +1,7 @@
 package com.fasttime.domain.member.docs;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -34,6 +36,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import java.util.Optional;
@@ -45,6 +48,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 public class MemberControllerDocsTest extends RestDocsSupport {
 
@@ -66,26 +70,21 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then
-        mockMvc.perform(post("/api/v1/login").contentType(MediaType.APPLICATION_JSON)
-                .content(data))
-            .andExpect(status().isOk())
-            .andDo(document("member-login",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
-                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
-                        .attributes(key("constraints").value("Not Blank")),
-                    fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                        .attributes(key("constraints").value("Not Blank"))),
-                responseFields(
-                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
-                        .description("메시지"),
-                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("사용자 닉네임")
-                ))
-            );
+        mockMvc.perform(post("/api/v1/login").contentType(MediaType.APPLICATION_JSON).content(data))
+            .andExpect(status().isOk()).andDo(
+                document("member-login", preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()), requestFields(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+                            .attributes(key("constraints").value("Not Blank")),
+                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                            .attributes(key("constraints").value("Not Blank"))), responseFields(
+                        fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                        fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                            .description("메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
+                        fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                            .description("사용자 닉네임"))));
     }
 
     @DisplayName("회원 로그아웃 API 문서화")
@@ -96,14 +95,11 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         session.setAttribute("MEMBER", 1L);
 
         //when then
-        mockMvc.perform(get("/api/v1/logout")
-                .contentType(MediaType.APPLICATION_JSON)
-                .session(session))
-            .andExpect(status().isOk())
-            .andDo(document("member-logout",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()))
-            );
+        mockMvc.perform(
+                get("/api/v1/logout").contentType(MediaType.APPLICATION_JSON).session(session))
+            .andExpect(status().isOk()).andDo(
+                document("member-logout", preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint())));
     }
 
     @DisplayName("회원 비밀번호 재설정 API 문서화")
@@ -120,27 +116,22 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then
-        mockMvc.perform(post("/api/v1/RePassword").contentType(MediaType.APPLICATION_JSON)
-                .content(data)
-                .session(session))
-            .andExpect(status().isOk())
-            .andDo(document("member-rePassword",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
+        mockMvc.perform(
+            post("/api/v1/RePassword").contentType(MediaType.APPLICATION_JSON).content(data)
+                .session(session)).andExpect(status().isOk()).andDo(
+            document("member-rePassword", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                         .attributes(key("constraints").value("Not Blank")),
                     fieldWithPath("rePassword").type(JsonFieldType.STRING).description("비밀번호 재확인")
-                        .attributes(key("constraints").value("Not Blank"))),
-                responseFields(
+                        .attributes(key("constraints").value("Not Blank"))), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).optional()
                         .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("사용자 닉네임")
-                ))
-            );
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                        .description("사용자 닉네임"))));
     }
 
     @DisplayName("회원 가입 API 문서화")
@@ -158,23 +149,23 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(memberDto);
 
         //then
-        mockMvc.perform(post("/v1/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(data))
-            .andExpect(status().isOk())
-            .andDo(document("member-join",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
+        mockMvc.perform(post("/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
+            .andExpect(jsonPath("$.message").value("가입 성공!")) // 메시지 확인
+            .andExpect(jsonPath("$.data").value("가입 성공!")) // 응답 데이터 확인
+            .andDo(document("member-join", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
                         .attributes(key("constraints").value("Not Blank")),
                     fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                         .attributes(key("constraints").value("Not Blank")),
                     fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임")
-                        .attributes(key("constraints").value("Not Blank"))
-
-                )
-            ));
+                        .attributes(key("constraints").value("Not Blank"))), responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).optional()
+                        .description("응답데이터"))));
     }
 
     @DisplayName("회원 탈퇴 API 문서화")
@@ -182,84 +173,144 @@ public class MemberControllerDocsTest extends RestDocsSupport {
     void deleteMember() throws Exception {
         // given
         long memberId = 1L;
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", memberId);
 
         // when, then
-        mockMvc.perform(delete("/v1/delete")
-                .param("id", String.valueOf(memberId))
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andDo(document("member-delete",
+        mockMvc.perform(
+                delete("/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
+            .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다.")) // 메시지 확인
+            .andDo(document("member-delete", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint())));
+    }
+
+    @DisplayName("마이페이지 조회 API 문서화")
+    @Test
+    void testGetMyPageInfo() throws Exception {
+        // Given
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
+
+        Member member = new Member();
+        member.setId(1L);
+        member.setNickname("NewNickname");
+        member.setEmail("test@example.com");
+        member.setImage("newimageURL");
+
+        when(memberService.getMember(1L)).thenReturn(member);
+
+        // When
+        ResultActions result = mockMvc.perform(get("/api/v1/mypage").session(session)
+            .contentType(MediaType.APPLICATION_JSON_UTF8));
+
+        // Then
+        result.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
+            .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
+            .andExpect(jsonPath("$.data.email").value("test@example.com"))
+            .andExpect(jsonPath("$.data.profileImageUrl").value("newimageURL"))
+            .andDo(document("member-getMyPageInfo",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                requestParameters(
-                    parameterWithName("id").description("삭제할 회원의 ID")
+                responseFields(
+                    fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
+                    fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
+                    fieldWithPath("data.nickname").description("사용자 닉네임")
+                        .type(JsonFieldType.STRING),
+                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING),
+                    fieldWithPath("data.profileImageUrl").description("프로필 이미지 URL")
+                        .type(JsonFieldType.STRING)
                 )
             ));
     }
 
-    @DisplayName("마이페이지 조회 API 테스트")
-    @Test
-    void testGetMyPageInfo() throws Exception {
-        // 가짜 세션을 생성하고 사용자 정보를 세션에 넣어줍니다.
-        MockHttpSession session = new MockHttpSession();
-        Member member = new Member();
-        member.setId(1L);
-        member.setNickname("testUser");
-        member.setEmail("test@example.com");
-        member.setImage("profile.jpg");
-        session.setAttribute("MEMBER", member);
 
-        // GET /api/v1/mypage 요청을 수행하고 API 문서화를 위한 스니펫을 생성합니다.
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON))
-            // HTTP 상태 코드가 200 OK인지 확인합니다.
-            .andExpect(status().isOk())
-            // 응답 본문이 JSON 형식인지 확인합니다.
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            // 응답 본문에 필요한 필드가 있는지 확인합니다.
-            .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
-            .andExpect(jsonPath("$.data.nickname").value("testUser"))
-            .andExpect(jsonPath("$.data.email").value("test@example.com"))
-            .andExpect(jsonPath("$.data.profileImageUrl").value("profile.jpg"))
-            // API 문서화를 위한 스니펫을 생성합니다.
-            .andDo(document("member-getMyPageInfo",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())));
-    }
+    /*
+        @DisplayName("마이페이지 조회 API 테스트")
+        @Test
+        void testGetMyPageInfo() throws Exception {
+            // 가짜 세션을 생성하고 사용자 정보를 세션에 넣어줍니다.
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L); // 사용자 ID를 세션에 저장
 
+            // 사용자 정보를 생성합니다. (실제 데이터에 맞게끔)
+            Member member = new Member();
+            member.setId(1L);
+            member.setNickname("testUser");
+            member.setEmail("test@example.com");
+            member.setImage("profile.jpg");
+
+            // memberService.getMember() 메서드가 호출될 때 위에서 생성한 사용자 정보를 반환하도록 설정합니다.
+            when(memberService.getMember(1L)).thenReturn(member);
+
+            // GET /api/v1/mypage 요청을 수행하고 API 문서화를 위한 스니펫을 생성합니다.
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage")
+                    .session(session)
+                    .contentType(MediaType.APPLICATION_JSON))
+                // HTTP 상태 코드가 200 OK인지 확인합니다.
+                .andExpect(status().isOk())
+                // 응답 본문이 JSON 형식인지 확인합니다.
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // 응답 본문에 필요한 필드가 있는지 확인합니다.
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
+                .andExpect(jsonPath("$.data.nickname").value("testUser"))
+                .andExpect(jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(jsonPath("$.data.profileImageUrl").value("profile.jpg"))
+                // API 문서화를 위한 스니펫을 생성합니다.
+                .andDo(document("member-getMyPageInfo",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint())));
+        }
+
+        */
     @DisplayName("회원 정보 수정 API 문서화")
     @Test
     void updateMember() throws Exception {
-        // 가짜 회원 정보 생성 (실제로는 회원을 생성하고 저장해야 함)
+        // Given
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
+
+        EditRequest editRequest = new EditRequest();
+        editRequest.setNickname("NewNickname");
+        editRequest.setImage("new-image-url");
+
         Member member = new Member();
-        member.setId(1L); // 회원 ID 설정
-        member.setEmail("test@example.com");
-        member.setNickname("oldNickname");
-        member.setImage("oldImageURL");
+        member.setId(1L);
+        member.setNickname("OldNickname");
+        member.setImage("old-image-url");
 
-        // 가짜 HttpSession 객체 생성
-        HttpSession session = new MockHttpSession();
-        session.setAttribute("member", member);
+        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(memberService.checkDuplicateNickname("NewNickname")).thenReturn(false);
 
-        // 수정할 회원 정보를 나타내는 JSON 문자열 생성
-        String requestJson = "{\"nickname\":\"newNickname\",\"image\":\"newImageURL\"}";
+        // When
+        ResultActions result = mockMvc.perform(
+            put("/v1/retouch-member").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(editRequest)).session(session));
 
-        // MockMvc를 사용하여 API 엔드포인트 호출하고 API 문서화를 위한 스니펫을 생성합니다.
-        mockMvc.perform(put("/v1/retouch-member")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson)
-                .session((MockHttpSession) session))
-            .andExpect(jsonPath("$.nickname").value("newNickname"))
-            .andExpect(jsonPath("$.image").value("newImageURL"))
-            .andExpect(jsonPath("$.email").value("test@example.com"))
-
-            // API 문서화를 위한 스니펫을 생성합니다.
+        // Then
+        result.andExpect(status().isOk())
             .andDo(document("member-update",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())));
-    }
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
+                    fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
+                    fieldWithPath("data.email").description("변경된 이메일").type(JsonFieldType.STRING)
+                        .optional(),
+                    fieldWithPath("data.nickname").description("변경된 닉네임")
+                        .type(JsonFieldType.STRING),
+                    fieldWithPath("data.image").description("변경된 이미지 URL")
+                        .type(JsonFieldType.STRING),
+                    fieldWithPath("data.message").description("변경된 메시지").type(JsonFieldType.NULL)
+                        .optional()
+                )
+            ));
 
+
+    }
 
 }

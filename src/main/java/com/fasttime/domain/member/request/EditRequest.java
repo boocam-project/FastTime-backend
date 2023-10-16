@@ -14,5 +14,9 @@ public class EditRequest { // 회원정보 수정 요청
         return image;
     }
 
+    public void setImage(String image) {
+        this.image = image;
+    }
+
 
 }

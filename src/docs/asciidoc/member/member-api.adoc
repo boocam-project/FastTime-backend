@@ -115,6 +115,7 @@ include::{snippets}/member-update/http-request.adoc[]
 === HttpResponse
 
 include::{snippets}/member-update/http-response.adoc[]
+include::{snippets}/member-update/response-fields.adoc[]
 
 
 
