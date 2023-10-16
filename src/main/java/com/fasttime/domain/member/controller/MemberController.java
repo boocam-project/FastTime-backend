@@ -15,6 +15,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -59,49 +60,65 @@ public class MemberController {
     @PutMapping("v1/retouch-member") // 회원 정보 수정
     public ResponseEntity<EditResponse> updateMember(@RequestBody EditRequest editRequest,
         HttpSession session) {
-        Member member = (Member) session.getAttribute("member");
-        if (member != null) {
-            // 닉네임 중복 여부 검사
-            if (!member.getNickname().equals(editRequest.getNickname()) &&
-                memberService.checkDuplicateNickname(editRequest.getNickname())) {
-                return ResponseEntity.badRequest().body(new EditResponse("중복된 닉네임입니다."));
+        Long memberId = (Long) session.getAttribute("MEMBER");
+        if (memberId != null) {
+            Optional<Member> memberOptional = memberRepository.findById(memberId);
+            if (memberOptional.isPresent()) {
+                Member member = memberOptional.get();
+                // 닉네임 중복 여부 검사
+                if (!member.getNickname().equals(editRequest.getNickname()) &&
+                    memberService.checkDuplicateNickname(editRequest.getNickname())) {
+                    return ResponseEntity.badRequest().body(new EditResponse("중복된 닉네임입니다."));
+                }
+
+                // 닉네임과 이미지 업데이트
+                member.setNickname(editRequest.getNickname());
+                member.setImage(editRequest.getImage());
+
+                // 업데이트된 Member 엔티티를 데이터베이스에 저장
+                memberRepository.save(member);
+
+                EditResponse memberResponse = new EditResponse(member);
+                return ResponseEntity.ok(memberResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new EditResponse("해당 회원을 찾을 수 없습니다."));
             }
-
-            // 닉네임과 이미지 업데이트
-            member.setNickname(editRequest.getNickname());
-            member.setImage(editRequest.getImage());
-
-            // 업데이트된 Member 엔티티를 데이터베이스에 저장
-            memberRepository.save(member);
-
-            EditResponse memberResponse = new EditResponse(member);
-            return ResponseEntity.ok(memberResponse);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new EditResponse("로그인 상태가 아닙니다."));
         }
-
-        EditResponse e = new EditResponse("로그인 상태가 아닙니다.");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e);
     }
 
 
     @DeleteMapping("v1/delete") // 회원탈퇴 (soft delete 적용)
     public ResponseEntity<String> deleteMember(HttpSession httpSession) {
-        Member member = (Member) httpSession.getAttribute("member");
-        try {
-            memberService.softDeleteMember(member); // 소프트 삭제 메소드 호출
-            httpSession.invalidate(); // 세션 무효화
-            return ResponseEntity.ok("탈퇴가 완료되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("알 수 없는 오류가 발생했습니다.");
+        Long memberId = (Long) httpSession.getAttribute("MEMBER");
+        if (memberId != null) {
+            try {
+                Member member = memberService.getMember(memberId); // ID로 Member 조회
+                memberService.softDeleteMember(member); // 소프트 삭제 메소드 호출
+                httpSession.invalidate(); // 세션 무효화
+                return ResponseEntity.ok("탈퇴가 완료되었습니다.");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage());
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요.");
         }
     }
 
     @GetMapping("/api/v1/mypage")
     public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
-        // 세션에서 현재 로그인한 사용자 정보 가져오기
-        Member member = (Member) session.getAttribute("MEMBER");
+        // 세션에서 현재 로그인한 사용자 ID 가져오기
+        Long memberId = (Long) session.getAttribute("MEMBER");
 
-        if (member != null) {
+        if (memberId != null) {
+            // 회원 ID를 사용하여 Member 객체 조회
+            Member member = memberService.getMember(memberId);
+
             // 회원의 닉네임, 이메일, 프로필 사진 URL 가져오기
             String nickname = member.getNickname();
             String email = member.getEmail();
