@@ -185,7 +185,7 @@ public class RecordServiceTest {
 
             // then
             assertThat(result).extracting("id", "postId", "memberId", "isLike")
-                .containsExactly(null, null, null, false);
+                .containsExactly(null, null, null, null);
 
             verify(recordRepository, times(1)).findByMemberIdAndPostId(any(Long.class),
                 any(Long.class));

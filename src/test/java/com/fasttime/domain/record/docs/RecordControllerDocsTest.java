@@ -127,7 +127,7 @@ public class RecordControllerDocsTest extends RestDocsSupport {
                             .description("회원 식별자"),
                         fieldWithPath("data.postId").type(JsonFieldType.NUMBER).optional()
                             .description("게시글 식별자"),
-                        fieldWithPath("data.like").type(JsonFieldType.BOOLEAN)
+                        fieldWithPath("data.isLike").type(JsonFieldType.BOOLEAN)
                             .description("좋아요(1), 싫어요(0)"))));
     }
 
