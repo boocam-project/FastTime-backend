@@ -38,7 +38,7 @@ public class PostQueryService implements PostQueryUseCase {
                 .likeCount(repositoryDto.getLikeCount())
                 .hateCount(repositoryDto.getHateCount())
                 .createdAt(repositoryDto.getCreatedAt())
-                .createdAt(repositoryDto.getLastModifiedAt())
+                .lastModifiedAt(repositoryDto.getLastModifiedAt())
                 .build())
             .collect(Collectors.toList());
     }
