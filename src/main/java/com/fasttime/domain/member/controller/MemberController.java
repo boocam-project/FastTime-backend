@@ -126,10 +126,16 @@ public class MemberController {
 
     @GetMapping("/api/v1/mypage")
     public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
-        // 세션에서 현재 로그인한 사용자 ID 가져오기
-        Long memberId = (Long) session.getAttribute("MEMBER");
+        try {
+            // 세션에서 현재 로그인한 사용자 ID 가져오기
+            Long memberId = (Long) session.getAttribute("MEMBER");
 
-        if (memberId != null) {
+            // 사용자 ID가 null이면 권한 없음 응답 반환
+            if (memberId == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
+            }
+
             // 회원 ID를 사용하여 Member 객체 조회
             Member member = memberService.getMember(memberId);
 
@@ -147,10 +153,10 @@ public class MemberController {
             // 사용자 정보를 응답으로 반환
             return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", userInfo));
-        } else {
-            // 로그인되어 있지 않은 경우 권한 없음 응답 반환
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
+        } catch (Exception e) {
+            // 예외가 발생한 경우 에러 응답 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 정보 조회 중 오류가 발생했습니다."));
         }
     }
 
