@@ -35,6 +35,21 @@ include::{snippets}/record-hate-create/request-fields.adoc[]
 include::{snippets}/record-hate-create/http-response.adoc[]
 include::{snippets}/record-hate-create/response-fields.adoc[]
 
+[[Record-Get]]
+== 좋아요/싫어요 조회
+
+게시글 좋아요/싫어요 내역을 조회 하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/record-get/http-request.adoc[]
+include::{snippets}/record-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/record-get/http-response.adoc[]
+include::{snippets}/record-get/response-fields.adoc[]
+
 [[Record-Delete]]
 == 좋아요/싫어요 취소
 
