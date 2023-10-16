@@ -1,0 +1,66 @@
+= Record REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Record-Like-Create]]
+== 좋아요 등록
+
+회원이 게시글을 좋아요 하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/record-like-create/http-request.adoc[]
+include::{snippets}/record-like-create/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/record-like-create/http-response.adoc[]
+include::{snippets}/record-like-create/response-fields.adoc[]
+
+[[Record-Hate-Create]]
+== 싫어요 등록
+
+회원이 게시글을 싫어요 하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/record-hate-create/http-request.adoc[]
+include::{snippets}/record-hate-create/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/record-hate-create/http-response.adoc[]
+include::{snippets}/record-hate-create/response-fields.adoc[]
+
+[[Record-Get]]
+== 좋아요/싫어요 조회
+
+게시글 좋아요/싫어요 내역을 조회 하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/record-get/http-request.adoc[]
+include::{snippets}/record-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/record-get/http-response.adoc[]
+include::{snippets}/record-get/response-fields.adoc[]
+
+[[Record-Delete]]
+== 좋아요/싫어요 취소
+
+회원이 게시글 좋아요/싫어요를 취소하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/record-delete/http-request.adoc[]
+include::{snippets}/record-delete/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/record-delete/http-response.adoc[]
+include::{snippets}/record-delete/response-fields.adoc[]
