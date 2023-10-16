@@ -92,21 +92,27 @@ public class MemberController {
 
 
     @DeleteMapping("v1/delete") // 회원탈퇴 (soft delete 적용)
-    public ResponseEntity<String> deleteMember(HttpSession httpSession) {
+    public ResponseEntity<ResponseDTO<Object>> deleteMember(HttpSession httpSession) {
         Long memberId = (Long) httpSession.getAttribute("MEMBER");
         if (memberId != null) {
             try {
                 Member member = memberService.getMember(memberId); // ID로 Member 조회
                 memberService.softDeleteMember(member); // 소프트 삭제 메소드 호출
                 httpSession.invalidate(); // 세션 무효화
-                return ResponseEntity.ok("탈퇴가 완료되었습니다.");
+
+                // 성공 응답 생성
+                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
             } catch (Exception e) {
+                // 실패 응답 생성
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage());
+                    .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage()));
             }
         } else {
+            // 권한 없음 응답 생성
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요.");
+                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED,
+                    "세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요."));
         }
     }
 
