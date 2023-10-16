@@ -10,5 +10,5 @@ public class RecordDTO {
     private Long id;
     private Long memberId;
     private Long postId;
-    private boolean isLike;
+    private Boolean isLike;
 }

@@ -39,7 +39,7 @@ public class RecordService {
 
     public RecordDTO getRecord(long memberId, long postId) {
         Optional<Record> record = recordRepository.findByMemberIdAndPostId(memberId, postId);
-        return record.map(Record::toDTO).orElse(null);
+        return record.map(Record::toDTO).orElse(RecordDTO.builder().id(null).memberId(null).postId(null).isLike(null).build());
     }
 
     public void deleteRecord(DeleteRecordRequestDTO req) {

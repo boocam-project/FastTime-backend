@@ -37,7 +37,7 @@ public class RecordRestController {
     }
 
     @PostMapping("/hate")
-    public ResponseEntity<ResponseDTO<Void>> createHate(
+    public ResponseEntity<ResponseDTO<RecordDTO>> createHate(
         @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO) {
         log.info("CreateRecordRequest: " + createRecordRequestDTO + "(hate)");
         recordService.createRecord(createRecordRequestDTO, false);
