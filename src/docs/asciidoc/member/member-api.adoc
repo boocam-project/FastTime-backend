@@ -100,7 +100,7 @@ include::{snippets}/member-getMyPageInfo/http-request.adoc[]
 === HttpResponse
 
 include::{snippets}/member-getMyPageInfo/http-response.adoc[]
-
+include::{snippets}/member-getMyPageInfo/response-fields.adoc[]
 [[Member-Update]]
 == 회원 정보 수정
 
