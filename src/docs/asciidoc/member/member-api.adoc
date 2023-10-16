@@ -54,3 +54,70 @@ include::{snippets}/member-rePassword/request-fields.adoc[]
 
 include::{snippets}/member-rePassword/http-response.adoc[]
 include::{snippets}/member-rePassword/response-fields.adoc[]
+
+[[Member-Join]]
+== 회원 가입
+
+회원 가입 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-join/http-request.adoc[]
+include::{snippets}/member-join/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/member-join/http-response.adoc[]
+include::{snippets}/member-join/response-fields.adoc[]
+
+[[Member-Delete]]
+== 회원 탈퇴
+
+회원 탈퇴 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-delete/http-request.adoc[]
+
+
+=== HttpResponse
+
+include::{snippets}/member-delete/http-response.adoc[]
+
+[[Member-MyPageInfo]]
+== 마이페이지 조회
+
+로그인된 사용자의 이메일,닉네임,프로필 이미지url을 조회하는 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-getMyPageInfo/http-request.adoc[]
+
+
+=== HttpResponse
+
+include::{snippets}/member-getMyPageInfo/http-response.adoc[]
+include::{snippets}/member-getMyPageInfo/response-fields.adoc[]
+[[Member-Update]]
+== 회원 정보 수정
+
+회원 정보 수정 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/member-update/http-request.adoc[]
+
+
+=== HttpResponse
+
+include::{snippets}/member-update/http-response.adoc[]
+include::{snippets}/member-update/response-fields.adoc[]
+
+
+
+
+

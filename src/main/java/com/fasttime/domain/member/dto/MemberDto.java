@@ -10,8 +10,9 @@ import java.util.Optional;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+
 public class MemberDto {
     // 회원가입 요청 DTO
 
@@ -20,5 +21,6 @@ public class MemberDto {
     private String password; // 비밀번호
 
     private String nickname; // 닉네임
+
 
 }
