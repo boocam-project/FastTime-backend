@@ -228,45 +228,6 @@ public class MemberControllerDocsTest extends RestDocsSupport {
     }
 
 
-    /*
-        @DisplayName("마이페이지 조회 API 테스트")
-        @Test
-        void testGetMyPageInfo() throws Exception {
-            // 가짜 세션을 생성하고 사용자 정보를 세션에 넣어줍니다.
-            MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", 1L); // 사용자 ID를 세션에 저장
-
-            // 사용자 정보를 생성합니다. (실제 데이터에 맞게끔)
-            Member member = new Member();
-            member.setId(1L);
-            member.setNickname("testUser");
-            member.setEmail("test@example.com");
-            member.setImage("profile.jpg");
-
-            // memberService.getMember() 메서드가 호출될 때 위에서 생성한 사용자 정보를 반환하도록 설정합니다.
-            when(memberService.getMember(1L)).thenReturn(member);
-
-            // GET /api/v1/mypage 요청을 수행하고 API 문서화를 위한 스니펫을 생성합니다.
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage")
-                    .session(session)
-                    .contentType(MediaType.APPLICATION_JSON))
-                // HTTP 상태 코드가 200 OK인지 확인합니다.
-                .andExpect(status().isOk())
-                // 응답 본문이 JSON 형식인지 확인합니다.
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                // 응답 본문에 필요한 필드가 있는지 확인합니다.
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
-                .andExpect(jsonPath("$.data.nickname").value("testUser"))
-                .andExpect(jsonPath("$.data.email").value("test@example.com"))
-                .andExpect(jsonPath("$.data.profileImageUrl").value("profile.jpg"))
-                // API 문서화를 위한 스니펫을 생성합니다.
-                .andDo(document("member-getMyPageInfo",
-                    preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint())));
-        }
-
-        */
     @DisplayName("회원 정보 수정 API 문서화")
     @Test
     void updateMember() throws Exception {
