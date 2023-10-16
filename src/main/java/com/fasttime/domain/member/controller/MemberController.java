@@ -37,28 +37,33 @@ public class MemberController {
 
 
     @PostMapping("/v1/join")
-    public ResponseEntity<String> join(@Valid @RequestBody MemberDto memberDto) {
+    public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
         try {
             if (memberService.isEmailExistsInFcmember(memberDto.getEmail())) {
                 if (memberService.isEmailExistsInMember(memberDto.getEmail())) {
-                    return ResponseEntity.badRequest().body("이미 가입된 회원입니다.");
+                    return ResponseEntity.badRequest()
+                        .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
                 } else if (memberService.checkDuplicateNickname(memberDto.getNickname())) {
-                    return ResponseEntity.badRequest().body("이미 사용 중인 닉네임 입니다.");
+                    return ResponseEntity.badRequest()
+                        .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
                 }
 
                 memberService.save(memberDto);
-                return ResponseEntity.ok("가입 성공!");
+                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "가입 성공!", "가입 성공!"));
             } else {
-                return ResponseEntity.badRequest().body("FastCampus에 등록된 이메일이 아닙니다.");
+                return ResponseEntity.badRequest()
+                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "FastCampus에 등록된 이메일이 아닙니다."));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("회원가입 실패 " + e.getMessage());
+                .body(
+                    ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패 " + e.getMessage()));
         }
     }
 
     @PutMapping("v1/retouch-member") // 회원 정보 수정
-    public ResponseEntity<EditResponse> updateMember(@RequestBody EditRequest editRequest,
+    public ResponseEntity<ResponseDTO<EditResponse>> updateMember(
+        @RequestBody EditRequest editRequest,
         HttpSession session) {
         Long memberId = (Long) session.getAttribute("MEMBER");
         if (memberId != null) {
@@ -68,7 +73,8 @@ public class MemberController {
                 // 닉네임 중복 여부 검사
                 if (!member.getNickname().equals(editRequest.getNickname()) &&
                     memberService.checkDuplicateNickname(editRequest.getNickname())) {
-                    return ResponseEntity.badRequest().body(new EditResponse("중복된 닉네임입니다."));
+                    return ResponseEntity.badRequest().body(
+                        ResponseDTO.res(HttpStatus.BAD_REQUEST, new EditResponse("중복된 닉네임입니다.")));
                 }
 
                 // 닉네임과 이미지 업데이트
@@ -79,14 +85,16 @@ public class MemberController {
                 memberRepository.save(member);
 
                 EditResponse memberResponse = new EditResponse(member);
-                return ResponseEntity.ok(memberResponse);
+                return ResponseEntity.ok(
+                    ResponseDTO.res(HttpStatus.OK, "회원 정보가 업데이트되었습니다.", memberResponse));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new EditResponse("해당 회원을 찾을 수 없습니다."));
+                    .body(ResponseDTO.res(HttpStatus.NOT_FOUND,
+                        new EditResponse("해당 회원을 찾을 수 없습니다.")));
             }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new EditResponse("로그인 상태가 아닙니다."));
+                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, new EditResponse("로그인 상태가 아닙니다.")));
         }
     }
 
