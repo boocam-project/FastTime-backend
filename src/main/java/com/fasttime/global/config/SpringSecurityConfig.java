@@ -24,7 +24,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // basic authentication
         http.httpBasic().disable(); // basic authentication filter 비활성화 for 보안
-        // csrf 보안을 위한 필터
-        http.csrf().disable();
+        // cors 허용, csrf 보안을 위한 필터
+        http.cors().and().csrf().disable();
     }
 }
