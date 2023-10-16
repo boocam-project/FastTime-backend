@@ -5,6 +5,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.entity.Record;
@@ -34,6 +35,11 @@ public class RecordService {
         recordRepository.save(
             Record.builder().member(member).post(Post.builder().id(postResponse.getId()).build())
                 .isLike(isLike).build());
+    }
+
+    public RecordDTO getRecord(long memberId, long postId) {
+        Optional<Record> record = recordRepository.findByMemberIdAndPostId(memberId, postId);
+        return record.map(Record::toDTO).orElse(null);
     }
 
     public void deleteRecord(DeleteRecordRequestDTO req) {
