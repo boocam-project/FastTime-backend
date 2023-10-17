@@ -25,12 +25,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.post.controller.PostController;
 import com.fasttime.domain.post.dto.controller.request.PostDeleteRequestDto;
-import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
-import com.fasttime.domain.post.dto.service.request.PostDeleteServiceDto;
-import com.fasttime.domain.post.dto.service.request.PostUpdateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
 import com.fasttime.domain.post.service.PostCommandUseCase;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostCreateServiceDto;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostDeleteServiceDto;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostUpdateServiceDto;
 import com.fasttime.domain.post.service.PostQueryUseCase;
 import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
 import java.time.LocalDateTime;
