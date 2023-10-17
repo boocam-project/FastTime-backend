@@ -1,8 +1,6 @@
 package com.fasttime.domain.member.service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +41,9 @@ public class EmailService {
     }
 
     // 메일 양식 작성
-    public MimeMessage createMessage(String to)
-        throws MessagingException, UnsupportedEncodingException {
+    public MimeMessage createMessage(String to) throws MessagingException {
         createCode();
-        String setFrom = "test@naver.com";
-        String toEmail = to;
+        String setFrom = "fasttime123@naver.com";
         String title = "FastTime 인증 번호";
 
         MimeMessage message = emailsender.createMimeMessage();
