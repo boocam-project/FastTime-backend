@@ -36,6 +36,7 @@ public class MemberService {
         member.setEmail(memberDto.getEmail());
         member.setNickname(memberDto.getNickname());
         member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
+        member.setCreatedAt(LocalDateTime.now());
         memberRepository.save(member);
     }
 
