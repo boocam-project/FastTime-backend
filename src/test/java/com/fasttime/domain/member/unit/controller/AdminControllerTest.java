@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostCommandService;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostCreateServiceDto;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

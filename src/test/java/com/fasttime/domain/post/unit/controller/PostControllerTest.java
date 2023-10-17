@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasttime.domain.post.dto.service.request.PostCreateServiceDto;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostCreateServiceDto;
 import com.fasttime.util.ControllerUnitTestSupporter;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
