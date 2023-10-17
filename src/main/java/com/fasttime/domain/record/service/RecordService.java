@@ -4,6 +4,8 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.exception.PostNotFoundException;
+import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
@@ -26,12 +28,19 @@ public class RecordService {
 
     private final RecordRepository recordRepository;
     private final PostQueryService postQueryService;
+    private final PostRepository postRepository;
     private final MemberService memberService;
 
     public void createRecord(CreateRecordRequestDTO req, boolean isLike) {
         PostDetailResponseDto postResponse = postQueryService.findById(req.getPostId());
         Member member = memberService.getMember(req.getMemberId());
         checkDuplicateRecord(member.getId(), postResponse.getId(), isLike);
+        Post post = postRepository.findById(req.getPostId()).orElseThrow(PostNotFoundException::new);
+        if (isLike) {
+            post.like(true);
+        } else {
+            post.hate(true);
+        }
         recordRepository.save(
             Record.builder().member(member).post(Post.builder().id(postResponse.getId()).build())
                 .isLike(isLike).build());
@@ -46,6 +55,12 @@ public class RecordService {
         Record record = recordRepository.findByMemberIdAndPostId(req.getMemberId(), req.getPostId())
             .orElseThrow(RecordNotFoundException::new);
         recordRepository.delete(record);
+        Post post = postRepository.findById(req.getPostId()).orElseThrow(PostNotFoundException::new);
+        if (record.isLike()) {
+            post.like(false);
+        } else {
+            post.hate(false);
+        }
     }
 
     private void checkDuplicateRecord(long memberId, long postId, boolean isLike) {
