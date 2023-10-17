@@ -80,7 +80,7 @@ public class MemberController {
 
                 member.setNickname(editRequest.getNickname());
                 member.setImage(editRequest.getImage());
-                member.setCreatedAt(LocalDateTime.now());
+
 
                 memberRepository.save(member);
 
