@@ -59,9 +59,9 @@ public class MemberService {
 
 
     public void softDeleteMember(Member member) {
-        //deleted_at 칼럼에 값이 있으면 탈퇴된 회원으로 간주
-        member.setDeletedAt(LocalDateTime.now()); // 현재 시간으로 소프트 삭제 시간 설정
-        memberRepository.save(member); // 업데이트된 정보를 데이터베이스에 저장
+
+        member.delete(LocalDateTime.now());
+        memberRepository.save(member);
     }
 
     public Member getMember(Long id) throws UserNotFoundException {

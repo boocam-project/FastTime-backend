@@ -13,8 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+
 
 @Getter
 @Setter
@@ -35,21 +34,13 @@ public class Member extends BaseTimeEntity {
 
     private String nickname;
 
+    @Override
+    public void delete(LocalDateTime currentTime) {
+        super.delete(currentTime);
+    }
 
-    @Column(name = "deleted_at") // deletedAt 칼럼 추가
-    private LocalDateTime deletedAt;
-
-
-    @Column(name = "image", columnDefinition = "TEXT") // image 칼럼 추가
+    @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
-    @CreationTimestamp // created_at 필드 자동 갱신
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-
-    @UpdateTimestamp // updated_at 필드 자동 갱신
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
 }
