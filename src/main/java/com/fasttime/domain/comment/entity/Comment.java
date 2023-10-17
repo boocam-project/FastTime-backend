@@ -54,8 +54,9 @@ public class Comment extends BaseTimeEntity {
         this.parentComment = parentComment;
     }
 
-    public void deleteComment() {
-        this.delete(LocalDateTime.now());
+    @Override
+    public void delete(LocalDateTime currentTime) {
+        super.delete(currentTime);
     }
 
     public void updateContent(String content) {
