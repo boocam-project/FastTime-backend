@@ -34,10 +34,10 @@ public class Member extends BaseTimeEntity {
 
     private String nickname;
 
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
+    @Override
+    public void delete(LocalDateTime currentTime) {
+        super.delete(currentTime);
+    }
 
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
