@@ -40,7 +40,7 @@ public class PostCommandService implements PostCommandUseCase {
     public PostDetailResponseDto updatePost(PostUpdateServiceDto serviceDto) {
 
         final Member updateRequestMember = memberService.getMember(serviceDto.getMemberId());
-        Post post = findPostById(serviceDto);
+        Post post = findPostById(serviceDto.getPostId());
 
         validateAuthority(updateRequestMember, post);
 
@@ -68,8 +68,8 @@ public class PostCommandService implements PostCommandUseCase {
         post.delete(serviceDto.getDeletedAt());
     }
 
-    private Post findPostById(PostUpdateServiceDto serviceDto) {
-        return postRepository.findById(serviceDto.getPostId())
+    private Post findPostById(Long postId) {
+        return postRepository.findById(postId)
             .orElseThrow(PostNotFoundException::new);
     }
 

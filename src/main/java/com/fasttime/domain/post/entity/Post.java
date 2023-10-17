@@ -82,6 +82,22 @@ public class Post extends BaseTimeEntity {
         super.delete(currentTime);
     }
 
+    public void like(boolean increase) {
+        if (increase) {
+            this.likeCount++;
+        } else {
+            this.likeCount--;
+        }
+    }
+
+    public void hate(boolean increase) {
+        if (increase) {
+            this.hateCount++;
+        } else {
+            this.hateCount--;
+        }
+    }
+
     @Override
     public void restore() {
         super.restore();
