@@ -13,6 +13,7 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public class MemberController {
         }
     }
 
-    @PutMapping("/api/v1/retouch-member") // 회원 정보 수정
+    @PutMapping("/api/v1/retouch-member")
     public ResponseEntity<ResponseDTO<EditResponse>> updateMember(
         @RequestBody EditRequest editRequest,
         HttpSession session) {
@@ -70,18 +71,17 @@ public class MemberController {
             Optional<Member> memberOptional = memberRepository.findById(memberId);
             if (memberOptional.isPresent()) {
                 Member member = memberOptional.get();
-                // 닉네임 중복 여부 검사
+
                 if (!member.getNickname().equals(editRequest.getNickname()) &&
                     memberService.checkDuplicateNickname(editRequest.getNickname())) {
                     return ResponseEntity.badRequest().body(
                         ResponseDTO.res(HttpStatus.BAD_REQUEST, new EditResponse("중복된 닉네임입니다.")));
                 }
 
-                // 닉네임과 이미지 업데이트
                 member.setNickname(editRequest.getNickname());
                 member.setImage(editRequest.getImage());
+                member.setCreatedAt(LocalDateTime.now());
 
-                // 업데이트된 Member 엔티티를 데이터베이스에 저장
                 memberRepository.save(member);
 
                 EditResponse memberResponse = new EditResponse(member);
@@ -99,25 +99,24 @@ public class MemberController {
     }
 
 
-    @DeleteMapping("/api/v1/delete") // 회원탈퇴 (soft delete 적용)
+    @DeleteMapping("/api/v1/delete")
     public ResponseEntity<ResponseDTO<Object>> deleteMember(HttpSession httpSession) {
         Long memberId = (Long) httpSession.getAttribute("MEMBER");
         if (memberId != null) {
             try {
-                Member member = memberService.getMember(memberId); // ID로 Member 조회
-                memberService.softDeleteMember(member); // 소프트 삭제 메소드 호출
-                httpSession.invalidate(); // 세션 무효화
+                Member member = memberService.getMember(memberId);
+                memberService.softDeleteMember(member);
+                httpSession.invalidate();
 
-                // 성공 응답 생성
                 return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
             } catch (Exception e) {
-                // 실패 응답 생성
+
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR,
                         "회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage()));
             }
         } else {
-            // 권한 없음 응답 생성
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED,
                     "세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요."));
@@ -127,34 +126,29 @@ public class MemberController {
     @GetMapping("/api/v1/mypage")
     public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
         try {
-            // 세션에서 현재 로그인한 사용자 ID 가져오기
+
             Long memberId = (Long) session.getAttribute("MEMBER");
 
-            // 사용자 ID가 null이면 권한 없음 응답 반환
             if (memberId == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
             }
 
-            // 회원 ID를 사용하여 Member 객체 조회
             Member member = memberService.getMember(memberId);
 
-            // 회원의 닉네임, 이메일, 프로필 사진 URL 가져오기
             String nickname = member.getNickname();
             String email = member.getEmail();
-            String profileImageUrl = member.getImage(); // 엔터티에서 직접 이미지 URL 가져오기
+            String profileImageUrl = member.getImage();
 
-            // 사용자 정보를 포함한 응답 객체 생성
             Map<String, String> userInfo = new HashMap<>();
             userInfo.put("nickname", nickname);
             userInfo.put("email", email);
             userInfo.put("profileImageUrl", profileImageUrl);
 
-            // 사용자 정보를 응답으로 반환
             return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", userInfo));
         } catch (Exception e) {
-            // 예외가 발생한 경우 에러 응답 반환
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 정보 조회 중 오류가 발생했습니다."));
         }
