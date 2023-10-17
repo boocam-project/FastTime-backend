@@ -3,6 +3,7 @@ package com.fasttime.domain.comment.unit.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasttime.domain.comment.entity.Comment;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +49,7 @@ public class CommentTest {
             .parentComment(null).build();
 
         // when
-        comment.deleteComment();
+        comment.delete(LocalDateTime.now());
 
         // then
         assertThat(comment.getDeletedAt()).isNotNull();
