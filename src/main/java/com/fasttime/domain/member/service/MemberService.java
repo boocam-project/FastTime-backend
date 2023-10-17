@@ -60,7 +60,7 @@ public class MemberService {
 
     public void softDeleteMember(Member member) {
 
-        member.setDeletedAt(LocalDateTime.now());
+        member.delete(LocalDateTime.now());
         memberRepository.save(member);
     }
 
