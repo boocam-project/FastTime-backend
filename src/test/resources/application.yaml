@@ -3,3 +3,7 @@ spring:
     include: test
   datasource:
     driver-class-name: org.h2.Driver
+
+  mail:
+    username: test
+    password: 1234

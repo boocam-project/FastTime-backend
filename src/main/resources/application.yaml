@@ -5,7 +5,3 @@ spring:
     username: root
     password: dnwnrlfls12
 
-  jpa:
-    hibernate:
-      ddl-auto: create
-
