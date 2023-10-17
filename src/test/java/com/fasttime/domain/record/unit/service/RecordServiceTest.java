@@ -12,6 +12,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.post.service.PostQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
@@ -45,6 +46,9 @@ public class RecordServiceTest {
     private PostQueryService postQueryService;
 
     @Mock
+    private PostRepository postRepository;
+
+    @Mock
     private MemberService memberService;
 
     @Nested
@@ -60,11 +64,13 @@ public class RecordServiceTest {
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
+            Optional<Post> postOptional = Optional.of(Post.builder().id(1L).likeCount(1).hateCount(1).build());
 
             given(postQueryService.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
+            given(postRepository.findById(any(long.class))).willReturn(postOptional);
 
             // when
             recordService.createRecord(request, true);
@@ -82,11 +88,13 @@ public class RecordServiceTest {
             PostDetailResponseDto post = PostDetailResponseDto.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
+            Optional<Post> postOptional = Optional.of(Post.builder().id(1L).likeCount(1).hateCount(1).build());
 
             given(postQueryService.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
+            given(postRepository.findById(any(long.class))).willReturn(postOptional);
 
             // when
             recordService.createRecord(request, false);
@@ -206,9 +214,11 @@ public class RecordServiceTest {
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
                 Record.builder().id(1L).member(member).post(post).isLike(true).build());
+            Optional<Post> postOptional = Optional.of(Post.builder().id(1L).likeCount(1).hateCount(1).build());
 
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
+            given(postRepository.findById(any(long.class))).willReturn(postOptional);
 
             // when
             recordService.deleteRecord(request);
