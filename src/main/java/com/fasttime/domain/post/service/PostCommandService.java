@@ -27,8 +27,7 @@ public class PostCommandService implements PostCommandUseCase {
 
         final Member writeMember = memberService.getMember(serviceDto.getMemberId());
         final Post createdPost = Post.createNewPost(writeMember, serviceDto.getTitle(),
-            serviceDto.getContent(),
-            false);
+            serviceDto.getContent(), serviceDto.isAnonymity());
 
         return PostDetailResponseDto.entityToDto(postRepository.save(createdPost));
     }
