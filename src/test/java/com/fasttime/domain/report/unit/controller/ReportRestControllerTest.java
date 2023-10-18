@@ -1,10 +1,7 @@
 package com.fasttime.domain.report.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,8 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.domain.report.contoller.ReportRestController;
-import com.fasttime.domain.report.dto.ReportDTO;
-import com.fasttime.domain.report.dto.request.CreateReportRequest;
+import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.service.ReportService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ReportRestController.class)
@@ -34,27 +31,26 @@ public class ReportRestControllerTest {
     ReportService reportService;
 
     @Nested
-    @DisplayName("create()은")
-    class Context_create {
+    @DisplayName("createReport()는")
+    class Context_createReport {
 
         @Test
         @DisplayName("게시글을 신고할 수 있다.")
         void _willSuccess() throws Exception {
-
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
-                .build();
-            ReportDTO reportDTO = ReportDTO.builder().id(0L).postId(0L).memberId(0L).build();
-            given(reportService.createReport(any(CreateReportRequest.class))).willReturn(reportDTO);
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L).build();
+            doNothing().when(reportService)
+                .createReport(any(CreateReportRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/report/create").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.data.id").exists())
-                .andExpect(jsonPath("$.data.postId").exists())
-                .andExpect(jsonPath("$.data.memberId").exists()).andDo(print());
-            verify(reportService, times(1)).createReport(any(CreateReportRequest.class));
+                    post("/api/v1/report/create").content(json).contentType(MediaType.APPLICATION_JSON)
+                        .session(session)).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
         }
 
         @Nested
@@ -64,44 +60,20 @@ public class ReportRestControllerTest {
             @Test
             @DisplayName("null일 경우 신고할 수 없다.")
             void null_willFail() throws Exception {
-
                 // given
-                CreateReportRequest request = CreateReportRequest.builder().postId(null)
-                    .memberId(0L).build();
-                ReportDTO reportDto = ReportDTO.builder().id(0L).postId(0L).memberId(0L).build();
-                given(reportService.createReport(any(CreateReportRequest.class))).willReturn(
-                    reportDto);
+                CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(null).build();
+                doNothing().when(reportService)
+                    .createReport(any(CreateReportRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
 
                 // when, then
                 mockMvc.perform(post("/api/v1/report/create").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
-                verify(reportService, never()).createReport(any(CreateReportRequest.class));
-            }
-        }
-
-        @Nested
-        @DisplayName("memberId가 ")
-        class Element_memberId {
-
-            @Test
-            @DisplayName("null일 경우 댓글을 등록할 수 없다.")
-            void null_willFail() throws Exception {
-
-                // given
-                CreateReportRequest request = CreateReportRequest.builder().postId(0L)
-                    .memberId(null).build();
-                ReportDTO reportDto = ReportDTO.builder().id(0L).postId(0L).memberId(0L).build();
-                given(reportService.createReport(any(CreateReportRequest.class))).willReturn(
-                    reportDto);
-                String json = new ObjectMapper().writeValueAsString(request);
-
-                // when, then
-                mockMvc.perform(post("/api/v1/report/create").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
-                verify(reportService, never()).createReport(any(CreateReportRequest.class));
+                    .andExpect(jsonPath("$.code").exists())
+                    .andExpect(jsonPath("$.message").exists())
+                    .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
             }
         }
     }
