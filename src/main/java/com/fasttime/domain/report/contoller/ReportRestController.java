@@ -26,8 +26,7 @@ public class ReportRestController {
     public ResponseEntity<ResponseDTO<Void>> createReport(
         @Valid @RequestBody CreateReportRequestDTO createReportRequestDTO, HttpSession session) {
         log.info("CreateReportRequest: " + createReportRequestDTO);
-        Long memberId = (Long) session.getAttribute("MEMBER");
-        reportService.createReport(createReportRequestDTO, memberId);
+        reportService.createReport(createReportRequestDTO, (Long) session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, "신고를 성공적으로 접수했습니다.", null));
     }
