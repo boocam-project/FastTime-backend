@@ -13,6 +13,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.service.PostQueryService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -93,7 +94,7 @@ public class CommentService {
     public void deleteComment(DeleteCommentRequest req) {
         Comment comment = commentRepository.findById(req.getId())
             .orElseThrow(CommentNotFoundException::new);
-        comment.deleteComment();
+        comment.delete(LocalDateTime.now());
     }
 
     /**
