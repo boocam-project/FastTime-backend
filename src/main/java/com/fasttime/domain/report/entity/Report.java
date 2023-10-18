@@ -2,7 +2,6 @@ package com.fasttime.domain.report.entity;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.report.dto.ReportDTO;
 import com.fasttime.global.common.BaseTimeEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -37,10 +36,5 @@ public class Report extends BaseTimeEntity {
         this.id = id;
         this.member = member;
         this.post = post;
-    }
-
-    public ReportDTO toDTO() {
-        return ReportDTO.builder().id(this.id).memberId(this.member.getId())
-            .postId(this.post.getId()).build();
     }
 }
