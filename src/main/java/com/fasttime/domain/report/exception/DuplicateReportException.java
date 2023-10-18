@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public class DuplicateReportException extends ApplicationException {
 
-    public DuplicateReportException(String message) {
-        super(HttpStatus.BAD_REQUEST, message);
+    public DuplicateReportException() {
+        super(HttpStatus.BAD_REQUEST, "이미 신고한 게시글입니다.");
     }
 }
