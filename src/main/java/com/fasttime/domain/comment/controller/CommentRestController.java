@@ -70,6 +70,7 @@ public class CommentRestController {
     public ResponseEntity<ResponseDTO<Void>> deleteComment(
         @Valid @RequestBody DeleteCommentRequest deleteCommentRequest) {
         log.info("DeleteCommentRequest: " + deleteCommentRequest);
+        commentService.deleteComment(deleteCommentRequest);
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.", null));
     }
