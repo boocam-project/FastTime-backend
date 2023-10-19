@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +20,8 @@ public class AdminService {
 
     private final PostRepository postRepository;
 
-    public List<PostsResponseDto> findReportedPost(){
-        return postRepository.findAllByReportStatus(ReportStatus.REPORTED).stream()
+    public List<PostsResponseDto> findReportedPost(int page){
+        return postRepository.findAllByReportStatus(PageRequest.of(page, 10), ReportStatus.REPORTED).stream()
             .map(post -> PostsResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
