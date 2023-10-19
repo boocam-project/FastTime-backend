@@ -105,7 +105,7 @@ class PostCommandServiceTest {
             // then
             assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
                     "hateCount")
-                .containsExactly(1L, "title", "newContent", true, 0, 0);
+                .containsExactly(1L, "new title", "newContent", true, 0, 0);
         }
 
         @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")

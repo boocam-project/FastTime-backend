@@ -39,12 +39,13 @@ class PostTest {
         Post createdPost = Post.createNewPost(null, title, content, anounumity);
 
         // when
+        String updateTitle = "새로운 제목1";
         String updateContent = "새로운 내용1";
-        createdPost.update(updateContent);
+        createdPost.update(updateTitle, updateContent);
 
         // then
         assertThat(createdPost).extracting("title", "content", "anonymity")
-            .containsExactly(title, updateContent, anounumity);
+            .containsExactly(updateTitle, updateContent, anounumity);
     }
 
 

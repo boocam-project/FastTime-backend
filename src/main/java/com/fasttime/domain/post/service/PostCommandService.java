@@ -38,9 +38,9 @@ public class PostCommandService implements PostCommandUseCase {
         final Member updateRequestMember = memberService.getMember(serviceDto.getMemberId());
         Post post = findPostById(serviceDto.getPostId());
 
-        validateAuthority(updateRequestMember, post);
+        isWriter(updateRequestMember, post);
 
-        post.update(serviceDto.getContent());
+        post.update(serviceDto.getTitle(), serviceDto.getContent());
 
         return PostDetailResponseDto.builder()
             .id(post.getId())

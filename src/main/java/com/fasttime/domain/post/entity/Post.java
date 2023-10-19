@@ -1,6 +1,8 @@
 package com.fasttime.domain.post.entity;
 
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.post.exception.PostDeletedException;
+import com.fasttime.domain.post.exception.PostReportedException;
 import com.fasttime.global.common.BaseTimeEntity;
 import java.time.LocalDateTime;
 import javax.persistence.Embedded;
@@ -69,7 +71,16 @@ public class Post extends BaseTimeEntity {
             .build();
     }
 
-    public void update(String content) {
+    public void update(String title, String content) {
+        if (reportStatus.equals(ReportStatus.REPORTED)) {
+            throw new PostReportedException();
+        }
+
+        if (this.isDeleted()) {
+            throw new PostDeletedException();
+        }
+
+        this.title = title;
         this.content.updateContent(content);
     }
 
