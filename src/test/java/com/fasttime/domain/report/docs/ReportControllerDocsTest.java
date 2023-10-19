@@ -51,7 +51,7 @@ public class ReportControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(
-            post("/api/v1/report/create").content(json).contentType(MediaType.APPLICATION_JSON)
+            post("/api/v1/report").content(json).contentType(MediaType.APPLICATION_JSON)
                 .session(session)).andExpect(status().isCreated()).andDo(
             document("report-create", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
