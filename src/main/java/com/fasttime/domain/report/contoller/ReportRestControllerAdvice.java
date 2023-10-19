@@ -22,7 +22,7 @@ class ReportRestControllerAdvice {
 
     @ExceptionHandler
     ResponseEntity<ResponseDTO<Object>> alreadyDeletedPostException(AlreadyDeletedPostException e) {
-        log.error("PostAlreadyDeletedException: " + e.getMessage());
+        log.error("AlreadyDeletedPostException: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
