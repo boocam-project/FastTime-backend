@@ -14,7 +14,4 @@ public class DeleteRecordRequestDTO {
 
     @NotNull(message = "게시글 ID를 입력하세요.")
     private Long postId;
-
-    @NotNull(message = "회원 ID를 입력하세요.")
-    private Long memberId;
 }
