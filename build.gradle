@@ -22,6 +22,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 ext {
@@ -45,6 +46,9 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // logback discord webhook
+    implementation 'com.github.napstr:logback-discord-appender:1.0.0'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
