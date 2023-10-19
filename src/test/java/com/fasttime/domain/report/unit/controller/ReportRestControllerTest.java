@@ -47,7 +47,7 @@ public class ReportRestControllerTest {
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/report/create").content(json).contentType(MediaType.APPLICATION_JSON)
+                    post("/api/v1/report").content(json).contentType(MediaType.APPLICATION_JSON)
                         .session(session)).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
@@ -69,7 +69,7 @@ public class ReportRestControllerTest {
                 session.setAttribute("MEMBER", 1L);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/report/create").content(json)
+                mockMvc.perform(post("/api/v1/report").content(json)
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").exists())
                     .andExpect(jsonPath("$.message").exists())
