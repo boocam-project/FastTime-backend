@@ -64,7 +64,7 @@ public class RecordServiceTest {
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.getPostById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -86,7 +86,7 @@ public class RecordServiceTest {
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.getPostById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -110,7 +110,7 @@ public class RecordServiceTest {
                 Record.builder().member(member).post(Post.builder().id(post.getId()).build())
                     .isLike(true).build());
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.getPostById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -134,7 +134,7 @@ public class RecordServiceTest {
                 Record.builder().member(member).post(Post.builder().id(post.getId()).build())
                     .isLike(false).build());
 
-            given(postQueryService.findById(any(Long.class))).willReturn(post);
+            given(postQueryService.getPostById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndPostId(any(long.class),
                 any(long.class))).willReturn(record);

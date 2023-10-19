@@ -172,7 +172,7 @@ class PostControllerDocsTest extends RestDocsSupport {
         PostCreateServiceDto requestDto = new PostCreateServiceDto(1L, "게시글 제목입니다.",
             "게시글 본문입니다.", false);
 
-        when(postQueryUseCase.findById(anyLong()))
+        when(postQueryUseCase.getPostById(anyLong()))
             .thenReturn(PostDetailResponseDto.builder()
                 .id(1L)
                 .nickname("패캠러")

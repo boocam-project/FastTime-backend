@@ -61,7 +61,7 @@ public class PostQueryServiceTest {
                     .build()));
 
             // when
-            PostDetailResponseDto response = postQueryService.findById(id);
+            PostDetailResponseDto response = postQueryService.getPostById(id);
 
             // then
             assertThat(response)
@@ -77,7 +77,7 @@ public class PostQueryServiceTest {
             given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
             // when then
-            assertThatThrownBy(() -> postQueryService.findById(1L))
+            assertThatThrownBy(() -> postQueryService.getPostById(1L))
                 .isInstanceOf(PostNotFoundException.class);
         }
     }

@@ -42,7 +42,7 @@ public class CommentService {
             parentComment = getComment(req.getParentCommentId());
         }
 
-        PostDetailResponseDto postResponse = postQueryService.findById(req.getPostId());
+        PostDetailResponseDto postResponse = postQueryService.getPostById(req.getPostId());
 
         return commentRepository.save(
                 Comment.builder().post(Post.builder().id(postResponse.getId()).build())
@@ -68,7 +68,7 @@ public class CommentService {
      * @return 게시글에 등록된 댓글 DTO 리스트
      */
     public List<PostCommentResponseDTO> getCommentsByPostId(long postId) {
-        PostDetailResponseDto postResponse = postQueryService.findById(postId);
+        PostDetailResponseDto postResponse = postQueryService.getPostById(postId);
         return getCommentsByPost(Post.builder().id(postResponse.getId()).build());
     }
 
