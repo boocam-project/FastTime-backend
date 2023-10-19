@@ -1,9 +1,12 @@
 package com.fasttime.domain.post.unit.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
+import com.fasttime.domain.post.exception.PostDeletedException;
+import com.fasttime.domain.post.exception.PostReportedException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,25 +32,62 @@ class PostTest {
             .containsExactly(title, content, anounumity);
     }
 
-    @DisplayName("게시글의 내용을 변경할 수 있다.")
-    @Test
-    void post_update_willSuccess(){
-        // given
-        String title = "제목1";
-        String content = "내용1";
-        boolean anounumity = true;
-        Post createdPost = Post.createNewPost(null, title, content, anounumity);
+    @Nested
+    class Context_update {
 
-        // when
-        String updateTitle = "새로운 제목1";
-        String updateContent = "새로운 내용1";
-        createdPost.update(updateTitle, updateContent);
+        @DisplayName("게시글의 내용을 변경할 수 있다.")
+        @Test
+        void post_update_willSuccess(){
+            // given
+            String title = "제목1";
+            String content = "내용1";
+            boolean anounumity = true;
+            Post createdPost = Post.createNewPost(null, title, content, anounumity);
 
-        // then
-        assertThat(createdPost).extracting("title", "content", "anonymity")
-            .containsExactly(updateTitle, updateContent, anounumity);
+            // when
+            String updateTitle = "새로운 제목1";
+            String updateContent = "새로운 내용1";
+            createdPost.update(updateTitle, updateContent);
+
+            // then
+            assertThat(createdPost).extracting("title", "content", "anonymity")
+                .containsExactly(updateTitle, updateContent, anounumity);
+        }
+
+        @DisplayName("게시글이 검토중인 상태에서는 수정 할 수 없다.")
+        @Test
+        void post_isReported_willThrowPostReportedException(){
+            // given
+            String title = "제목1";
+            String content = "내용1";
+            boolean anounumity = true;
+            Post createdPost = Post.createNewPost(null, title, content, anounumity);
+            createdPost.report();
+
+            // when
+            String updateTitle = "새로운 제목1";
+            String updateContent = "새로운 내용1";
+            assertThatThrownBy(() -> createdPost.update(updateTitle, updateContent))
+                .isInstanceOf(PostReportedException.class);
+        }
+
+        @DisplayName("삭제된 게시글 역시 수정 할 수 없다.")
+        @Test
+        void post_isDeleted_willThrowPostDeletedException(){
+            // given
+            String title = "제목1";
+            String content = "내용1";
+            boolean anounumity = true;
+            Post createdPost = Post.createNewPost(null, title, content, anounumity);
+            createdPost.delete(LocalDateTime.now());
+
+            // when
+            String updateTitle = "새로운 제목1";
+            String updateContent = "새로운 내용1";
+            assertThatThrownBy(() -> createdPost.update(updateTitle, updateContent))
+                .isInstanceOf(PostDeletedException.class);
+        }
     }
-
 
     @DisplayName("report()는")
     @Nested
