@@ -49,7 +49,7 @@ public class AdminControllerDocsTest extends RestDocsSupport {
     @Test
     void reportedPostsSearch() throws Exception {
         //given
-        when(adminService.findReportedPost())
+        when(adminService.findReportedPost(0))
             .thenReturn(List.of(
                 PostsResponseDto.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
                     .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())

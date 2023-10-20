@@ -33,11 +33,12 @@ public class RecordService {
     private final MemberService memberService;
 
     public void createRecord(CreateRecordRequestDTO createRecordRequestDTO, Long memberId) {
-        PostDetailResponseDto postResponse = postQueryService.findById(
+        PostDetailResponseDto postResponse = postQueryService.getPostById(
             createRecordRequestDTO.getPostId());
         Member member = memberService.getMember(memberId);
         checkDuplicateRecords(member.getId(), postResponse.getId(),
             createRecordRequestDTO.getIsLike());
+
         recordRepository.save(
             Record.builder().member(member).post(Post.builder().id(postResponse.getId()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());

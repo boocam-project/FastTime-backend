@@ -8,7 +8,7 @@ import lombok.Getter;
 
 public interface PostQueryUseCase {
 
-    PostDetailResponseDto findById(Long id);
+    PostDetailResponseDto getPostById(Long id);
 
     List<PostsResponseDto> searchPost(PostSearchCondition postSearchCondition);
 

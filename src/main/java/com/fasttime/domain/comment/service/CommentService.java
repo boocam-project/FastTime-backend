@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
-
+  
     private final CommentRepository commentRepository;
     private final PostQueryService postQueryService;
     private final MemberService memberService;
@@ -44,7 +44,7 @@ public class CommentService {
     }
 
     public List<PostCommentResponseDTO> getCommentsByPostId(long postId) {
-        PostDetailResponseDto postResponse = postQueryService.findById(postId);
+        PostDetailResponseDto postResponse = postQueryService.getPostById(postId);
         return getCommentsByPost(Post.builder().id(postResponse.getId()).build());
     }
 
