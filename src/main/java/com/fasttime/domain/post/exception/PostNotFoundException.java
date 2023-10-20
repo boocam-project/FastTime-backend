@@ -1,13 +1,16 @@
 package com.fasttime.domain.post.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class PostNotFoundException extends ApplicationException {
-
-    private static final HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+    private static final ErrorCode ERROR_CODE = ErrorCode.POST_NOT_FOUND;
 
     public PostNotFoundException() {
-        super(httpStatus, "존재하지 않는 게시글입니다.");
+        super(ERROR_CODE);
+    }
+
+    public PostNotFoundException(String message) {
+        super(ERROR_CODE, message);
     }
 }

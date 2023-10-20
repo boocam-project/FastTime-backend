@@ -3,11 +3,11 @@ package com.fasttime.domain.report.service;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.exception.PostDeletedException;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.entity.Report;
-import com.fasttime.domain.report.exception.AlreadyDeletedPostException;
 import com.fasttime.domain.report.exception.DuplicateReportException;
 import com.fasttime.domain.report.repository.ReportRepository;
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class ReportService {
 
     private void checkPostAlreadyDeleted(Post post) {
         if (post.isDeleted()) {
-            throw new AlreadyDeletedPostException();
+            throw new PostDeletedException();
         }
     }
 

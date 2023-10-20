@@ -1,11 +1,17 @@
 package com.fasttime.domain.record.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class AlreadyExistsRecordException extends ApplicationException {
 
+    private static final ErrorCode ERROR_CODE = ErrorCode.CANNOT_RECORD_BOTH_IN_ONE_POST;
+
     public AlreadyExistsRecordException() {
-        super(HttpStatus.BAD_REQUEST, "한 게시글에 좋아요와 싫어요를 모두 등록할 수는 없습니다.");
+        super(ERROR_CODE);
+    }
+
+    public AlreadyExistsRecordException(String message) {
+        super(ERROR_CODE, message);
     }
 }
