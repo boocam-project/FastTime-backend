@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public class AlreadyDeletedPostException extends ApplicationException {
 
-    public AlreadyDeletedPostException(String message) {
-        super(HttpStatus.BAD_REQUEST, message);
+    public AlreadyDeletedPostException() {
+        super(HttpStatus.BAD_REQUEST, "이미 삭제된 게시글입니다.");
     }
 }
