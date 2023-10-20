@@ -33,9 +33,24 @@ public class AdminService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MemberService memberService;
 
+    // 수정이 필요한 버전
+    public void save(saveAdminDTO dto) {
+        String[] adminEmail ={"testAdmin@gmail.com", "frontAdmin@gmail.com",
+            "backAdmin@gmail.com"};
 
-
+        if(memberService.isEmailExistsInMember(dto.getEmail())){
+            throw new IllegalArgumentException("이미 생성된 이메일입니다.");
+        }
+        for (String s : adminEmail) {
+            if (s.equals(dto.getEmail())) {
+                memberService.save(new MemberDto(dto.getEmail(), dto.getEmail(), dto.getPassword()));
+                adminRepository.save(Admin.builder().member(memberRepository.findByEmail(
+                    dto.getEmail()).get()).build());
+            }
+        }
+    }
 
     public Long loginAdmin(LoginRequestDTO dto) {
         Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
