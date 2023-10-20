@@ -16,8 +16,7 @@ import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
-import com.fasttime.domain.report.dto.ReportDTO;
-import com.fasttime.domain.report.dto.request.CreateReportRequest;
+import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.entity.Report;
 import com.fasttime.domain.report.exception.AlreadyDeletedPostException;
 import com.fasttime.domain.report.exception.DuplicateReportException;
@@ -60,24 +59,21 @@ public class ReportServiceTest {
         @DisplayName("게시글을 신고할 수 있다.")
         void _willSuccess() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
-            Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Member member = Member.builder().id(0L).build();
-            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
+            Optional<Post> post = Optional.of(Post.builder().id(1L).build());
+            Member member = Member.builder().id(1L).build();
+            Report report = Report.builder().id(1L).member(member).post(post.get()).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
-
             given(postRepository.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
             given(reportRepository.save(any(Report.class))).willReturn(report);
 
             // when
-            ReportDTO reportDto = reportService.createReport(request);
+            reportService.createReport(request, 1L);
 
             // then
-            assertThat(reportDto).extracting("id", "postId", "memberId")
-                .containsExactly(0L, 0L, 0L);
             verify(postRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
@@ -88,11 +84,10 @@ public class ReportServiceTest {
         @DisplayName("게시글 10번째 신고 시 게시글 상태를 수정할 수 있다.")
         void post_reported_willSuccess() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
-            Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Member member = Member.builder().id(0L).build();
-            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
+            Optional<Post> post = Optional.of(Post.builder().id(1L).build());
+            Member member = Member.builder().id(1L).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 10L; i++) {
                 reports.get().add(Report.builder().id(i).build());
@@ -100,16 +95,13 @@ public class ReportServiceTest {
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.save(any(Report.class))).willReturn(report);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
             // when
-            ReportDTO reportDto = reportService.createReport(request);
+            reportService.createReport(request, 11L);
 
             // then
-            assertThat(reportDto).extracting("id", "postId", "memberId")
-                .containsExactly(0L, 0L, 0L);
-            verify(postRepository, times(2)).findById(any(Long.class));
+            verify(postRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, times(1)).save(any(Report.class));
@@ -119,27 +111,23 @@ public class ReportServiceTest {
         @DisplayName("게시글 20번째 신고 시 게시글을 삭제할 수 있다.")
         void post_delete_willSuccess() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
             Member member = Member.builder().id(0L).build();
-            Report report = Report.builder().id(0L).member(member).post(post.get()).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
-            for (long i = 1L; i < 10L; i++) {
+            for (long i = 1L; i < 20L; i++) {
                 reports.get().add(Report.builder().id(i).build());
             }
             given(postRepository.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.save(any(Report.class))).willReturn(report);
             given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
 
             // when
-            ReportDTO reportDto = reportService.createReport(request);
+            reportService.createReport(request, 21L);
 
             // then
-            assertThat(reportDto).extracting("id", "postId", "memberId")
-                .containsExactly(0L, 0L, 0L);
-            verify(postRepository, times(2)).findById(any(Long.class));
+            verify(postRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, times(1)).save(any(Report.class));
@@ -149,19 +137,18 @@ public class ReportServiceTest {
         @DisplayName("게시물을 찾을 수 없으면 신고할 수 없다.")
         void postNotFound_willFail() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
             Optional<Post> post = Optional.empty();
-
             given(postRepository.findById(any(Long.class))).willReturn(post);
 
             // when, then
             Throwable exception = assertThrows(PostNotFoundException.class, () -> {
-                reportService.createReport(request);
+                reportService.createReport(request, 1L);
             });
             assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
-
             verify(postRepository, times(1)).findById(any(Long.class));
+            verify(memberService, never()).getMember(any(Long.class));
             verify(reportRepository, never()).findAllByPost(any(Post.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
@@ -170,20 +157,21 @@ public class ReportServiceTest {
         @DisplayName("이미 삭제된 게시물은 신고할 수 없다.")
         void alreadyDeletedPost_willFail() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
             Optional<Post> post = Optional.of(
-                Post.builder().id(0L).reportStatus(ReportStatus.REPORTED).build());
+                Post.builder().id(1L).reportStatus(ReportStatus.REPORTED).build());
             post.get().approveReport(LocalDateTime.now());
             given(postRepository.findById(any(Long.class))).willReturn(post);
 
             // when, then
             Throwable exception = assertThrows(AlreadyDeletedPostException.class, () -> {
-                reportService.createReport(request);
+                reportService.createReport(request, 1L);
             });
             assertEquals("이미 삭제된 게시글입니다.", exception.getMessage());
 
             verify(postRepository, times(1)).findById(any(Long.class));
+            verify(memberService, never()).getMember(any(Long.class));
             verify(reportRepository, never()).findAllByPost(any(Post.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
@@ -192,20 +180,19 @@ public class ReportServiceTest {
         @DisplayName("회원을 찾을 수 없으면 신고할 수 없다.")
         void memberNotFound_willFail() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
-            Optional<Post> post = Optional.of(Post.builder().id(0L).build());
-            Optional<Member> member = Optional.empty();
+            Optional<Post> post = Optional.of(Post.builder().id(1L).build());
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willThrow(
-                new UserNotFoundException("User not found with id: 0L"));
+                new UserNotFoundException("User not found with id: 1L"));
 
             // when, then
             Throwable exception = assertThrows(UserNotFoundException.class, () -> {
-                reportService.createReport(request);
+                reportService.createReport(request, 1L);
             });
-            assertEquals("User not found with id: 0L", exception.getMessage());
+            assertEquals("User not found with id: 1L", exception.getMessage());
 
             verify(postRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
@@ -217,7 +204,7 @@ public class ReportServiceTest {
         @DisplayName("중복 신고할 수 없다.")
         void duplicate_report_willFail() {
             // given
-            CreateReportRequest request = CreateReportRequest.builder().postId(0L).memberId(0L)
+            CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(0L)
                 .build();
             Optional<Post> post = Optional.of(Post.builder().id(0L).build());
             Member member = Member.builder().id(0L).build();
@@ -230,7 +217,7 @@ public class ReportServiceTest {
 
             // when, then
             Throwable exception = assertThrows(DuplicateReportException.class, () -> {
-                reportService.createReport(request);
+                reportService.createReport(request, 1L);
             });
             assertEquals("이미 신고한 게시글입니다.", exception.getMessage());
 
@@ -238,32 +225,6 @@ public class ReportServiceTest {
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(reportRepository, times(1)).findAllByPost(any(Post.class));
             verify(reportRepository, never()).save(any(Report.class));
-        }
-    }
-
-    @Nested
-    @DisplayName("getReportsByPost()는 ")
-    class Context_getReportsByPost {
-
-        @Test
-        @DisplayName("주어진 게시글의 신고 내역을 가져올 수 있다.")
-        void _willSuccess() {
-            // given
-            Post post = Post.builder().id(0L).build();
-            Member member = Member.builder().id(0L).build();
-            List<Report> reportList = new ArrayList<>();
-            reportList.add(Report.builder().post(post).member(member).build());
-            Optional<List<Report>> reports = Optional.of(reportList);
-
-            given(reportRepository.findAllByPost(any(Post.class))).willReturn(reports);
-
-            // when
-            List<Report> result = reportService.getReportsByPost(post);
-
-            // then
-            assertThat(result).isEqualTo(reports.get());
-
-            verify(reportRepository, times(1)).findAllByPost(any(Post.class));
         }
     }
 }

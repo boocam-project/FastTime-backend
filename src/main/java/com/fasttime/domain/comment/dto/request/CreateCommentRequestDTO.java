@@ -12,13 +12,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCommentRequest {
+public class CreateCommentRequestDTO {
 
     @NotNull(message = "게시글 ID를 입력하세요.")
     private Long postId;
-
-    @NotNull(message = "회원 ID를 입력하세요.")
-    private Long memberId;
 
     @NotBlank(message = "댓글 내용을 입력하세요.")
     @Size(min = 1, max = 100, message = "내용을 100자 이내로 입력하세요.")

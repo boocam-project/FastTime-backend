@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 public class DuplicateRecordException extends ApplicationException {
 
-    public DuplicateRecordException(String message) {
-        super(HttpStatus.BAD_REQUEST, message);
+    public DuplicateRecordException() {
+        super(HttpStatus.BAD_REQUEST, "중복된 좋아요/싫어요 등록 요청입니다.");
     }
 }

@@ -15,6 +15,6 @@ public class CreateRecordRequestDTO {
     @NotNull(message = "게시글 ID를 입력하세요.")
     private Long postId;
 
-    @NotNull(message = "회원 ID를 입력하세요.")
-    private Long memberId;
+    @NotNull(message = "좋아요 = true, 싫어요 = false 를 입력하세요.")
+    private Boolean isLike;
 }

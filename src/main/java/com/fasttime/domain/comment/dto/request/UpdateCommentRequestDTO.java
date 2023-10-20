@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateCommentRequest {
+public class UpdateCommentRequestDTO {
 
     @NotNull(message = "수정할 댓글 ID를 입력하세요.") Long id;
 
