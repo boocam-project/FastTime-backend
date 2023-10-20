@@ -33,7 +33,7 @@ public class CommentService {
         Comment parentComment = isCommentOfComment(createCommentRequestDTO) ? getComment(
             createCommentRequestDTO.getParentCommentId()) : null;
         commentRepository.save(Comment.builder().post(Post.builder()
-                    .id(postQueryService.findById(createCommentRequestDTO.getPostId()).getId()).build())
+                    .id(postQueryService.getPostById(createCommentRequestDTO.getPostId()).getId()).build())
                 .member(memberService.getMember(memberId)).content(createCommentRequestDTO.getContent())
                 .anonymity(createCommentRequestDTO.getAnonymity()).parentComment(parentComment).build())
             .toPostCommentResponseDTO();

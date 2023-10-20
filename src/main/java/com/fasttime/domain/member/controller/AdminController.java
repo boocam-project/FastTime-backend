@@ -7,18 +7,15 @@ import com.fasttime.global.util.ResponseDTO;
 import java.rmi.AccessException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,9 +26,9 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> postList() {
+    public ResponseEntity<ResponseDTO> postList(@RequestParam(defaultValue = "0") int page) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
-            , "신고가 10번이상된 게시글들을 보여줍니다.", adminService.findReportedPost()));
+            , "신고가 10번이상된 게시글들을 보여줍니다.", adminService.findReportedPost(page)));
     }
 
     @GetMapping("/{post_id}")
