@@ -5,35 +5,20 @@
 :toc: left
 :toclevels: 2
 
-[[Record-Like-Create]]
-== 좋아요 등록
+[[Record-Create]]
+== 좋아요/싫어요 등록
 
-회원이 게시글을 좋아요 하는 API 입니다.
-
-=== HttpRequest
-
-include::{snippets}/record-like-create/http-request.adoc[]
-include::{snippets}/record-like-create/request-fields.adoc[]
-
-=== HttpResponse
-
-include::{snippets}/record-like-create/http-response.adoc[]
-include::{snippets}/record-like-create/response-fields.adoc[]
-
-[[Record-Hate-Create]]
-== 싫어요 등록
-
-회원이 게시글을 싫어요 하는 API 입니다.
+회원이 게시글을 좋아요/싫어요 하는 API 입니다.
 
 === HttpRequest
 
-include::{snippets}/record-hate-create/http-request.adoc[]
-include::{snippets}/record-hate-create/request-fields.adoc[]
+include::{snippets}/record-create/http-request.adoc[]
+include::{snippets}/record-create/request-fields.adoc[]
 
 === HttpResponse
 
-include::{snippets}/record-hate-create/http-response.adoc[]
-include::{snippets}/record-hate-create/response-fields.adoc[]
+include::{snippets}/record-create/http-response.adoc[]
+include::{snippets}/record-create/response-fields.adoc[]
 
 [[Record-Get]]
 == 좋아요/싫어요 조회
