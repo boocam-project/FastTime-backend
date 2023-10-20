@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/fast-time
+    url: jdbc:mariadb://localhost:3306/fasttime
     username: root
     password: 1234
   jpa:
@@ -9,3 +9,6 @@ spring:
       show-sql: true
       jdbc:
         time_zone: Asia/Seoul
+  mail:
+    username: fasttime123
+    password: dnwnrlfls123
