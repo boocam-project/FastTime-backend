@@ -50,7 +50,7 @@ public class AdminService {
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
             throw new AdminNotFoundException("Admin not found");
-          
+        }
         memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
         adminRepository.save(Admin.builder().member(memberRepository.findByEmail
             (dto.getEmail()).get()).build());
