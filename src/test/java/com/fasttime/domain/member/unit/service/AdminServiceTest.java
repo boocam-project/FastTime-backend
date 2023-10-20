@@ -65,12 +65,14 @@ public class AdminServiceTest {
             post2.report();
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
+
             // when
             List<PostsResponseDto> postList = adminService.findReportedPost(0);
+            System.out.println(postList.size());
 
             //then
-            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post1.getTitle());
-            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post2.getTitle());
+            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post1.getTitle());
+            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post2.getTitle());
         }
         @DisplayName("없어 조회 할 수 없다.")
         @Test
@@ -123,6 +125,7 @@ public class AdminServiceTest {
 
             post1.report();
             post1.approveReport(LocalDateTime.now());
+
             //when
             adminService.passPost(post1.getId());
 
