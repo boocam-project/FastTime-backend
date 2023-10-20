@@ -7,6 +7,7 @@ import com.fasttime.domain.member.entity.Admin;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
 import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.repository.AdminEmailRepository;
 import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
@@ -39,37 +40,34 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
+    private final AdminEmailRepository adminEmailRepository;
 
     // 수정이 필요한 버전
     public void save(saveAdminDTO dto) {
-        String[] adminEmail = {"testAdmin@gmail.com", "frontAdmin@gmail.com",
-            "backAdmin@gmail.com"};
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
             throw new IllegalArgumentException("이미 생성된 이메일입니다.");
         }
-        for (String s : adminEmail) {
-            if (s.equals(dto.getEmail())) {
-                memberService.save(
-                    new MemberDto(dto.getEmail(), dto.getEmail(), dto.getPassword()));
-                adminRepository.save(Admin.builder().member(memberRepository.findByEmail(
-                    dto.getEmail()).get()).build());
-            }
+        if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
+            throw new AdminNotFoundException("Admin not found");
         }
+        memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
+        adminRepository.save(Admin.builder().member(memberRepository.findByEmail
+            (dto.getEmail()).get()).build());
     }
-
     public Long loginAdmin(LoginRequestDTO dto) {
         Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
         if (byEmail.isEmpty()) {
             throw new UserNotFoundException("User not found with email: " + dto.getEmail());
         }
+
         Member member = byEmail.get();
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         }
         Optional<Admin> byMember = adminRepository.findByMember(member);
         if (byMember.isEmpty()) {
-            throw new AdminNotFoundException("Admin not found ");
+            throw new AdminNotFoundException("Admin not found");
         }
         return byMember.get().getId();
     }

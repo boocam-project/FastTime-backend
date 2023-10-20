@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,7 +58,9 @@ public class AdminController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto,
         HttpSession session) {
-
+        if (session.getAttribute("MEMBER") != null) {
+            session.removeAttribute("MEMBER");
+        }
         session.setAttribute("ADMIN",adminService.loginAdmin(dto));
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "관리자 로그인 완료"));
@@ -66,6 +69,6 @@ public class AdminController {
     public ResponseEntity<ResponseDTO> join(@RequestBody @Valid saveAdminDTO dto) {
         adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "관리자 로그인 완료"));
+            (HttpStatus.OK, "관리자 회원가입 완료"));
     }
 }
