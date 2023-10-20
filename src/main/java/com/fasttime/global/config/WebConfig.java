@@ -16,7 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new AdminCheckInterceptor())
             .order(1)
-            .addPathPatterns("/api/v1/admin");
+            .addPathPatterns("/api/v1/admin/**")
+            .excludePathPatterns("/api/v1/admin/login");
         registry.addInterceptor(new LoginCheckInterceptor())
             .order(2)
             .addPathPatterns("/api/v1/comment", "/api/v1/my-page/**", "/api/v1/post",

@@ -1,5 +1,6 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.member.exception.AdminNotFoundException;
 import com.fasttime.global.util.ResponseDTO;
 import java.rmi.AccessException;
 import org.springframework.http.HttpStatus;
@@ -15,8 +16,15 @@ public class AdminControllerAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.res
             (HttpStatus.BAD_REQUEST, e.getMessage()));
     }
+
     @ExceptionHandler
     public ResponseEntity<ResponseDTO> accessException(AccessException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.res
+            (HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ResponseDTO> adminNotFoundException(AdminNotFoundException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.res
             (HttpStatus.BAD_REQUEST, e.getMessage()));
     }
