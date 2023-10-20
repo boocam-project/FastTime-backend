@@ -28,7 +28,6 @@ include::{snippets}/comment-create/response-fields.adoc[]
 === HttpRequest
 
 include::{snippets}/comments-search-mypage/http-request.adoc[]
-include::{snippets}/comments-search-mypage/path-parameters.adoc[]
 
 === HttpResponse
 

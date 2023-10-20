@@ -10,8 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteCommentRequest {
+public class DeleteCommentRequestDTO {
 
-    @NotNull(message = "삭제할 댓글 ID를 입력하세요.")
-    Long id;
+    @NotNull(message = "삭제할 댓글 ID를 입력하세요.") Long id;
 }
