@@ -1,11 +1,13 @@
 package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.global.util.ResponseDTO;
 import java.rmi.AccessException;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -60,6 +62,12 @@ public class AdminController {
         HttpSession session) {
 
         session.setAttribute("ADMIN",adminService.loginAdmin(dto));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
+            (HttpStatus.OK, "관리자 로그인 완료"));
+    }
+    @PostMapping("/join")
+    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid saveAdminDTO dto) {
+        adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "관리자 로그인 완료"));
     }
