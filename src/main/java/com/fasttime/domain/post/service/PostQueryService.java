@@ -2,14 +2,10 @@ package com.fasttime.domain.post.service;
 
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +22,8 @@ public class PostQueryService implements PostQueryUseCase {
     @Override
     public PostDetailResponseDto getPostById(Long id) {
         return PostDetailResponseDto.entityToDto(postRepository.findById(id)
-            .orElseThrow(PostNotFoundException::new));
+            .orElseThrow(() -> new PostNotFoundException(
+                String.format("Post Not Found From Persistence Layer / postId = %d", id))));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.fasttime.domain.report.unit.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,11 +13,11 @@ import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.entity.Post;
 import com.fasttime.domain.post.entity.ReportStatus;
+import com.fasttime.domain.post.exception.PostDeletedException;
 import com.fasttime.domain.post.exception.PostNotFoundException;
 import com.fasttime.domain.post.repository.PostRepository;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.entity.Report;
-import com.fasttime.domain.report.exception.AlreadyDeletedPostException;
 import com.fasttime.domain.report.exception.DuplicateReportException;
 import com.fasttime.domain.report.repository.ReportRepository;
 import com.fasttime.domain.report.service.ReportService;
@@ -165,10 +164,10 @@ public class ReportServiceTest {
             given(postRepository.findById(any(Long.class))).willReturn(post);
 
             // when, then
-            Throwable exception = assertThrows(AlreadyDeletedPostException.class, () -> {
+            Throwable exception = assertThrows(PostDeletedException.class, () -> {
                 reportService.createReport(request, 1L);
             });
-            assertEquals("이미 삭제된 게시글입니다.", exception.getMessage());
+            assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
 
             verify(postRepository, times(1)).findById(any(Long.class));
             verify(memberService, never()).getMember(any(Long.class));

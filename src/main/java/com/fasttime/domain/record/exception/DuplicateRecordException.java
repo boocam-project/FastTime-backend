@@ -1,11 +1,17 @@
 package com.fasttime.domain.record.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class DuplicateRecordException extends ApplicationException {
 
+    private static final ErrorCode ERROR_CODE = ErrorCode.DUPLICATED_REQUEST_FOR_RECORD;
+
     public DuplicateRecordException() {
-        super(HttpStatus.BAD_REQUEST, "중복된 좋아요/싫어요 등록 요청입니다.");
+        super(ERROR_CODE);
+    }
+
+    public DuplicateRecordException(String message) {
+        super(ERROR_CODE, message);
     }
 }

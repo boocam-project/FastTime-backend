@@ -1,13 +1,17 @@
 package com.fasttime.domain.record.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class RecordNotFoundException extends ApplicationException {
 
-    private static final HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+    private static final ErrorCode ERROR_CODE = ErrorCode.RECORD_NOT_FOUND;
 
     public RecordNotFoundException() {
-        super(httpStatus, "존재하지 않는 좋아요/싫어요 입니다.");
+        super(ERROR_CODE);
+    }
+
+    public RecordNotFoundException(String message) {
+        super(ERROR_CODE, message);
     }
 }

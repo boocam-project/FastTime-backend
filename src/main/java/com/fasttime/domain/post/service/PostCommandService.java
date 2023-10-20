@@ -56,8 +56,7 @@ public class PostCommandService implements PostCommandUseCase {
     public void deletePost(PostDeleteServiceDto serviceDto) {
 
         final Member deleteRequestMember = memberService.getMember(serviceDto.getMemberId());
-        final Post post = postRepository.findById(serviceDto.getPostId())
-            .orElseThrow(PostNotFoundException::new);
+        final Post post = findPostById(serviceDto.getPostId());
 
         validateAuthority(deleteRequestMember, post);
 
@@ -66,7 +65,8 @@ public class PostCommandService implements PostCommandUseCase {
 
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
-            .orElseThrow(PostNotFoundException::new);
+            .orElseThrow(() -> new PostNotFoundException(
+                String.format("Post Not Found From Persistence Layer / postId = %d", postId)));
     }
 
     private void validateAuthority(Member requestUser, Post post) {
@@ -78,9 +78,11 @@ public class PostCommandService implements PostCommandUseCase {
         // TODO Admin 정보를 가져와 Admin 유저인지 확인해야 함.
     }
 
-    private void isWriter(Member targetUser, Post post) {
-        if (!targetUser.getId().equals(post.getMember().getId())) {
-            throw new NotPostWriterException();
+    private void isWriter(Member requestMember, Post post) {
+        if (!requestMember.getId().equals(post.getMember().getId())) {
+            throw new NotPostWriterException(String.format(
+                "This member has no auth to control this post / targetPostId = %d, requestMemberId = %d",
+                post.getId(), requestMember.getId()));
         }
     }
 

@@ -1,11 +1,17 @@
 package com.fasttime.domain.report.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class DuplicateReportException extends ApplicationException {
 
+    private static final ErrorCode ERROR_CODE = ErrorCode.ALREADY_REPORTED_THIS_POST;
+
     public DuplicateReportException() {
-        super(HttpStatus.BAD_REQUEST, "이미 신고한 게시글입니다.");
+        super(ERROR_CODE);
+    }
+
+    public DuplicateReportException(String message) {
+        super(ERROR_CODE, message);
     }
 }

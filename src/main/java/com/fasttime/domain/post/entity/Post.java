@@ -12,15 +12,22 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = {
+    @Index(name = "idx_created_at", columnList = "createdAt")
+})
 @Entity
 public class Post extends BaseTimeEntity {
 
@@ -39,8 +46,10 @@ public class Post extends BaseTimeEntity {
 
     private boolean anonymity;
 
+//    @Formula("(SELECT COALESCE(COUNT(1), 0) FROM record r WHERE r.post_id = id GROUP BY r.type HAVING r.type = true)")
     private int likeCount;
 
+//    @Formula("(SELECT COALESCE(COUNT(1), 0) FROM record r WHERE r.post_id = id GROUP BY r.type HAVING r.type = false)")
     private int hateCount;
 
     @Enumerated(EnumType.STRING)
@@ -73,11 +82,11 @@ public class Post extends BaseTimeEntity {
 
     public void update(String title, String content) {
         if (reportStatus.equals(ReportStatus.REPORTED)) {
-            throw new PostReportedException();
+            throw new PostReportedException(String.format("This post is reported. So cannot update this post. / requestPostId = %d", this.id));
         }
 
         if (this.isDeleted()) {
-            throw new PostDeletedException();
+            throw new PostDeletedException(String.format("This post is deleted. So cannot update this post. / requestPostId = %d", this.id));
         }
 
         this.title = title;

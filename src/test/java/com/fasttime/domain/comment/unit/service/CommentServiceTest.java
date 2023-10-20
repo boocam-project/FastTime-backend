@@ -170,8 +170,7 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(false).parentCommentId(null).build();
-            given(postQueryService.getPostById(any(Long.class))).willThrow(
-                new PostNotFoundException());
+            given(postQueryService.getPostById(any(Long.class))).willThrow(new PostNotFoundException());
 
             // when, then
             Throwable exception = assertThrows(PostNotFoundException.class, () -> {

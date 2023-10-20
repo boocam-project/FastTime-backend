@@ -1,11 +1,17 @@
 package com.fasttime.domain.post.exception;
 
 import com.fasttime.global.exception.ApplicationException;
-import org.springframework.http.HttpStatus;
+import com.fasttime.global.exception.ErrorCode;
 
 public class PostDeletedException extends ApplicationException {
 
+    private static final ErrorCode ERROR_CODE = ErrorCode.POST_NOT_FOUND;
+
     public PostDeletedException() {
-        super(HttpStatus.NOT_FOUND, "삭제된 게시글입니다.");
+        super(ERROR_CODE);
+    }
+
+    public PostDeletedException(String message) {
+        super(ERROR_CODE, message);
     }
 }

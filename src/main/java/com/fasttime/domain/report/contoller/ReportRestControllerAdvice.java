@@ -1,6 +1,5 @@
 package com.fasttime.domain.report.contoller;
 
-import com.fasttime.domain.report.exception.AlreadyDeletedPostException;
 import com.fasttime.domain.report.exception.DuplicateReportException;
 import com.fasttime.global.util.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +15,6 @@ class ReportRestControllerAdvice {
     @ExceptionHandler
     ResponseEntity<ResponseDTO<Object>> duplicateReportException(DuplicateReportException e) {
         log.error("DuplicateReportException: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
-    }
-
-    @ExceptionHandler
-    ResponseEntity<ResponseDTO<Object>> alreadyDeletedPostException(AlreadyDeletedPostException e) {
-        log.error("AlreadyDeletedPostException: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
