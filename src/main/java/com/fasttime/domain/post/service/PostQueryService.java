@@ -20,9 +20,10 @@ public class PostQueryService implements PostQueryUseCase {
     }
 
     @Override
-    public PostDetailResponseDto findById(Long id) {
+    public PostDetailResponseDto getPostById(Long id) {
         return PostDetailResponseDto.entityToDto(postRepository.findById(id)
-            .orElseThrow(PostNotFoundException::new));
+            .orElseThrow(() -> new PostNotFoundException(
+                String.format("Post Not Found From Persistence Layer / postId = %d", id))));
     }
 
     @Override

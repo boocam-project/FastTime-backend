@@ -21,6 +21,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class AdminService {
+
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     private final AdminRepository adminRepository;
     private final PostRepository postRepository;
@@ -45,7 +50,7 @@ public class AdminService {
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
             throw new AdminNotFoundException("Admin not found");
-        }
+          
         memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
         adminRepository.save(Admin.builder().member(memberRepository.findByEmail
             (dto.getEmail()).get()).build());
@@ -67,8 +72,10 @@ public class AdminService {
         return byMember.get().getId();
     }
 
-    public List<PostsResponseDto> findReportedPost() {
-        return postRepository.findAllByReportStatus(ReportStatus.REPORTED).stream()
+    public List<PostsResponseDto> findReportedPost(int page) {
+        return postRepository.findAllByReportStatus(
+                createSortCondition(page, "createdAt"), ReportStatus.REPORTED)
+            .stream()
             .map(post -> PostsResponseDto.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -80,6 +87,12 @@ public class AdminService {
                 .lastModifiedAt(post.getUpdatedAt())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    @NotNull
+    private static PageRequest createSortCondition(int searchPage, String propertyName) {
+        return PageRequest.of(searchPage, DEFAULT_PAGE_SIZE)
+            .withSort(Sort.by(propertyName).descending());
     }
 
     public PostDetailResponseDto findOneReportedPost(Long id) throws AccessException {

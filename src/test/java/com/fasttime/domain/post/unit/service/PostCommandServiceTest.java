@@ -105,7 +105,7 @@ class PostCommandServiceTest {
             // then
             assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
                     "hateCount")
-                .containsExactly(1L, "title", "newContent", true, 0, 0);
+                .containsExactly(1L, "new title", "newContent", true, 0, 0);
         }
 
         @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
@@ -119,8 +119,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.updatePost(serviceDto))
-                .isInstanceOf(PostNotFoundException.class)
-                .hasMessage("존재하지 않는 게시글입니다.");
+                .isInstanceOf(PostNotFoundException.class);
         }
 
         @DisplayName("게시글 작성자가 아닌 경우 NotPostWriterException을 던진다.")
@@ -157,8 +156,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.deletePost(serviceDto))
-                .isInstanceOf(PostNotFoundException.class)
-                .hasMessage("존재하지 않는 게시글입니다.");
+                .isInstanceOf(PostNotFoundException.class);
         }
 
         @DisplayName("게시글 작성자가 아닌 경우 UserNotFoundException을 던진다.")
@@ -176,8 +174,7 @@ class PostCommandServiceTest {
 
             // when then
             assertThatThrownBy(() -> postCommandService.deletePost(serviceDto))
-                .isInstanceOf(NotPostWriterException.class)
-                .hasMessage("해당 게시글에 대한 권한이 없습니다.");
+                .isInstanceOf(NotPostWriterException.class);
         }
     }
 

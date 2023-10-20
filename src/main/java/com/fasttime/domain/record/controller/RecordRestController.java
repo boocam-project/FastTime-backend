@@ -27,40 +27,34 @@ public class RecordRestController {
 
     private final RecordService recordService;
 
-    @PostMapping("/like")
-    public ResponseEntity<ResponseDTO<Void>> createLike(
-        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO) {
-        log.info("CreateRecordRequest: " + createRecordRequestDTO + "(like)");
-        recordService.createRecord(createRecordRequestDTO, true);
+    @PostMapping
+    public ResponseEntity<ResponseDTO<Object>> createLike(
+        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO, HttpSession session) {
+        log.info("CreateRecordRequest: " + createRecordRequestDTO);
+        recordService.createRecord(createRecordRequestDTO, (Long) session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요를 성공적으로 접수했습니다.", null));
-    }
-
-    @PostMapping("/hate")
-    public ResponseEntity<ResponseDTO<RecordDTO>> createHate(
-        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO) {
-        log.info("CreateRecordRequest: " + createRecordRequestDTO + "(hate)");
-        recordService.createRecord(createRecordRequestDTO, false);
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDTO.res(HttpStatus.CREATED, "싫어요를 성공적으로 접수했습니다.", null));
+            .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요/싫어요를 성공적으로 등록했습니다."));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<ResponseDTO<RecordDTO>> getRecord(@PathVariable long postId,
         HttpSession session) {
-        long memberId = (long) session.getAttribute("MEMBER");
-        log.info("getRecord: " + postId + "(postId) + " + memberId + "(memberId)");
+        Long memberId = (Long) session.getAttribute("MEMBER");
+        log.info("getRecordRequest: postId(" + postId + "), memberId(" + memberId + ")");
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 조회했습니다.",
                 recordService.getRecord(memberId, postId)));
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO<Void>> deleteRecord(
-        @Valid @RequestBody DeleteRecordRequestDTO deleteRecordRequestDTO) {
-        log.info("DeleteRecordRequest: " + deleteRecordRequestDTO);
-        recordService.deleteRecord(deleteRecordRequestDTO);
+    public ResponseEntity<ResponseDTO<Object>> deleteRecord(
+        @Valid @RequestBody DeleteRecordRequestDTO deleteRecordRequestDTO, HttpSession session) {
+        Long memberId = (Long) session.getAttribute("MEMBER");
+        log.info(
+            "DeleteRecordRequest: postId(" + deleteRecordRequestDTO.getPostId() + "), memberId("
+                + memberId + ")");
+        recordService.deleteRecord(deleteRecordRequestDTO, memberId);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 취소했습니다.", null));
+            .body(ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 취소했습니다."));
     }
 }

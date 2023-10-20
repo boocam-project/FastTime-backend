@@ -14,10 +14,10 @@ public class GlobalExceptionRestAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> applicationException(ApplicationException e) {
-        log.error("applicationException: " + e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
-            .status(e.getHttpStatus())
-            .body(ResponseDTO.res(e.getHttpStatus(), e.getMessage()));
+            .status(e.getErrorCode().getHttpStatus())
+            .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
 
     @ExceptionHandler

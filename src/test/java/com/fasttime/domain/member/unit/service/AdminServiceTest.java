@@ -65,12 +65,14 @@ public class AdminServiceTest {
             post2.report();
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
+
             // when
-            List<PostsResponseDto> postList = adminService.findReportedPost();
+            List<PostsResponseDto> postList = adminService.findReportedPost(0);
+            System.out.println(postList.size());
 
             //then
-            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post1.getTitle());
-            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post2.getTitle());
+            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post1.getTitle());
+            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post2.getTitle());
         }
         @DisplayName("없어 조회 할 수 없다.")
         @Test
@@ -83,13 +85,8 @@ public class AdminServiceTest {
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
 
-            PostDetailResponseDto newPost1 = postCommandService.writePost(dto1);
-            PostDetailResponseDto newPost2 = postCommandService.writePost(dto2);
-            Post post1 = postRepository.findById(newPost1.getId()).get();
-            Post post2 = postRepository.findById(newPost2.getId()).get();
-
             // when
-            List<PostsResponseDto> postList = adminService.findReportedPost();
+            List<PostsResponseDto> postList = adminService.findReportedPost(0);
             //then
             Assertions.assertThat(postList.isEmpty()).isTrue();
         }
@@ -128,6 +125,7 @@ public class AdminServiceTest {
 
             post1.report();
             post1.approveReport(LocalDateTime.now());
+
             //when
             adminService.passPost(post1.getId());
 
