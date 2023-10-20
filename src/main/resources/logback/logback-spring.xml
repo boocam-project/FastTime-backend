@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <timestamp key="BY_DATE" datePattern="yyyy-MM-dd"/>
+    <property name="LOG_PATTERN"
+      value="[%d{yyyy-MM-dd HH:mm:ss}:%-4relative] %green([%thread]) %highlight(%-5level) %cyan([%C.%M:%yellow(%L)]) - %msg%n"/>
+
+    <!--  외부 서버 사용 외의 환경 -->
+    <springProfile name="local, test, default">
+        <include resource="logback/appender/logback-console.xml"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <!-- 라이브 서버 환경 -->
+    <springProfile name="prod">
+        <include resource="logback/appender/logback-prod.xml"/>
+
+        <logger level="ERROR" name="org.springframework.boot">
+            <appender-ref ref="FILE-ERROR"/>
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </logger>
+
+        <logger level="ERROR" name="com.fasttime.global.exception.GlobalExceptionRestAdvice">
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </logger>
+
+        <logger level="WARN" name="org.springframework.boot">
+            <appender-ref ref="FILE-WARN"/>
+        </logger>
+
+        <logger level="DEBUG" name="org.hibernate.SQL">
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </logger>
+
+        <logger level="TRACE" name="org.hibernate.type.descriptor.sql.BasicBinder">
+            <appender-ref ref="ASYNC_DISCORD"/>
+        </logger>
+
+        <root level="INFO">
+            <appender-ref ref="FILE-ERROR"/>
+            <appender-ref ref="FILE-WARN"/>
+            <appender-ref ref="FILE-INFO"/>
+        </root>
+    </springProfile>
+</configuration>

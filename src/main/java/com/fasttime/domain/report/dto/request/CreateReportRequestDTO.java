@@ -1,4 +1,4 @@
-package com.fasttime.domain.comment.dto.request;
+package com.fasttime.domain.report.dto.request;
 
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteCommentRequest {
+public class CreateReportRequestDTO {
 
-    @NotNull(message = "삭제할 댓글 ID를 입력하세요.")
-    Long id;
+    @NotNull(message = "게시글 ID를 입력하세요.")
+    private Long postId;
 }

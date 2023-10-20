@@ -86,7 +86,7 @@ public class PostController {
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK,
-                postQueryUseCase.findById(postId)));
+                postQueryUseCase.getPostById(postId)));
     }
 
     @GetMapping

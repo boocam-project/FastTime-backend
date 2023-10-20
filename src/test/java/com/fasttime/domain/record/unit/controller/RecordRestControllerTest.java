@@ -1,7 +1,6 @@
 package com.fasttime.domain.record.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -37,88 +36,47 @@ public class RecordRestControllerTest {
     RecordService recordService;
 
     @Nested
-    @DisplayName("createLike()는")
-    class Context_createLike {
+    @DisplayName("createRecord()는")
+    class Context_createRecord {
 
         @Test
         @DisplayName("게시글을 좋아요 할 수 있다.")
-        void _willSuccess() throws Exception {
+        void like_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L)
-                .postId(1L).build();
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+                .isLike(true).build();
             doNothing().when(recordService)
-                .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
+                .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/record/like").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.message").exists())
-                .andDo(print());
+                    post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        .session(session)).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
         }
-
-        @Nested
-        @DisplayName("postId가 ")
-        class Element_postId {
-
-            @Test
-            @DisplayName("null일 경우 좋아요 할 수 없다.")
-            void null_willFail() throws Exception {
-                // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L)
-                    .postId(null).build();
-                doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
-                String json = new ObjectMapper().writeValueAsString(request);
-
-                // when, then
-                mockMvc.perform(post("/api/v1/record/like").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
-            }
-        }
-
-        @Nested
-        @DisplayName("memberId가 ")
-        class Element_memberId {
-
-            @Test
-            @DisplayName("null일 경우 좋아요 할 수 없다.")
-            void null_willFail() throws Exception {
-                // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(null)
-                    .postId(1L).build();
-                doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
-                String json = new ObjectMapper().writeValueAsString(request);
-
-                // when, then
-                mockMvc.perform(post("/api/v1/record/like").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("createHate()는")
-    class Context_createHate {
 
         @Test
         @DisplayName("게시글을 싫어요 할 수 있다.")
-        void _willSuccess() throws Exception {
+        void hate_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L)
-                .postId(1L).build();
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+                .isLike(false).build();
             doNothing().when(recordService)
-                .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
+                .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/record/hate").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated()).andExpect(jsonPath("$.message").exists())
-                .andDo(print());
+                    post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        .session(session)).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
         }
 
         @Nested
@@ -126,40 +84,50 @@ public class RecordRestControllerTest {
         class Element_postId {
 
             @Test
-            @DisplayName("null일 경우 싫어요 할 수 없다.")
+            @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(1L)
-                    .postId(null).build();
+                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(null)
+                    .isLike(true).build();
                 doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
+                    .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/record/hate").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                            .session(session)).andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").exists())
+                    .andExpect(jsonPath("$.message").exists())
+                    .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
             }
         }
 
         @Nested
-        @DisplayName("memberId가 ")
-        class Element_memberId {
+        @DisplayName("isLike가 ")
+        class Element_isLike {
 
             @Test
-            @DisplayName("null일 경우 싫어요 할 수 없다.")
+            @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().memberId(null)
-                    .postId(1L).build();
+                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+                    .isLike(null).build();
                 doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), anyBoolean());
+                    .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
 
                 // when, then
-                mockMvc.perform(post("/api/v1/record/hate").content(json)
-                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").exists()).andDo(print());
+                mockMvc.perform(
+                        post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                            .session(session)).andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").exists())
+                    .andExpect(jsonPath("$.message").exists())
+                    .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
             }
         }
     }
@@ -172,17 +140,17 @@ public class RecordRestControllerTest {
         @DisplayName("좋아요/싫어요 데이터를 불러올 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", 1L);
             RecordDTO recordDTO = RecordDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
                 .build();
             given(recordService.getRecord(any(Long.class), any(Long.class))).willReturn(recordDTO);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
 
             // when, then
             mockMvc.perform(get("/api/v1/record/{postId}", 1L).session(session)
                     .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
-                .andExpect(jsonPath("$.data.id").exists())
+                .andExpect(jsonPath("$.data").isMap()).andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.memberId").exists())
                 .andExpect(jsonPath("$.data.postId").exists())
                 .andExpect(jsonPath("$.data.isLike").exists()).andDo(print());
@@ -197,16 +165,19 @@ public class RecordRestControllerTest {
         @DisplayName("게시글 좋아요(싫어요)를 취소할 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().memberId(1L)
-                .postId(1L).build();
-            doNothing().when(recordService).deleteRecord(any(DeleteRecordRequestDTO.class));
+            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().postId(1L).build();
+            doNothing().when(recordService)
+                .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
 
             // when, then
             mockMvc.perform(
-                    delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.message").exists())
-                .andDo(print());
+                    delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        .session(session)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
         }
 
         @Nested
@@ -217,37 +188,21 @@ public class RecordRestControllerTest {
             @DisplayName("null일 경우 취소할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().memberId(1L)
-                    .postId(null).build();
-                doNothing().when(recordService).deleteRecord(any(DeleteRecordRequestDTO.class));
+                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().postId(null)
+                    .build();
+                doNothing().when(recordService)
+                    .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
 
                 // when, then
                 mockMvc.perform(
-                        delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
-                    .andDo(print());
-            }
-        }
-
-        @Nested
-        @DisplayName("memberId가 ")
-        class Element_memberId {
-
-            @Test
-            @DisplayName("null일 경우 취소할 수 없다.")
-            void null_willFail() throws Exception {
-                // given
-                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().memberId(null)
-                    .postId(1L).build();
-                doNothing().when(recordService).deleteRecord(any(DeleteRecordRequestDTO.class));
-                String json = new ObjectMapper().writeValueAsString(request);
-
-                // when, then
-                mockMvc.perform(
-                        delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").exists())
-                    .andDo(print());
+                        delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                            .session(session)).andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").exists())
+                    .andExpect(jsonPath("$.message").exists())
+                    .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
             }
         }
     }

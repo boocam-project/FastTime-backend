@@ -148,4 +148,5 @@ $RECYCLE.BIN/
 
 application.yaml
 **/*-prod.yaml
+log/
 # End of https://www.toptal.com/developers/gitignore/api/intellij,macos,windows,java
