@@ -50,7 +50,6 @@ public class AdminService {
         adminRepository.save(Admin.builder().member(memberRepository.findByEmail
             (dto.getEmail()).get()).build());
     }
-
     public Long loginAdmin(LoginRequestDTO dto) {
         Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
         if (byEmail.isEmpty()) {
