@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.AdminController;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
@@ -219,4 +220,24 @@ public class AdminControllerDocsTest extends RestDocsSupport {
                         fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                             .attributes(key("constraints").value("Not Blank")))));
     }
+    @DisplayName("관리자 계정 회원가입 API 문서화")
+    @Test
+    void join() throws Exception {
+        //given
+        saveAdminDTO dto = new saveAdminDTO("testAdmin@gmail.com", "1234");
+        doNothing().when(adminService).save(any(saveAdminDTO.class));
+        String data = new ObjectMapper().writeValueAsString(dto);
+
+        //when then
+        mockMvc.perform(post("/api/v1/admin/join")
+                .contentType(MediaType.APPLICATION_JSON).content(data))
+            .andExpect(status().isOk()).andDo(
+                document("admin-join", preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()), requestFields(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+                            .attributes(key("constraints").value("Not Blank")),
+                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                            .attributes(key("constraints").value("Not Blank")))));
+    }
+
 }

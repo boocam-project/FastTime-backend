@@ -5,6 +5,20 @@
 :toc: left
 :toclevels: 2
 
+[[Admin-Join]]
+== 관리자 계정 회원가입
+
+Admin 계정이 회원가입을 하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/admin-join/http-request.adoc[]
+include::{snippets}/admin-join/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/admin-join/http-response.adoc[]
+
 
 [[Admin-Login]]
 == 관리자 계정 로그인
