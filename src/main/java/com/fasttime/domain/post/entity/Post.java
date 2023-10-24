@@ -46,10 +46,8 @@ public class Post extends BaseTimeEntity {
 
     private boolean anonymity;
 
-//    @Formula("(SELECT COALESCE(COUNT(1), 0) FROM record r WHERE r.post_id = id GROUP BY r.type HAVING r.type = true)")
     private int likeCount;
 
-//    @Formula("(SELECT COALESCE(COUNT(1), 0) FROM record r WHERE r.post_id = id GROUP BY r.type HAVING r.type = false)")
     private int hateCount;
 
     @Enumerated(EnumType.STRING)
@@ -68,7 +66,8 @@ public class Post extends BaseTimeEntity {
         this.reportStatus = reportStatus;
     }
 
-    public static Post createNewPost(Member member, String title, String content, boolean anonymity) {
+    public static Post createNewPost(Member member, String title, String content,
+        boolean anonymity) {
         return Post.builder()
             .member(member)
             .title(title)
@@ -82,11 +81,14 @@ public class Post extends BaseTimeEntity {
 
     public void update(String title, String content) {
         if (reportStatus.equals(ReportStatus.REPORTED)) {
-            throw new PostReportedException(String.format("This post is reported. So cannot update this post. / requestPostId = %d", this.id));
+            throw new PostReportedException(String.format(
+                "This post is reported. So cannot update this post. / requestPostId = %d",
+                this.id));
         }
 
         if (this.isDeleted()) {
-            throw new PostDeletedException(String.format("This post is deleted. So cannot update this post. / requestPostId = %d", this.id));
+            throw new PostDeletedException(String.format(
+                "This post is deleted. So cannot update this post. / requestPostId = %d", this.id));
         }
 
         this.title = title;
@@ -102,19 +104,19 @@ public class Post extends BaseTimeEntity {
         super.delete(currentTime);
     }
 
-    public void like(boolean increase) {
-        if (increase) {
-            this.likeCount++;
+    public void likeOrHate(boolean isLike, boolean increase) {
+        if (isLike) {
+            if (increase) {
+                this.likeCount++;
+            } else {
+                this.likeCount--;
+            }
         } else {
-            this.likeCount--;
-        }
-    }
-
-    public void hate(boolean increase) {
-        if (increase) {
-            this.hateCount++;
-        } else {
-            this.hateCount--;
+            if (increase) {
+                this.hateCount++;
+            } else {
+                this.hateCount--;
+            }
         }
     }
 

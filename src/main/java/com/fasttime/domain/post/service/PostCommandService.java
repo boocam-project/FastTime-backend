@@ -63,6 +63,12 @@ public class PostCommandService implements PostCommandUseCase {
         post.delete(serviceDto.getDeletedAt());
     }
 
+    @Override
+    public void likeOrHatePost(PostLikeOrHateServiceDto serviceDto) {
+        Post post = findPostById(serviceDto.getPostId());
+        post.likeOrHate(serviceDto.isLike(), serviceDto.isIncrease());
+    }
+
     private Post findPostById(Long postId) {
         return postRepository.findById(postId)
             .orElseThrow(() -> new PostNotFoundException(

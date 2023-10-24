@@ -14,6 +14,8 @@ public interface PostCommandUseCase {
 
     void deletePost(PostDeleteServiceDto serviceDto);
 
+    void likeOrHatePost(PostLikeOrHateServiceDto serviceDto);
+
     @Getter
     class PostCreateServiceDto {
 
@@ -63,6 +65,20 @@ public interface PostCommandUseCase {
             this.postId = postId;
             this.memberId = memberId;
             this.deletedAt = deletedAt;
+        }
+    }
+
+    @Getter
+    class PostLikeOrHateServiceDto {
+
+        private Long postId;
+        private boolean isLike;
+        private boolean increase;
+
+        public PostLikeOrHateServiceDto(Long postId, boolean isLike, boolean increase) {
+            this.postId = postId;
+            this.isLike = isLike;
+            this.increase = increase;
         }
     }
 
