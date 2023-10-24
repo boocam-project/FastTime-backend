@@ -22,7 +22,7 @@ public class GlobalExceptionRestAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> bindException(BindException e) {
-        log.error("BindException: " + e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST,
@@ -31,7 +31,7 @@ public class GlobalExceptionRestAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> serverException(RuntimeException e) {
-        log.error("Server Exception: " + e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러!"));
