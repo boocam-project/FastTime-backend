@@ -19,6 +19,12 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         }
         HttpSession session = request.getSession(false);
 
+        if (isSessionNull(session)) {
+            log.error("Member Authorized Fail! / session is null");
+            response.sendError(403,"로그인 후 이용가능합니다.");
+            return false;
+        }
+
         if (isNotLogin(session)) {
             log.error("Member Authorized Fail! / session.getAttribute(\"MEMBER\") info : {}", session.getAttribute("MEMBER"));
             response.sendError(403,"로그인 후 이용가능합니다.");
@@ -36,9 +42,12 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         return false;
     }
 
+    private  boolean isSessionNull(HttpSession session) {
+        return session == null;
+    }
+
     private  boolean isNotLogin(HttpSession session) {
-        return session == null || (session.getAttribute("MEMBER") == null
-            && session.getAttribute("ADMIN") == null);
+        return (session.getAttribute("MEMBER") == null && session.getAttribute("ADMIN") == null);
     }
 }
 
