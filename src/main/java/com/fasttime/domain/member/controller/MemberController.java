@@ -40,21 +40,17 @@ public class MemberController {
     @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
         try {
-            if (memberService.isEmailExistsInFcmember(memberDto.getEmail())) {
-                if (memberService.isEmailExistsInMember(memberDto.getEmail())) {
-                    return ResponseEntity.badRequest()
-                        .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
-                } else if (memberService.checkDuplicateNickname(memberDto.getNickname())) {
-                    return ResponseEntity.badRequest()
-                        .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
-                }
-
-                memberService.save(memberDto);
-                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "가입 성공!", "가입 성공!"));
-            } else {
+            if (memberService.isEmailExistsInMember(memberDto.getEmail())) {
                 return ResponseEntity.badRequest()
-                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "FastCampus에 등록된 이메일이 아닙니다."));
+                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
+            } else if (memberService.checkDuplicateNickname(memberDto.getNickname())) {
+                return ResponseEntity.badRequest()
+                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
             }
+
+            memberService.save(memberDto);
+            return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "가입 성공!", "가입 성공!"));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
@@ -80,7 +76,6 @@ public class MemberController {
 
                 member.setNickname(editRequest.getNickname());
                 member.setImage(editRequest.getImage());
-
 
                 memberRepository.save(member);
 

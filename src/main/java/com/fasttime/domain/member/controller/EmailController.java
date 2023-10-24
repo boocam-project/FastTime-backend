@@ -2,8 +2,10 @@ package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
+import com.fasttime.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
@@ -15,16 +17,27 @@ import java.util.Map;
 public class EmailController {
 
     private final EmailService emailService;
+    private final MemberService memberService;
 
     private final HttpSession session;
 
-    @PostMapping("/api/v1/emailconfirm") // 인증번호 발송 버튼 누르면 메일 가게
-    public ResponseEntity<String> mailConfirm(@RequestBody EmailRequest emailRequest)
-        throws Exception {
-        String code = emailService.sendSimpleMessage(emailRequest.getEmail());
-        session.setAttribute("emailCode", code);
+    @PostMapping("/api/v1/emailconfirm")
+    public ResponseEntity<?> mailConfirm(@RequestBody EmailRequest emailRequest) throws Exception {
+        try {
 
-        return ResponseEntity.ok("success");
+            if (!memberService.isEmailExistsInFcmember(emailRequest.getEmail())) {
+                return ResponseEntity.badRequest()
+                    .body("FastCampus에 등록된 이메일이 아닙니다.");
+            }
+
+            String code = emailService.sendSimpleMessage(emailRequest.getEmail());
+            session.setAttribute("emailCode", code);
+            return ResponseEntity.ok("success");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("메일 발송 실패: " + e.getMessage());
+        }
     }
 
 

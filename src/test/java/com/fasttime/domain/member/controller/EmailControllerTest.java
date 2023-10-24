@@ -5,7 +5,9 @@ import static org.mockito.Mockito.*;
 
 import com.fasttime.domain.member.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
+import com.fasttime.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(EmailController.class)
 public class EmailControllerTest {
-    //MockMvc를 사용해 API 요청을 모방. MockBean을 사용해 EmailService 모킹하여 테스트 진행
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -26,22 +28,48 @@ public class EmailControllerTest {
     @MockBean
     private EmailService emailService;
 
-    @Test
+    @MockBean
+    private MemberService memberService;
+
+    @Nested
     @DisplayName("이메일 확인 API 테스트")
-    public void testMailConfirm() throws Exception {
-        String email = "test@example.com";
+    class testMailConfirm {
 
-        when(emailService.sendSimpleMessage(anyString())).thenReturn("123456");//인증번호 고정
+        @Test
+        @DisplayName("성공한다. : 등록된 이메일")
+        public void testMailConfirm_RegisteredEmail() throws Exception {
+            String email = "test@example.com";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/emailconfirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\": \"" + email + "\"}"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().string("success"));
+            when(memberService.isEmailExistsInFcmember(anyString())).thenReturn(true);
+            when(emailService.sendSimpleMessage(anyString())).thenReturn("123456");
 
-        // sendSimpleMessage호출여부 확인
-        verify(emailService).sendSimpleMessage(email);
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/emailconfirm")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"email\": \"" + email + "\"}"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("success"));
+
+            verify(emailService).sendSimpleMessage(email);
+        }
+
+        @Test
+        @DisplayName("실패한다. : 등록되지 않은 이메일")
+        public void testMailConfirm_UnregisteredEmail() throws Exception {
+            String email = "unregistered@example.com";
+
+            when(memberService.isEmailExistsInFcmember(anyString())).thenReturn(
+                false);
+
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/emailconfirm")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"email\": \"" + email + "\"}"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("FastCampus에 등록된 이메일이 아닙니다."));
+
+            verify(emailService, never()).sendSimpleMessage(email);
+        }
     }
+
 
     @Test
     @DisplayName("이메일 인증 코드를 확인한다.")
@@ -49,13 +77,11 @@ public class EmailControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("emailCode", "123456");
 
-        //발송된 이메일 인증번호와 입력된 인증번호가 일치할 때
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/verify/123456")
                 .session(session))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
 
-        //발송된 이메일 인증번호와 입력된 인증번호가 일치하지 않을 때
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/verify/111111")
                 .session(session))
             .andExpect(MockMvcResultMatchers.status().isOk())
