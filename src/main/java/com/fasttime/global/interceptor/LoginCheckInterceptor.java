@@ -20,6 +20,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession(false);
 
         if (isNotLogin(session)) {
+            log.error("Member Authorized Fail! / session.getAttribute(\"MEMBER\") info : {}", session.getAttribute("MEMBER"));
             response.sendError(403,"로그인 후 이용가능합니다.");
             return false;
         }
