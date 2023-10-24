@@ -32,7 +32,7 @@ public class GlobalExceptionRestAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> dbException(DataAccessException e) {
-        log.error("Database Error : " + e.getMessage());
+        log.error(e.getMessage(), e);
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러!"));
