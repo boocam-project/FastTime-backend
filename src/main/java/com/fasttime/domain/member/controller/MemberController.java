@@ -1,11 +1,8 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.dto.MemberDto;
-
-
-import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
@@ -13,19 +10,21 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -152,11 +151,8 @@ public class MemberController {
 
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
-        , BindingResult bindingResult, HttpSession session)
-        throws UserNotFoundException, BindException {
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
+        ,HttpSession session) throws Exception {
+
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
@@ -177,12 +173,8 @@ public class MemberController {
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request, BindingResult bindingResult
-            , HttpSession session)
-        throws BindException {
-        if (bindingResult.hasErrors()) {
-            throw new BindException(bindingResult);
-        }
+        (@Validated @RequestBody RePasswordRequest request, HttpSession session) {
+
         MemberResponse response =
             memberService.rePassword(request, (Long) session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
