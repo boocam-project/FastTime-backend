@@ -4,6 +4,8 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.service.PostCommandService;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostLikeOrHateServiceDto;
 import com.fasttime.domain.post.service.PostQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
@@ -30,6 +32,7 @@ public class RecordService {
 
     private final RecordRepository recordRepository;
     private final PostQueryService postQueryService;
+    private final PostCommandService postCommandService;
     private final MemberService memberService;
 
     public void createRecord(CreateRecordRequestDTO createRecordRequestDTO, Long memberId) {
@@ -42,6 +45,9 @@ public class RecordService {
         recordRepository.save(
             Record.builder().member(member).post(Post.builder().id(postResponse.getId()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());
+
+        postCommandService.likeOrHatePost(new PostLikeOrHateServiceDto(postResponse.getId(),
+            createRecordRequestDTO.getIsLike(), true));
     }
 
     public RecordDTO getRecord(long memberId, long postId) {

@@ -12,6 +12,8 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
 import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.post.service.PostCommandService;
+import com.fasttime.domain.post.service.PostCommandUseCase.PostLikeOrHateServiceDto;
 import com.fasttime.domain.post.service.PostQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
@@ -49,6 +51,9 @@ public class RecordServiceTest {
     private PostQueryService postQueryService;
 
     @Mock
+    private PostCommandService postCommandService;
+
+    @Mock
     private MemberService memberService;
 
     @Nested
@@ -75,6 +80,7 @@ public class RecordServiceTest {
 
             // then
             verify(recordRepository, times(1)).save(any(Record.class));
+            verify(postCommandService, times(1)).likeOrHatePost(any(PostLikeOrHateServiceDto.class));
         }
 
         @Test
@@ -97,6 +103,7 @@ public class RecordServiceTest {
 
             // then
             verify(recordRepository, times(1)).save(any(Record.class));
+            verify(postCommandService, times(1)).likeOrHatePost(any(PostLikeOrHateServiceDto.class));
         }
 
         @Test
