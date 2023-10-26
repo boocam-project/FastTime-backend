@@ -38,6 +38,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Attributes.Attribute;
 
@@ -70,9 +71,13 @@ class PostControllerDocsTest extends RestDocsSupport {
                 .lastModifiedAt(null)
                 .build());
 
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
+
         // when then
         mockMvc.perform(post("/api/v1/post")
                 .contentType(MediaType.APPLICATION_JSON)
+                .session(session)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
             .andDo(document("post-create",
@@ -87,17 +92,21 @@ class PostControllerDocsTest extends RestDocsSupport {
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN).description("익명 여부"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
+                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
+                        .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.NULL).description("최종 수정 일시")
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.NULL)
+                        .description("최종 수정 일시")
                 )
             ));
     }
@@ -118,11 +127,14 @@ class PostControllerDocsTest extends RestDocsSupport {
         when(postQueryUseCase.searchPost(any(PostSearchCondition.class)))
             .thenReturn(List.of(
                 PostsResponseDto.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
-                    .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build(),
+                    .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
+                    .lastModifiedAt(LocalDateTime.now()).build(),
                 PostsResponseDto.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
-                    .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build(),
+                    .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now())
+                    .lastModifiedAt(LocalDateTime.now()).build(),
                 PostsResponseDto.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
-                    .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now()).lastModifiedAt(LocalDateTime.now()).build()
+                    .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now())
+                    .lastModifiedAt(LocalDateTime.now()).build()
             ));
 
         // when then
@@ -155,11 +167,16 @@ class PostControllerDocsTest extends RestDocsSupport {
                         .description("작성자 닉네임"),
                     fieldWithPath("data[].anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
-                    fieldWithPath("data[].commentCounts").type(JsonFieldType.NUMBER).description("댓글 수"),
-                    fieldWithPath("data[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data[].hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data[].lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
+                    fieldWithPath("data[].commentCounts").type(JsonFieldType.NUMBER)
+                        .description("댓글 수"),
+                    fieldWithPath("data[].likeCount").type(JsonFieldType.NUMBER)
+                        .description("좋아요 수"),
+                    fieldWithPath("data[].hateCount").type(JsonFieldType.NUMBER)
+                        .description("싫어요 수"),
+                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING)
+                        .description("생성 일시"),
+                    fieldWithPath("data[].lastModifiedAt").type(JsonFieldType.STRING)
+                        .description("수정 일시")
                 )
             ));
     }
@@ -200,14 +217,16 @@ class PostControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
                     fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING)
+                        .description("수정 일시")
                 )
             ));
     }
@@ -219,6 +238,9 @@ class PostControllerDocsTest extends RestDocsSupport {
         // given
         PostUpdateServiceDto requestDto = new PostUpdateServiceDto(1L, 1L, "새로운 게시글 제목입니다.",
             "새로운 게시글 본문입니다.");
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
 
         when(postCommandUseCase.updatePost(any(PostUpdateServiceDto.class)))
             .thenReturn(PostDetailResponseDto.builder()
@@ -236,7 +258,9 @@ class PostControllerDocsTest extends RestDocsSupport {
         // when then
         mockMvc.perform(patch("/api/v1/post")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto)))
+                .content(objectMapper.writeValueAsString(requestDto))
+                .session(session)
+            )
             .andExpect(status().isOk())
             .andDo(document("post-update",
                 preprocessRequest(prettyPrint()),
@@ -255,14 +279,16 @@ class PostControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
                     fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING).description("수정 일시")
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING)
+                        .description("수정 일시")
                 )
             ));
     }
@@ -273,12 +299,15 @@ class PostControllerDocsTest extends RestDocsSupport {
 
         // given
         PostDeleteRequestDto requestDto = new PostDeleteRequestDto(1L, 1L);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
 
         doNothing().when(postCommandUseCase).deletePost(any(PostDeleteServiceDto.class));
 
         // when then
         mockMvc.perform(delete("/api/v1/post")
                 .contentType(MediaType.APPLICATION_JSON)
+                .session(session)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
             .andDo(document("post-delete",

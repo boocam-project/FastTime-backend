@@ -14,6 +14,7 @@ import com.fasttime.domain.post.service.PostQueryUseCase.PostSearchCondition;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.List;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PostController {
 
+    private static final String SESSION_MEMBER_KEY = "MEMBER";
+
     private final PostCommandUseCase postCommandUseCase;
     private final PostQueryUseCase postQueryUseCase;
 
@@ -43,25 +46,37 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<PostDetailResponseDto>> writePost(
+    public ResponseEntity<ResponseDTO<PostDetailResponseDto>> writePost(HttpSession session,
         @RequestBody @Valid PostCreateRequestDto requestDto) {
+
+        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
+
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, postCommandUseCase.writePost(
-                new PostCreateServiceDto(requestDto.getMemberId(),
+                new PostCreateServiceDto(memberId,
                     requestDto.getTitle(),
                     requestDto.getContent(),
                     requestDto.isAnonymity()))));
     }
 
     @PatchMapping
-    public ResponseEntity<ResponseDTO<PostDetailResponseDto>> updatePost(
+    public ResponseEntity<ResponseDTO<PostDetailResponseDto>> updatePost(HttpSession session,
         @RequestBody @Valid PostUpdateRequestDto requestDto) {
+
+        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
+
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK, postCommandUseCase.updatePost(
                 new PostUpdateServiceDto(
-                    requestDto.getPostId(),
+                    memberId,
                     requestDto.getMemberId(),
                     requestDto.getTitle(),
                     requestDto.getContent()
@@ -69,12 +84,18 @@ public class PostController {
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO<Void>> deletePost(
+    public ResponseEntity<ResponseDTO<Void>> deletePost(HttpSession session,
         @RequestBody @Valid PostDeleteRequestDto requestDto) {
+
+        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
+
+        if (memberId == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         postCommandUseCase.deletePost(new PostDeleteServiceDto(
             requestDto.getPostId(),
-            requestDto.getMemberId(),
+            memberId,
             LocalDateTime.now()
         ));
         return ResponseEntity.status(HttpStatus.OK)
