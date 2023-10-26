@@ -151,7 +151,7 @@ public class MemberController {
 
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
-        ,HttpSession session) throws Exception {
+        ,HttpSession session) {
 
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getId());

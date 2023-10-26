@@ -41,7 +41,7 @@ public class AdminController {
 
     @GetMapping("/{post_id}/delete") // 문제가 있는 Post를 삭제
     public ResponseEntity<ResponseDTO> deletePost
-        (@PathVariable("post_id") Long post_id) throws AccessException {
+        (@PathVariable("post_id") Long post_id) {
         adminService.deletePost(post_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 삭제합니다."));
@@ -49,7 +49,7 @@ public class AdminController {
 
     @GetMapping("/{post_id}/pass") // 문제가 없는 Post 검토완료로 변경
     public ResponseEntity<ResponseDTO> passPost
-        (@PathVariable("post_id") Long post_id) throws AccessException {
+        (@PathVariable("post_id") Long post_id) {
         adminService.passPost(post_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 복구합니다."));
