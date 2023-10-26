@@ -35,7 +35,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             ))
             .from(post)
             .where(createSearchConditionBuilder(postSearchCondition))
-            .offset(postSearchCondition.getPage())
+            .offset((long) postSearchCondition.getPage() * postSearchCondition.getPageSize())
             .limit(postSearchCondition.getPageSize())
             .orderBy(post.createdAt.desc())
             .fetch();
@@ -55,6 +55,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         if (searchCondition.getLikeCount() > 0) {
             booleanBuilder.and(post.likeCount.gt(searchCondition.getLikeCount()));
         }
+
+        booleanBuilder.and(post.deletedAt.isNull());
 
         return booleanBuilder;
     }

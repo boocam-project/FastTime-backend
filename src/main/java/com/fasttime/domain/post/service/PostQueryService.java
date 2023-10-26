@@ -30,7 +30,6 @@ public class PostQueryService implements PostQueryUseCase {
     public List<PostsResponseDto> searchPost(PostSearchCondition postSearchCondition) {
         return postRepository.search(postSearchCondition)
             .stream()
-            .filter(respositoryDto -> respositoryDto.getDeletedAt() == null)
             .map(repositoryDto -> PostsResponseDto.builder()
                 .id(repositoryDto.getId())
                 .title(repositoryDto.getTitle())
