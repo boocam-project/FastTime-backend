@@ -1,10 +1,13 @@
 package com.fasttime.domain.post.entity;
 
+import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.post.exception.PostDeletedException;
 import com.fasttime.domain.post.exception.PostReportedException;
 import com.fasttime.global.common.BaseTimeEntity;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,6 +42,9 @@ public class Post extends BaseTimeEntity {
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
 
     private String title;
 

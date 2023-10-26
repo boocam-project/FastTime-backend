@@ -17,6 +17,7 @@ public interface PostRepositoryCustom {
         private String nickname;
         private String title;
         private boolean anonymity;
+        private int commentCount;
         private int likeCount;
         private int hateCount;
         private LocalDateTime createdAt;

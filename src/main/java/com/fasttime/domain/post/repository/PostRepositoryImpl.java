@@ -27,6 +27,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 post.member.nickname,
                 post.title,
                 post.anonymity,
+                post.comments.size().as("commentCount"),
                 post.likeCount,
                 post.hateCount,
                 post.createdAt,
