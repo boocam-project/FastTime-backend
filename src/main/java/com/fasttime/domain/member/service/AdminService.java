@@ -17,7 +17,6 @@ import com.fasttime.domain.post.entity.ReportStatus;
 import com.fasttime.domain.post.repository.PostRepository;
 import java.rmi.AccessException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,7 @@ public class AdminService {
     private final MemberService memberService;
     private final AdminEmailRepository adminEmailRepository;
 
-    // 수정이 필요한 버전
+
     public void save(saveAdminDTO dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
@@ -55,21 +54,18 @@ public class AdminService {
         adminRepository.save(Admin.builder().member(memberRepository.findByEmail
             (dto.getEmail()).get()).build());
     }
-    public Long loginAdmin(LoginRequestDTO dto) {
-        Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
-        if (byEmail.isEmpty()) {
-            throw new UserNotFoundException("User not found with email: " + dto.getEmail());
-        }
 
-        Member member = byEmail.get();
+    public Long loginAdmin(LoginRequestDTO dto) {
+
+        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
+            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         }
-        Optional<Admin> byMember = adminRepository.findByMember(member);
-        if (byMember.isEmpty()) {
-            throw new AdminNotFoundException("Admin not found");
-        }
-        return byMember.get().getId();
+        return adminRepository.findByMember(member)
+            .orElseThrow(() -> new AdminNotFoundException("Admin not found")).getId();
+
     }
 
     public List<PostsResponseDto> findReportedPost(int page) {
@@ -94,6 +90,7 @@ public class AdminService {
         return PageRequest.of(searchPage, DEFAULT_PAGE_SIZE)
             .withSort(Sort.by(propertyName).descending());
     }
+
 
     public PostDetailResponseDto findOneReportedPost(Long id) throws AccessException {
         Post post = postRepository.findById(id)

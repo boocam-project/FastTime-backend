@@ -70,16 +70,17 @@ public class MemberService {
     }
 
     public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
-        Optional<Member> byEmail = memberRepository.findByEmail(dto.getEmail());
-        if (!byEmail.isPresent()) {
-            throw new UserNotFoundException("User not found with email: " + dto.getEmail());
+        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
+            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+        if (member.getDeletedAt() != null) {
+            throw new UserNotFoundException("이미 탈퇴한 계정입니다");
         }
-        Member member = byEmail.get();
+
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
-        } else {
-            return new MemberResponse(member.getId(), member.getNickname());
         }
+        return new MemberResponse(member.getId(), member.getNickname());
+
     }
 
     public MemberResponse rePassword(RePasswordRequest request, Long id) {
@@ -87,9 +88,9 @@ public class MemberService {
             Member member = memberRepository.findById(id).get();
             member.setPassword(passwordEncoder.encode(request.getPassword()));
             return new MemberResponse(member.getId(), member.getNickname());
-        } else {
-            throw new BadCredentialsException("Not Match RePassword!");
         }
+        throw new BadCredentialsException("Not Match RePassword!");
+
     }
 
 
