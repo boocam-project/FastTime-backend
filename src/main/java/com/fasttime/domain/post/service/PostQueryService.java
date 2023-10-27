@@ -37,6 +37,7 @@ public class PostQueryService implements PostQueryUseCase {
                 .anonymity(repositoryDto.isAnonymity())
                 .likeCount(repositoryDto.getLikeCount())
                 .hateCount(repositoryDto.getHateCount())
+                .commentCounts(repositoryDto.getCommentCount())
                 .createdAt(repositoryDto.getCreatedAt())
                 .lastModifiedAt(repositoryDto.getLastModifiedAt())
                 .build())
