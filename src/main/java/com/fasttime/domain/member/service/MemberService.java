@@ -29,6 +29,12 @@ public class MemberService {
     private final FcMemberRepository fcMemberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
+    public void deleteExpiredSoftDeletedMembers() {
+        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+        memberRepository.deleteByDeletedAtBefore(oneYearAgo);
+    }
+
 
     public void save(MemberDto memberDto) {
 
