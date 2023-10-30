@@ -55,7 +55,7 @@ public class AdminServiceTest {
                     "testTitle1", "testContent1", false);
             PostCreateServiceDto dto2 = new PostCreateServiceDto
                 (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle2", "testContent2", false);
+                    "testTitle1", "testContent1", false);
           
             PostDetailResponseDto newPost1 = postCommandService.writePost(dto1);
             PostDetailResponseDto newPost2 = postCommandService.writePost(dto2);
