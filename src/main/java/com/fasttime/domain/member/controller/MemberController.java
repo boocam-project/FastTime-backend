@@ -10,6 +10,7 @@ import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +40,19 @@ public class MemberController {
     @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
         try {
+            LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+            Optional<Member> softDeletedMember = memberRepository.findByEmailAndDeletedAtBefore(
+                memberDto.getEmail(), oneYearAgo);
+
+            if (softDeletedMember.isPresent()) {
+                Member member = softDeletedMember.get();
+                member.recover();
+                member.setNickname(memberDto.getNickname());
+
+                memberService.save(member);
+                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
+            }
+
             if (memberService.isEmailExistsInMember(memberDto.getEmail())) {
                 return ResponseEntity.badRequest()
                     .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
@@ -151,7 +165,7 @@ public class MemberController {
 
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
-        ,HttpSession session) {
+        , HttpSession session) {
 
         MemberResponse response = memberService.loginMember(dto);
         session.setAttribute("MEMBER", response.getId());

@@ -50,8 +50,9 @@ public class MemberService {
     }
 
     public boolean isEmailExistsInMember(String email) {
-        return memberRepository.existsByEmail(email);
+        return memberRepository.existsByEmail(email); // 저장소에 existsByEmail 메소드가 있다고 가정합니다.
     }
+
 
 
     public void save(Member member) {

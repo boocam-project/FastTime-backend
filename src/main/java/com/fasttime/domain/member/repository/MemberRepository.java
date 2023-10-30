@@ -17,5 +17,10 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
 
     void deleteByDeletedAtBefore(LocalDateTime dateTime);
 
+    Optional<Member> findByEmailAndDeletedAtBefore(String email, LocalDateTime dateTime);
+
+
+
+
 
 }
