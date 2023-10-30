@@ -12,3 +12,8 @@ spring:
   mail:
     username: fasttime123
     password: dnwnrlfls123
+  scheduling:
+    enabled: true
+
+
+
