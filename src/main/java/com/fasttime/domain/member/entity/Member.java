@@ -38,14 +38,14 @@ public class Member extends BaseTimeEntity {
     public void delete(LocalDateTime currentTime) {
         super.delete(currentTime);
     }
-    public void recover() {
+
+    @Override
+    public void restore() {
         super.restore();
     }
 
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
-
-
 
 
 }

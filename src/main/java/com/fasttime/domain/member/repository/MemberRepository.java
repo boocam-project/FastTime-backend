@@ -4,9 +4,11 @@ import com.fasttime.domain.member.entity.Member;
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
-public interface MemberRepository extends JpaRepository<Member, Long>{
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     Optional<Member> findByNickname(String nickname);
@@ -17,10 +19,9 @@ public interface MemberRepository extends JpaRepository<Member, Long>{
 
     void deleteByDeletedAtBefore(LocalDateTime dateTime);
 
-    Optional<Member> findByEmailAndDeletedAtBefore(String email, LocalDateTime dateTime);
-
-
-
+    @Query("SELECT m FROM Member m WHERE m.email = :email AND m.deletedAt > :dateTime")
+    Optional<Member> findSoftDeletedByEmail(@Param("email") String email,
+        @Param("dateTime") LocalDateTime dateTime);
 
 
 }

@@ -4,7 +4,9 @@ import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,10 +31,45 @@ public class MemberService {
     private final FcMemberRepository fcMemberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+
     public void deleteExpiredSoftDeletedMembers() {
         LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
         memberRepository.deleteByDeletedAtBefore(oneYearAgo);
+    }
+
+    public ResponseDTO<Object> registerOrRecoverMember(MemberDto memberDto) {
+        try {
+            LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+            Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
+                memberDto.getEmail(), oneYearAgo);
+
+            if (softDeletedMember.isPresent()) {
+                System.out.println("Member found and trying to recover.");
+
+                Member member = softDeletedMember.get();
+
+                member.restore();
+                member.setNickname(memberDto.getNickname());
+                save(member);
+                return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
+            } else {
+                System.out.println(
+                    "No soft deleted member found with email: " + memberDto.getEmail());
+            }
+
+            if (isEmailExistsInMember(memberDto.getEmail())) {
+
+                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다.");
+            } else if (checkDuplicateNickname(memberDto.getNickname())) {
+                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다.");
+            }
+
+            save(memberDto);
+            return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
+
+        } catch (Exception e) {
+            return ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패 " + e.getMessage());
+        }
     }
 
 
@@ -50,9 +87,8 @@ public class MemberService {
     }
 
     public boolean isEmailExistsInMember(String email) {
-        return memberRepository.existsByEmail(email); // 저장소에 existsByEmail 메소드가 있다고 가정합니다.
+        return memberRepository.existsByEmail(email);
     }
-
 
 
     public void save(Member member) {

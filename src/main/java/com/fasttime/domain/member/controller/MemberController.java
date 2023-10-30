@@ -36,39 +36,10 @@ public class MemberController {
 
     private final MemberRepository memberRepository;
 
-
     @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
-        try {
-            LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-            Optional<Member> softDeletedMember = memberRepository.findByEmailAndDeletedAtBefore(
-                memberDto.getEmail(), oneYearAgo);
-
-            if (softDeletedMember.isPresent()) {
-                Member member = softDeletedMember.get();
-                member.recover();
-                member.setNickname(memberDto.getNickname());
-
-                memberService.save(member);
-                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
-            }
-
-            if (memberService.isEmailExistsInMember(memberDto.getEmail())) {
-                return ResponseEntity.badRequest()
-                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
-            } else if (memberService.checkDuplicateNickname(memberDto.getNickname())) {
-                return ResponseEntity.badRequest()
-                    .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
-            }
-
-            memberService.save(memberDto);
-            return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "가입 성공!", "가입 성공!"));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                    ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패 " + e.getMessage()));
-        }
+        ResponseDTO<Object> response = memberService.registerOrRecoverMember(memberDto);
+        return ResponseEntity.status(HttpStatus.valueOf(response.getCode())).body(response);
     }
 
     @PutMapping("/api/v1/retouch-member")
