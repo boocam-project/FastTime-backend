@@ -1,7 +1,6 @@
 package com.fasttime.domain.member.docs;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -16,17 +15,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.MemberController;
@@ -36,19 +31,18 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.util.ResponseDTO;
 import java.util.Optional;
-import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 
 public class MemberControllerDocsTest extends RestDocsSupport {
 
@@ -141,18 +135,17 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         MemberDto memberDto = new MemberDto("test@gmail.com", "testPassword", "testNickname");
 
         //when
-        when(memberService.isEmailExistsInFcmember(any(String.class))).thenReturn(true);
-        when(memberService.isEmailExistsInMember(any(String.class))).thenReturn(false);
-        when(memberService.checkDuplicateNickname(any(String.class))).thenReturn(false);
-        doNothing().when(memberService).save(any(MemberDto.class));
+        when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+            .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
         String data = new ObjectMapper().writeValueAsString(memberDto);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
-            .andExpect(jsonPath("$.message").value("가입 성공!")) // 메시지 확인
-            .andExpect(jsonPath("$.data").value("가입 성공!")) // 응답 데이터 확인
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("가입 성공!"))
+            .andExpect(jsonPath("$.data").doesNotExist())
             .andDo(document("member-join", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
@@ -167,6 +160,41 @@ public class MemberControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data").type(JsonFieldType.STRING).optional()
                         .description("응답데이터"))));
     }
+
+
+    @DisplayName("회원 복구 API 문서화")
+    @Test
+    void recover() throws Exception {
+        //given
+        MemberDto memberDto = new MemberDto("test@gmail.com", "testPassword", "testNickname");
+
+        //when
+        when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+            .thenReturn(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
+
+        String data = new ObjectMapper().writeValueAsString(memberDto);
+
+        //then
+        mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("계정이 성공적으로 복구되었습니다!"))
+            .andExpect(jsonPath("$.data").doesNotExist())
+            .andDo(document("member-restore", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), requestFields(
+                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+                        .attributes(key("constraints").value("Not Blank")),
+                    fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                        .attributes(key("constraints").value("Not Blank")),
+                    fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임")
+                        .attributes(key("constraints").value("Not Blank"))), responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).optional()
+                        .description("응답데이터"))));
+    }
+
 
     @DisplayName("회원 탈퇴 API 문서화")
     @Test
