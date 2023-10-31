@@ -44,7 +44,7 @@ public class MemberService {
                 memberDto.getEmail(), oneYearAgo);
 
             if (softDeletedMember.isPresent()) {
-                System.out.println("Member found and trying to recover.");
+                
 
                 Member member = softDeletedMember.get();
 
@@ -52,10 +52,7 @@ public class MemberService {
                 member.setNickname(memberDto.getNickname());
                 save(member);
                 return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
-            } else {
-                System.out.println(
-                    "No soft deleted member found with email: " + memberDto.getEmail());
-            }
+            } 
 
             if (isEmailExistsInMember(memberDto.getEmail())) {
 
