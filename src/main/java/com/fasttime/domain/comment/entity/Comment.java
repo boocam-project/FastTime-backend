@@ -3,7 +3,7 @@ package com.fasttime.domain.comment.entity;
 import com.fasttime.domain.comment.dto.response.MyPageCommentResponseDTO;
 import com.fasttime.domain.comment.dto.response.PostCommentResponseDTO;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.article.entity.Article;
 import com.fasttime.global.common.BaseTimeEntity;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,9 +27,9 @@ public class Comment extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "article_id")
     @ManyToOne
-    private Post post;
+    private Article article;
 
     @JoinColumn(name = "member_Id")
     @ManyToOne
@@ -44,10 +44,10 @@ public class Comment extends BaseTimeEntity {
     private Comment parentComment;
 
     @Builder
-    public Comment(Long id, Post post, Member member, String content, boolean anonymity,
+    public Comment(Long id, Article article, Member member, String content, boolean anonymity,
         Comment parentComment) {
         this.id = id;
-        this.post = post;
+        this.article = article;
         this.member = member;
         this.content = content;
         this.anonymity = anonymity;
@@ -80,7 +80,7 @@ public class Comment extends BaseTimeEntity {
         if (this.parentComment != null) {
             parentCommentId = this.parentComment.getId();
         }
-        return MyPageCommentResponseDTO.builder().id(this.id).postId(this.post.getId())
+        return MyPageCommentResponseDTO.builder().id(this.id).postId(this.article.getId())
             .nickname(this.member.getNickname()).content(this.content).anonymity(this.anonymity)
             .parentCommentId(parentCommentId).createdAt(dateTimeParse(this.getCreatedAt()))
             .updatedAt(dateTimeParse(this.getUpdatedAt()))

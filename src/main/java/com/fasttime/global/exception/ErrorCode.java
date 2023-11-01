@@ -13,9 +13,9 @@ public enum ErrorCode {
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),
 
     // POST
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
-    POST_IS_REPORTED(HttpStatus.UNAUTHORIZED, "해당 게시글은 수정할 수 있는 상태가 아닙니다."),
-    HAS_NO_PERMISSION_WITH_THIS_POST(HttpStatus.UNAUTHORIZED, "해당 게시글에 대한 권한이 없습니다."),
+    ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+    ARTICLE_IS_REPORTED(HttpStatus.UNAUTHORIZED, "해당 게시글은 수정할 수 있는 상태가 아닙니다."),
+    HAS_NO_PERMISSION_WITH_THIS_ARTICLE(HttpStatus.UNAUTHORIZED, "해당 게시글에 대한 권한이 없습니다."),
 
     // COMMENT
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
