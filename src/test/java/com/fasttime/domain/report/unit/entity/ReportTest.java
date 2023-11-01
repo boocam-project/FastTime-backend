@@ -3,7 +3,7 @@ package com.fasttime.domain.report.unit.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.report.entity.Report;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ public class ReportTest {
     @Test
     void create_report_willSuccess() {
         // given
-        Post post = Post.builder().id(0L).build();
+        Article post = Article.builder().id(0L).build();
         Member member = Member.builder().id(0L).build();
 
         // when

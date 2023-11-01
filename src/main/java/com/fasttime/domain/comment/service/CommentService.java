@@ -10,9 +10,9 @@ import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.service.ArticleQueryService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +26,14 @@ import org.springframework.stereotype.Service;
 public class CommentService {
   
     private final CommentRepository commentRepository;
-    private final PostQueryService postQueryService;
+    private final ArticleQueryService postQueryService;
     private final MemberService memberService;
 
     public void createComment(CreateCommentRequestDTO createCommentRequestDTO, Long memberId) {
         Comment parentComment = isCommentOfComment(createCommentRequestDTO) ? getComment(
             createCommentRequestDTO.getParentCommentId()) : null;
-        commentRepository.save(Comment.builder().post(Post.builder()
-                    .id(postQueryService.getPostById(createCommentRequestDTO.getPostId()).getId()).build())
+        commentRepository.save(Comment.builder().article(Article.builder()
+                    .id(postQueryService.queryById(createCommentRequestDTO.getPostId()).getId()).build())
                 .member(memberService.getMember(memberId)).content(createCommentRequestDTO.getContent())
                 .anonymity(createCommentRequestDTO.getAnonymity()).parentComment(parentComment).build())
             .toPostCommentResponseDTO();
@@ -44,8 +44,8 @@ public class CommentService {
     }
 
     public List<PostCommentResponseDTO> getCommentsByPostId(long postId) {
-        PostDetailResponseDto postResponse = postQueryService.getPostById(postId);
-        return getCommentsByPost(Post.builder().id(postResponse.getId()).build());
+        ArticleResponse postResponse = postQueryService.queryById(postId);
+        return getCommentsByPost(Article.builder().id(postResponse.getId()).build());
     }
 
     public void updateComment(UpdateCommentRequestDTO updateCommentRequestDTO) {
@@ -62,9 +62,9 @@ public class CommentService {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
     }
 
-    public List<PostCommentResponseDTO> getCommentsByPost(Post post) {
+    public List<PostCommentResponseDTO> getCommentsByPost(Article post) {
         List<PostCommentResponseDTO> comments = new ArrayList<>();
-        List<Comment> list = commentRepository.findAllByPost(post).orElseGet(ArrayList::new);
+        List<Comment> list = commentRepository.findAllByArticle(post).orElseGet(ArrayList::new);
         for (Comment comment : list) {
             comments.add(comment.toPostCommentResponseDTO());
         }

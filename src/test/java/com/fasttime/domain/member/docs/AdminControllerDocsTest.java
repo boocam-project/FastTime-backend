@@ -26,9 +26,9 @@ import com.fasttime.domain.member.controller.AdminController;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.service.AdminService;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.service.PostCommandUseCase.PostCreateServiceDto;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -52,13 +52,13 @@ public class AdminControllerDocsTest extends RestDocsSupport {
         //given
         when(adminService.findReportedPost(0))
             .thenReturn(List.of(
-                PostsResponseDto.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
+                ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
                     .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
-                PostsResponseDto.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
+                ArticlesResponse.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
                     .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
-                PostsResponseDto.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
+                ArticlesResponse.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
                     .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build()
             ));
@@ -99,11 +99,11 @@ public class AdminControllerDocsTest extends RestDocsSupport {
     @Test
     void ReportedPostDetailSearch() throws Exception {
         // given
-        PostCreateServiceDto requestDto = new PostCreateServiceDto(1L, "게시글 제목입니다.",
+        ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
             "게시글 본문입니다.", false);
 
         when(adminService.findOneReportedPost(anyLong()))
-            .thenReturn(PostDetailResponseDto.builder()
+            .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
                 .title(requestDto.getTitle())
@@ -146,11 +146,11 @@ public class AdminControllerDocsTest extends RestDocsSupport {
     @Test
     void deletePost() throws Exception {
         //given
-        PostCreateServiceDto requestDto = new PostCreateServiceDto(1L, "게시글 제목입니다.",
+        ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
             "게시글 본문입니다.", false);
 
         when(adminService.findOneReportedPost(anyLong()))
-            .thenReturn(PostDetailResponseDto.builder()
+            .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
                 .title(requestDto.getTitle())
@@ -176,11 +176,11 @@ public class AdminControllerDocsTest extends RestDocsSupport {
     @Test
     void passPost() throws Exception {
         //given
-        PostCreateServiceDto requestDto = new PostCreateServiceDto(1L, "게시글 제목입니다.",
+        ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
             "게시글 본문입니다.", false);
 
         when(adminService.findOneReportedPost(anyLong()))
-            .thenReturn(PostDetailResponseDto.builder()
+            .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
                 .title(requestDto.getTitle())

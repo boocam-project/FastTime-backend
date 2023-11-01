@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
 
-    Optional<Record> findByMemberIdAndPostId(Long memberId, Long postId);
+    Optional<Record> findByMemberIdAndArticleId(Long articleId, Long postId);
 
-    Optional<List<Record>> findAllByPostId(long postId);
+    Optional<List<Record>> findAllByArticleId(long articleId);
 }

@@ -17,7 +17,7 @@ public class CommentTest {
         boolean anonymity = true;
 
         // when
-        Comment comment = Comment.builder().post(null).member(null).content(content)
+        Comment comment = Comment.builder().article(null).member(null).content(content)
             .anonymity(anonymity).parentComment(null).build();
 
         // then
@@ -29,7 +29,7 @@ public class CommentTest {
     @Test
     void update_content_willSuccess() {
         // given
-        Comment comment = Comment.builder().post(null).member(null).content("test").anonymity(true)
+        Comment comment = Comment.builder().article(null).member(null).content("test").anonymity(true)
             .parentComment(null).build();
         String content = "change";
 
@@ -45,7 +45,7 @@ public class CommentTest {
     @Test
     void delete_comment_willSuccess() {
         // given
-        Comment comment = Comment.builder().post(null).member(null).content("test").anonymity(true)
+        Comment comment = Comment.builder().article(null).member(null).content("test").anonymity(true)
             .parentComment(null).build();
 
         // when
