@@ -58,7 +58,7 @@ include::{snippets}/member-rePassword/response-fields.adoc[]
 [[Member-Join]]
 == 회원 가입
 
-회원 가입 API 입니다.
+회원 가입, 탈퇴 계정 복구 API 입니다.
 
 
 === HttpRequest
@@ -69,7 +69,10 @@ include::{snippets}/member-join/request-fields.adoc[]
 === HttpResponse
 
 include::{snippets}/member-join/http-response.adoc[]
+include::{snippets}/member-restore/http-response.adoc[]
 include::{snippets}/member-join/response-fields.adoc[]
+
+
 
 [[Member-Delete]]
 == 회원 탈퇴
@@ -116,6 +119,9 @@ include::{snippets}/member-update/http-request.adoc[]
 
 include::{snippets}/member-update/http-response.adoc[]
 include::{snippets}/member-update/response-fields.adoc[]
+
+
+
 
 
 

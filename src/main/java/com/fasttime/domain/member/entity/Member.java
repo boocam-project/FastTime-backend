@@ -39,6 +39,11 @@ public class Member extends BaseTimeEntity {
         super.delete(currentTime);
     }
 
+    @Override
+    public void restore() {
+        super.restore();
+    }
+
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
