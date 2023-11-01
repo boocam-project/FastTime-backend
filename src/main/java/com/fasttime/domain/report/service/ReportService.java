@@ -2,10 +2,10 @@ package com.fasttime.domain.report.service;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.exception.PostDeletedException;
-import com.fasttime.domain.post.exception.PostNotFoundException;
-import com.fasttime.domain.post.repository.PostRepository;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.exception.ArticleDeletedException;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.entity.Report;
 import com.fasttime.domain.report.exception.DuplicateReportException;
@@ -25,12 +25,12 @@ import org.springframework.stereotype.Service;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final PostRepository postRepository;
+    private final ArticleRepository postRepository;
     private final MemberService memberService;
 
     public void createReport(CreateReportRequestDTO createReportRequestDTO, Long memberId) {
-        Post post = postRepository.findById(createReportRequestDTO.getPostId())
-            .orElseThrow(PostNotFoundException::new);
+        Article post = postRepository.findById(createReportRequestDTO.getPostId())
+            .orElseThrow(ArticleNotFoundException::new);
         checkPostAlreadyDeleted(post);
         Member member = memberService.getMember(memberId);
         List<Report> reports = reportRepository.findAllByPost(post).orElseGet(ArrayList::new);
@@ -39,9 +39,9 @@ public class ReportService {
         reportRepository.save(Report.builder().member(member).post(post).build());
     }
 
-    private void checkPostAlreadyDeleted(Post post) {
+    private void checkPostAlreadyDeleted(Article post) {
         if (post.isDeleted()) {
-            throw new PostDeletedException();
+            throw new ArticleDeletedException();
         }
     }
 
@@ -53,7 +53,7 @@ public class ReportService {
         }
     }
 
-    private void checkHowManyReportsOfPost(List<Report> reports, Post post) {
+    private void checkHowManyReportsOfPost(List<Report> reports, Article post) {
         if (is10thReport(reports)) {
             post.report();
         } else if (is20thReport(reports)) {

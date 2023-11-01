@@ -10,11 +10,11 @@ import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
 import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.dto.service.response.PostsResponseDto;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.entity.ReportStatus;
-import com.fasttime.domain.post.repository.PostRepository;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.repository.ArticleRepository;
 import java.rmi.AccessException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +35,7 @@ public class AdminService {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     private final AdminRepository adminRepository;
-    private final PostRepository postRepository;
+    private final ArticleRepository postRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
@@ -68,11 +68,11 @@ public class AdminService {
 
     }
 
-    public List<PostsResponseDto> findReportedPost(int page) {
+    public List<ArticlesResponse> findReportedPost(int page) {
         return postRepository.findAllByReportStatus(
                 createSortCondition(page, "createdAt"), ReportStatus.REPORTED)
             .stream()
-            .map(post -> PostsResponseDto.builder()
+            .map(post -> ArticlesResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .nickname(post.getMember().getNickname())
@@ -92,24 +92,24 @@ public class AdminService {
     }
 
 
-    public PostDetailResponseDto findOneReportedPost(Long id) throws AccessException {
-        Post post = postRepository.findById(id)
+    public ArticleResponse findOneReportedPost(Long id) throws AccessException {
+        Article post = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         System.out.println(post.getReportStatus());
         if (!post.getReportStatus().equals(ReportStatus.REPORTED)) {
             throw new AccessException("잘못된 접근입니다.");
         }
-        return PostDetailResponseDto.entityToDto(post);
+        return ArticleResponse.entityToDto(post);
     }
 
     public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
+        Article post = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         postRepository.delete(post);
     }
 
     public void passPost(Long id) {
-        Post post = postRepository.findById(id).
+        Article post = postRepository.findById(id).
             orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         post.rejectReport();
     }

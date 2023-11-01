@@ -2,11 +2,11 @@ package com.fasttime.domain.record.service;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.service.PostCommandService;
-import com.fasttime.domain.post.service.PostCommandUseCase.PostLikeOrHateServiceDto;
-import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.service.ArticleCommandService;
+import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
+import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
@@ -31,39 +31,39 @@ import org.springframework.stereotype.Service;
 public class RecordService {
 
     private final RecordRepository recordRepository;
-    private final PostQueryService postQueryService;
-    private final PostCommandService postCommandService;
+    private final ArticleQueryService postQueryService;
+    private final ArticleCommandService postCommandService;
     private final MemberService memberService;
 
     public void createRecord(CreateRecordRequestDTO createRecordRequestDTO, Long memberId) {
-        PostDetailResponseDto postResponse = postQueryService.getPostById(
+        ArticleResponse postResponse = postQueryService.queryById(
             createRecordRequestDTO.getPostId());
         Member member = memberService.getMember(memberId);
         checkDuplicateRecords(member.getId(), postResponse.getId(),
             createRecordRequestDTO.getIsLike());
 
         recordRepository.save(
-            Record.builder().member(member).post(Post.builder().id(postResponse.getId()).build())
+            Record.builder().member(member).article(Article.builder().id(postResponse.getId()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());
 
-        postCommandService.likeOrHatePost(new PostLikeOrHateServiceDto(postResponse.getId(),
+        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.getId(),
             createRecordRequestDTO.getIsLike(), true));
     }
 
     public RecordDTO getRecord(long memberId, long postId) {
-        Optional<Record> record = recordRepository.findByMemberIdAndPostId(memberId, postId);
+        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, postId);
         return record.map(Record::toDTO)
             .orElse(RecordDTO.builder().id(null).memberId(null).postId(null).isLike(null).build());
     }
 
     public void deleteRecord(DeleteRecordRequestDTO req, Long memberId) {
-        Record record = recordRepository.findByMemberIdAndPostId(memberId, req.getPostId())
+        Record record = recordRepository.findByMemberIdAndArticleId(memberId, req.getPostId())
             .orElseThrow(RecordNotFoundException::new);
         recordRepository.delete(record);
     }
 
     private void checkDuplicateRecords(long memberId, long postId, boolean isLike) {
-        Optional<Record> record = recordRepository.findByMemberIdAndPostId(memberId, postId);
+        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, postId);
         if (record.isPresent()) {
             if (record.get().isLike() == isLike) {
                 throw new DuplicateRecordException();
@@ -74,7 +74,7 @@ public class RecordService {
     }
 
     public Map<String, Integer> getRecordCount(long postId) {
-        Optional<List<Record>> records = recordRepository.findAllByPostId(postId);
+        Optional<List<Record>> records = recordRepository.findAllByArticleId(postId);
         Map<String, Integer> recordCount = new HashMap<>();
         if (records.isPresent()) {
             for (Record record : records.get()) {

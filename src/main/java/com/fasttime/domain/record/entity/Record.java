@@ -1,7 +1,7 @@
 package com.fasttime.domain.record.entity;
 
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.post.entity.Post;
+import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.global.common.BaseTimeEntity;
 import javax.persistence.Column;
@@ -30,24 +30,24 @@ public class Record extends BaseTimeEntity {
     @ManyToOne
     private Member member;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "article_id")
     @ManyToOne
-    private Post post;
+    private Article article;
 
     @Comment("좋아요 = 1, 싫어요 = 0")
     @Column(name = "type")
     private boolean isLike;
 
     @Builder
-    public Record(Long id, Member member, Post post, boolean isLike) {
+    public Record(Long id, Member member, Article article, boolean isLike) {
         this.id = id;
         this.member = member;
-        this.post = post;
+        this.article = article;
         this.isLike = isLike;
     }
 
     public RecordDTO toDTO() {
-        return RecordDTO.builder().id(this.id).postId(this.post.getId())
+        return RecordDTO.builder().id(this.id).postId(this.article.getId())
             .memberId(this.member.getId()).isLike(this.isLike).build();
     }
 }

@@ -21,10 +21,10 @@ import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.exception.PostNotFoundException;
-import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.service.ArticleQueryService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +48,7 @@ public class CommentServiceTest {
     private CommentRepository commentRepository;
 
     @Mock
-    private PostQueryService postQueryService;
+    private ArticleQueryService postQueryService;
 
     @Mock
     private MemberService memberService;
@@ -64,10 +64,10 @@ public class CommentServiceTest {
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(false).parentCommentId(null).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
-            Comment comment = Comment.builder().id(1L).post(Post.builder().id(1L).build())
+            Comment comment = Comment.builder().id(1L).article(Article.builder().id(1L).build())
                 .member(member).content("test").anonymity(false).parentComment(null).build();
-            given(postQueryService.getPostById(any(Long.class))).willReturn(
-                PostDetailResponseDto.builder().id(0L).build());
+            given(postQueryService.queryById(any(Long.class))).willReturn(
+                ArticleResponse.builder().id(0L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -75,7 +75,7 @@ public class CommentServiceTest {
             commentService.createComment(request, 1L);
 
             // then
-            verify(postQueryService, times(1)).getPostById(any(Long.class));
+            verify(postQueryService, times(1)).queryById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(commentRepository, never()).findById(any(Long.class));
             verify(commentRepository, times(1)).save(any(Comment.class));
@@ -87,12 +87,12 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(true).parentCommentId(null).build();
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
-            Comment comment = Comment.builder().id(1L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(1L).article(post).member(member).content("test")
                 .anonymity(true).parentComment(null).build();
-            given(postQueryService.getPostById(any(Long.class))).willReturn(
-                PostDetailResponseDto.builder().id(1L).build());
+            given(postQueryService.queryById(any(Long.class))).willReturn(
+                ArticleResponse.builder().id(1L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -100,7 +100,7 @@ public class CommentServiceTest {
             commentService.createComment(request, 1L);
 
             // then
-            verify(postQueryService, times(1)).getPostById(any(Long.class));
+            verify(postQueryService, times(1)).queryById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(commentRepository, never()).findById(any(Long.class));
             verify(commentRepository, times(1)).save(any(Comment.class));
@@ -112,16 +112,16 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(false).parentCommentId(1L).build();
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
             Optional<Comment> parentComment = Optional.of(
-                Comment.builder().id(1L).post(post).member(member).content("test").anonymity(false)
+                Comment.builder().id(1L).article(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
-            Comment comment = Comment.builder().id(1L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(1L).article(post).member(member).content("test")
                 .anonymity(false).parentComment(parentComment.get()).build();
             given(commentRepository.findById(any(Long.class))).willReturn(parentComment);
-            given(postQueryService.getPostById(any(Long.class))).willReturn(
-                PostDetailResponseDto.builder().id(1L).build());
+            given(postQueryService.queryById(any(Long.class))).willReturn(
+                ArticleResponse.builder().id(1L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -129,7 +129,7 @@ public class CommentServiceTest {
             commentService.createComment(request, 1L);
 
             // then
-            verify(postQueryService, times(1)).getPostById(any(Long.class));
+            verify(postQueryService, times(1)).queryById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(commentRepository, times(1)).findById(any(Long.class));
             verify(commentRepository, times(1)).save(any(Comment.class));
@@ -141,16 +141,16 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(true).parentCommentId(1L).build();
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
             Optional<Comment> parentComment = Optional.of(
-                Comment.builder().id(1L).post(post).member(member).content("test").anonymity(false)
+                Comment.builder().id(1L).article(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
-            Comment comment = Comment.builder().id(1L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(1L).article(post).member(member).content("test")
                 .anonymity(true).parentComment(parentComment.get()).build();
             given(commentRepository.findById(any(Long.class))).willReturn(parentComment);
-            given(postQueryService.getPostById(any(Long.class))).willReturn(
-                PostDetailResponseDto.builder().id(1L).build());
+            given(postQueryService.queryById(any(Long.class))).willReturn(
+                ArticleResponse.builder().id(1L).build());
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(commentRepository.save(any(Comment.class))).willReturn(comment);
 
@@ -158,7 +158,7 @@ public class CommentServiceTest {
             commentService.createComment(request, 1L);
 
             // then
-            verify(postQueryService, times(1)).getPostById(any(Long.class));
+            verify(postQueryService, times(1)).queryById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(commentRepository, times(1)).findById(any(Long.class));
             verify(commentRepository, times(1)).save(any(Comment.class));
@@ -170,10 +170,10 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(false).parentCommentId(null).build();
-            given(postQueryService.getPostById(any(Long.class))).willThrow(new PostNotFoundException());
+            given(postQueryService.queryById(any(Long.class))).willThrow(new ArticleNotFoundException());
 
             // when, then
-            Throwable exception = assertThrows(PostNotFoundException.class, () -> {
+            Throwable exception = assertThrows(ArticleNotFoundException.class, () -> {
                 commentService.createComment(request, 1L);
             });
             assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
@@ -187,8 +187,8 @@ public class CommentServiceTest {
             // given
             CreateCommentRequestDTO request = CreateCommentRequestDTO.builder().postId(1L)
                 .content("test").anonymity(false).parentCommentId(null).build();
-            given(postQueryService.getPostById(any(Long.class))).willReturn(
-                PostDetailResponseDto.builder().id(1L).build());
+            given(postQueryService.queryById(any(Long.class))).willReturn(
+                ArticleResponse.builder().id(1L).build());
             given(memberService.getMember(any(Long.class))).willThrow(
                 new UserNotFoundException("User not found with id: 1L"));
 
@@ -197,7 +197,7 @@ public class CommentServiceTest {
                 commentService.createComment(request, 1L);
             });
             assertEquals("User not found with id: 1L", exception.getMessage());
-            verify(postQueryService, times(1)).getPostById(any(Long.class));
+            verify(postQueryService, times(1)).queryById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
             verify(commentRepository, never()).findById(any(Long.class));
             verify(commentRepository, never()).save(any(Comment.class));
@@ -231,10 +231,10 @@ public class CommentServiceTest {
             // given
             UpdateCommentRequestDTO request = UpdateCommentRequestDTO.builder().id(1L)
                 .content("modified").build();
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
             Optional<Comment> comment = Optional.of(
-                Comment.builder().id(1L).post(post).member(member).content("test").anonymity(false)
+                Comment.builder().id(1L).article(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
@@ -272,10 +272,10 @@ public class CommentServiceTest {
         void _willSuccess() {
             // given
             DeleteCommentRequestDTO request = DeleteCommentRequestDTO.builder().id(0L).build();
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).nickname("testNickname").build();
             Optional<Comment> comment = Optional.of(
-                Comment.builder().id(1L).post(post).member(member).content("test").anonymity(false)
+                Comment.builder().id(1L).article(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
 
@@ -311,10 +311,10 @@ public class CommentServiceTest {
         @DisplayName("댓글을 가져올 수 있다.")
         void _willSuccess() {
             // given
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Comment> comment = Optional.of(
-                Comment.builder().id(1L).post(post).member(member).content("test").anonymity(false)
+                Comment.builder().id(1L).article(post).member(member).content("test").anonymity(false)
                     .parentComment(null).build());
 
             given(commentRepository.findById(any(Long.class))).willReturn(comment);
@@ -323,7 +323,7 @@ public class CommentServiceTest {
             Comment result = commentService.getComment(1L);
 
             // then
-            assertThat(result).extracting("id", "post", "member", "content", "anonymity",
+            assertThat(result).extracting("id", "article", "member", "content", "anonymity",
                 "parentComment").containsExactly(1L, post, member, "test", false, null);
 
             verify(commentRepository, times(1)).findById(any(Long.class));
@@ -356,16 +356,16 @@ public class CommentServiceTest {
         @DisplayName("해당 게시글의 댓글들을 불러올 수 있다.")
         void _willSuccess() {
             // given
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Comment comment = Comment.builder().id(1L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(1L).article(post).member(member).content("test")
                 .anonymity(false).parentComment(null).build();
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);
             Optional<List<Comment>> comments = Optional.of(commentList);
             List<PostCommentResponseDTO> commentDTOList = new ArrayList<>();
             commentDTOList.add(comment.toPostCommentResponseDTO());
-            given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
+            given(commentRepository.findAllByArticle(any(Article.class))).willReturn(comments);
 
             // when
             List<PostCommentResponseDTO> result = commentService.getCommentsByPost(post);
@@ -374,23 +374,23 @@ public class CommentServiceTest {
             assertThat(result.get(0).getId()).isEqualTo(commentDTOList.get(0).getId());
             assertThat(
                 result.get(0).getContent().equals(commentDTOList.get(0).getContent())).isTrue();
-            verify(commentRepository, times(1)).findAllByPost(any(Post.class));
+            verify(commentRepository, times(1)).findAllByArticle(any(Article.class));
         }
 
         @Test
         @DisplayName("댓글을 찾을 수 없으면 빈 리스트를 반환한다.")
         void CommentNotFound_willFail() {
             // given
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Optional<List<Comment>> comments = Optional.empty();
-            given(commentRepository.findAllByPost(any(Post.class))).willReturn(comments);
+            given(commentRepository.findAllByArticle(any(Article.class))).willReturn(comments);
 
             // when
             List<PostCommentResponseDTO> result = commentService.getCommentsByPost(post);
 
             // then
             assertThat(result).isEmpty();
-            verify(commentRepository, times(1)).findAllByPost(any(Post.class));
+            verify(commentRepository, times(1)).findAllByArticle(any(Article.class));
         }
     }
 
@@ -402,9 +402,9 @@ public class CommentServiceTest {
         @DisplayName("해당 회원의 댓글들을 불러올 수 있다.")
         void _willSuccess() {
             // given
-            Post post = Post.builder().id(1L).build();
+            Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Comment comment = Comment.builder().id(1L).post(post).member(member).content("test")
+            Comment comment = Comment.builder().id(1L).article(post).member(member).content("test")
                 .anonymity(false).parentComment(null).build();
             List<Comment> commentList = new ArrayList<>();
             commentList.add(comment);

@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.post.dto.service.response.PostDetailResponseDto;
-import com.fasttime.domain.post.entity.Post;
-import com.fasttime.domain.post.repository.PostRepository;
-import com.fasttime.domain.post.service.PostCommandService;
-import com.fasttime.domain.post.service.PostCommandUseCase.PostCreateServiceDto;
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.repository.ArticleRepository;
+import com.fasttime.domain.article.service.ArticleCommandService;
+import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,9 +32,9 @@ public class AdminControllerTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
-    private PostCommandService postCommandService;
+    private ArticleCommandService postCommandService;
     @Autowired
-    private PostRepository postRepository;
+    private ArticleRepository postRepository;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -52,16 +52,16 @@ public class AdminControllerTest {
         @Test
         void _willSuccess() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostCreateServiceDto dto2 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(), "testTitle2", "testContent2", false);
 
-            PostDetailResponseDto result1 = postCommandService.writePost(dto1);
-            PostDetailResponseDto result2 = postCommandService.writePost(dto2);
-            Post postFromDB1 = postRepository.findById(result1.getId()).get();
-            Post postFromDB2 = postRepository.findById(result2.getId()).get();
+            ArticleResponse result1 = postCommandService.write(dto1);
+            ArticleResponse result2 = postCommandService.write(dto2);
+            Article postFromDB1 = postRepository.findById(result1.getId()).get();
+            Article postFromDB2 = postRepository.findById(result2.getId()).get();
             postFromDB1.report();
             postFromDB2.report();
             postFromDB1.approveReport(LocalDateTime.now());
@@ -77,17 +77,17 @@ public class AdminControllerTest {
         @Test
         void _willFail() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
-            PostCreateServiceDto dto2 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle2", "testContent2", false);
           
-            PostDetailResponseDto savedPost1 = postCommandService.writePost(dto1);
-            PostDetailResponseDto savedPost2 = postCommandService.writePost(dto2);
-            Post postFromDB1 = postRepository.findById(savedPost1.getId()).get();
-            Post postFromDB2 = postRepository.findById(savedPost2.getId()).get();
+            ArticleResponse savedPost1 = postCommandService.write(dto1);
+            ArticleResponse savedPost2 = postCommandService.write(dto2);
+            Article postFromDB1 = postRepository.findById(savedPost1.getId()).get();
+            Article postFromDB2 = postRepository.findById(savedPost2.getId()).get();
 
             // when, then
             mockMvc.perform(get("/api/v1/admin"))
@@ -103,12 +103,12 @@ public class AdminControllerTest {
         void _willSuccess() throws Exception {
             //given
 
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse newPost = postCommandService.write(dto1);
+            Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
             post1.approveReport(LocalDateTime.now());
@@ -123,12 +123,12 @@ public class AdminControllerTest {
         @Test
         void _willFail() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse newPost = postCommandService.write(dto1);
+            Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
             post1.approveReport(LocalDateTime.now());
@@ -144,12 +144,12 @@ public class AdminControllerTest {
         @Test
         void Access_willFail() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse newPost = postCommandService.write(dto1);
+            Article post1 = postRepository.findById(newPost.getId()).get();
 
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}",  post1.getId()))
@@ -163,12 +163,12 @@ public class AdminControllerTest {
         @Test
         void Delete_willSuccess() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse newPost = postCommandService.write(dto1);
+            Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
             post1.approveReport(LocalDateTime.now());
@@ -183,12 +183,12 @@ public class AdminControllerTest {
         @Test
         void Pass_willSuccess() throws Exception {
             //given
-            PostCreateServiceDto dto1 = new PostCreateServiceDto
+            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
                 (memberRepository.findByEmail("test").get().getId(),
                     "testTitle1", "testContent1", false);
 
-            PostDetailResponseDto newPost = postCommandService.writePost(dto1);
-            Post post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse newPost = postCommandService.write(dto1);
+            Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.report();
             post1.approveReport(LocalDateTime.now());

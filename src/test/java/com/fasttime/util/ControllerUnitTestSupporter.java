@@ -1,9 +1,9 @@
 package com.fasttime.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.post.controller.PostController;
-import com.fasttime.domain.post.service.PostCommandService;
-import com.fasttime.domain.post.service.PostQueryService;
+import com.fasttime.domain.article.controller.ArticleController;
+import com.fasttime.domain.article.service.ArticleCommandService;
+import com.fasttime.domain.article.service.ArticleQueryService;
 import org.apache.catalina.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(value = PostController.class,
+@WebMvcTest(value = ArticleController.class,
     excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)},
     excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -26,10 +26,10 @@ public abstract class ControllerUnitTestSupporter {
     protected ObjectMapper objectMapper;
 
     @MockBean
-    protected PostCommandService postCommandService;
+    protected ArticleCommandService postCommandService;
 
     @MockBean
-    protected PostQueryService postQueryService;
+    protected ArticleQueryService postQueryService;
 
 
 }
