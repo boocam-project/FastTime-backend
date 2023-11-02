@@ -1,22 +1,21 @@
 package com.fasttime.domain.comment.dto.response;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class ArticleCommentResponseDTO {
+public class CommentResponseDTO {
 
-    private Long id;
-    private Long memberId;
-    private Long postId;
+    private long commentId;
+    private long memberId;
+    private long articleId;
     private String nickname;
     private String content;
-    private boolean anonymity;
-    private Long parentCommentId;
+    private Boolean anonymity;
+    private long parentCommentId;
     private String createdAt;
     private String updatedAt;
     private String deletedAt;
-    private List<ArticleCommentResponseDTO> childComments;
+    private int childCommentCount;
 }
