@@ -7,6 +7,7 @@ import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleDeletedException;
 import com.fasttime.domain.article.exception.ArticleReportedException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -62,7 +63,7 @@ class ArticleTest {
             String content = "내용1";
             boolean anounumity = true;
             Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
-            createdArticle.report();
+            createdArticle.transToWaitForReview();
 
             // when
             String updateTitle = "새로운 제목1";
@@ -102,14 +103,14 @@ class ArticleTest {
                 .build();
 
             // when
-            testArticle.report();
+            testArticle.transToWaitForReview();
 
             // then
-            assertThat(testArticle.getReportStatus()).isSameAs(ReportStatus.REPORTED);
+            assertThat(testArticle.getReportStatus()).isSameAs(ReportStatus.WAIT_FOR_REPORT_REVIEW);
         }
 
         @DisplayName("이미 신고당한 상태면 ReportStatus를 변경할 수 없다.")
-        @EnumSource(value = ReportStatus.class, names = {"REPORTED", "REPORT_REJECTED"})
+        @EnumSource(value = ReportStatus.class, names = {"WAIT_FOR_REPORT_REVIEW", "REPORT_REJECT"})
         @ParameterizedTest
         void reportStatus_alreadyReported_willNotChanged(ReportStatus reportStatus){
             // given
@@ -117,11 +118,9 @@ class ArticleTest {
                 .reportStatus(reportStatus)
                 .build();
 
-            // when
-            testArticle.report();
-
-            // then
-            assertThat(testArticle.getReportStatus()).isSameAs(reportStatus);
+            // when then
+            assertThatThrownBy(testArticle::transToWaitForReview)
+                .isInstanceOf(BadArticleReportStatusException.class);
         }
     }
 
@@ -135,7 +134,7 @@ class ArticleTest {
             // given
             LocalDateTime deletedTime = LocalDateTime.now();
             Article testArticle = Article.builder()
-                .reportStatus(ReportStatus.REPORTED)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
                 .build();
 
             // when
@@ -147,7 +146,7 @@ class ArticleTest {
         }
 
         @DisplayName("ReportStatus가 Reported 가 아니면 approve 할 수 없다.")
-        @EnumSource(value = ReportStatus.class, names = {"NORMAL", "REPORT_REJECTED"})
+        @EnumSource(value = ReportStatus.class, names = {"NORMAL", "REPORT_REJECT"})
         @ParameterizedTest
         void article_isNotReported_willNotChanged(ReportStatus reportStatus){
             // given
@@ -156,12 +155,9 @@ class ArticleTest {
                 .reportStatus(reportStatus)
                 .build();
 
-            // when
-            testArticle.approveReport(deletedTime);
-
-            // then
-            assertThat(testArticle.getDeletedAt()).isNull();
-            assertThat(testArticle.isDeleted()).isFalse();
+            // when then
+            assertThatThrownBy(() -> testArticle.approveReport(deletedTime))
+                .isInstanceOf(BadArticleReportStatusException.class);
         }
     }
 
@@ -174,18 +170,18 @@ class ArticleTest {
         void reportStatus_isReported_willChangedToReportRejected(){
             // given
             Article testArticle = Article.builder()
-                .reportStatus(ReportStatus.REPORTED)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
                 .build();
 
             // when
             testArticle.rejectReport();
 
             // then
-            assertThat(testArticle.getReportStatus()).isSameAs(ReportStatus.REPORT_REJECTED);
+            assertThat(testArticle.getReportStatus()).isSameAs(ReportStatus.REPORT_REJECT);
         }
 
         @DisplayName("일반적인 게시글은 Reject할 수 없다 변경할 수 없다.")
-        @EnumSource(value = ReportStatus.class, names = {"NORMAL", "REPORT_REJECTED"})
+        @EnumSource(value = ReportStatus.class, names = {"NORMAL", "REPORT_REJECT"})
         @ParameterizedTest
         void article_isNotReported_willNotChanged(ReportStatus reportStatus){
             // given
@@ -193,11 +189,9 @@ class ArticleTest {
                 .reportStatus(reportStatus)
                 .build();
 
-            // when
-            testArticle.rejectReport();
-
-            // then
-            assertThat(testArticle.getReportStatus()).isSameAs(reportStatus);
+            // when then
+            assertThatThrownBy(testArticle::rejectReport)
+                .isInstanceOf(BadArticleReportStatusException.class);
         }
     }
 
