@@ -14,8 +14,8 @@ public class CommentResponseDTO {
     private String content;
     private Boolean anonymity;
     private long parentCommentId;
+    private int childCommentCount;
     private String createdAt;
     private String updatedAt;
     private String deletedAt;
-    private int childCommentCount;
 }
