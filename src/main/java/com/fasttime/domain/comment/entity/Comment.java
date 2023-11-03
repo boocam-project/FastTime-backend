@@ -62,7 +62,7 @@ public class Comment extends BaseTimeEntity {
     @Override
     public void delete(LocalDateTime currentTime) {
         super.delete(currentTime);
-        if(!this.childComments.isEmpty()){
+        if (!this.childComments.isEmpty()) {
             this.childComments.forEach(comment -> {
                 comment.delete(currentTime);
             });
@@ -75,10 +75,11 @@ public class Comment extends BaseTimeEntity {
 
     public CommentResponseDTO toCommentResponseDTO() {
         long parentCommentId = -1L;
-        if (this.parentComment != null) {
+        boolean isChildComment = this.parentComment != null;
+        int deletedChildCommentCount = 0;
+        if (isChildComment) {
             parentCommentId = this.parentComment.getId();
         }
-        int deletedChildCommentCount = 0;
         for (Comment comment : this.childComments) {
             if (comment.isDeleted()) {
                 deletedChildCommentCount++;
