@@ -1,17 +1,20 @@
 package com.fasttime.domain.article.entity;
 
-import com.fasttime.domain.comment.entity.Comment;
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.exception.ArticleDeletedException;
 import com.fasttime.domain.article.exception.ArticleReportedException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
+import com.fasttime.domain.comment.entity.Comment;
+import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,7 +43,7 @@ public class Article extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member member;
 
     @OneToMany(mappedBy = "article")
@@ -87,7 +90,7 @@ public class Article extends BaseTimeEntity {
     }
 
     public void update(String title, String content) {
-        if (reportStatus.equals(ReportStatus.REPORTED)) {
+        if (reportStatus.equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new ArticleReportedException(String.format(
                 "This article is reported. So cannot update this article. / requestArticleId = %d",
                 this.id));
@@ -95,7 +98,8 @@ public class Article extends BaseTimeEntity {
 
         if (this.isDeleted()) {
             throw new ArticleDeletedException(String.format(
-                "This article is deleted. So cannot update this article. / requestArticleId = %d", this.id));
+                "This article is deleted. So cannot update this article. / requestArticleId = %d",
+                this.id));
         }
 
         this.title = title;
@@ -132,21 +136,28 @@ public class Article extends BaseTimeEntity {
         super.restore();
     }
 
-    public void report() {
-        if (this.reportStatus == ReportStatus.NORMAL) {
-            this.reportStatus = ReportStatus.REPORTED;
+    public void transToWaitForReview() {
+        if (this.reportStatus != ReportStatus.NORMAL) {
+            throw new BadArticleReportStatusException();
         }
+
+        this.reportStatus = ReportStatus.WAIT_FOR_REPORT_REVIEW;
     }
 
     public void approveReport(LocalDateTime currentTime) {
-        if (this.reportStatus == ReportStatus.REPORTED) {
-            delete(currentTime);
+        if (this.reportStatus != ReportStatus.WAIT_FOR_REPORT_REVIEW) {
+            throw new BadArticleReportStatusException();
         }
+
+        this.reportStatus = ReportStatus.REPORT_ACCEPT;
+        delete(currentTime);
     }
 
     public void rejectReport() {
-        if (this.reportStatus == ReportStatus.REPORTED) {
-            this.reportStatus = ReportStatus.REPORT_REJECTED;
+        if (this.reportStatus != ReportStatus.WAIT_FOR_REPORT_REVIEW) {
+            throw new BadArticleReportStatusException();
         }
+
+        this.reportStatus = ReportStatus.REPORT_REJECT;
     }
 }

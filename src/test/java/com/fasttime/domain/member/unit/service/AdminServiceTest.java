@@ -10,7 +10,7 @@ import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import java.rmi.AccessException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,8 +61,8 @@ public class AdminServiceTest {
             ArticleResponse newPost2 = postCommandService.write(dto2);
             Article post1 = postRepository.findById(newPost1.getId()).get();
             Article post2 = postRepository.findById(newPost2.getId()).get();
-            post1.report();
-            post2.report();
+            post1.transToWaitForReview();
+            post2.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             post2.approveReport(LocalDateTime.now());
 
@@ -105,7 +105,7 @@ public class AdminServiceTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
+            post1.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             //when
             adminService.deletePost(newPost.getId());
@@ -123,15 +123,14 @@ public class AdminServiceTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
-            post1.approveReport(LocalDateTime.now());
+            post1.transToWaitForReview();
 
             //when
             adminService.passPost(post1.getId());
 
             //then
             Assertions.assertThat(postRepository.findById(post1.getId()).get().getReportStatus())
-                .isEqualTo(ReportStatus.REPORT_REJECTED);
+                .isEqualTo(ReportStatus.REPORT_REJECT);
         }
         //IllegalArgumentException
         @DisplayName("잘못된 접근으로 바꿀 수 없다.")

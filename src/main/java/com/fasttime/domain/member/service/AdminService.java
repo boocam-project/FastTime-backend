@@ -70,7 +70,7 @@ public class AdminService {
 
     public List<ArticlesResponse> findReportedPost(int page) {
         return postRepository.findAllByReportStatus(
-                createSortCondition(page, "createdAt"), ReportStatus.REPORTED)
+                createSortCondition(page, "createdAt"), ReportStatus.WAIT_FOR_REPORT_REVIEW)
             .stream()
             .map(post -> ArticlesResponse.builder()
                 .id(post.getId())
@@ -96,10 +96,11 @@ public class AdminService {
         Article post = postRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         System.out.println(post.getReportStatus());
-        if (!post.getReportStatus().equals(ReportStatus.REPORTED)) {
+        if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new AccessException("잘못된 접근입니다.");
         }
-        return ArticleResponse.entityToDto(post);
+//        return ArticleResponse.entityToDto(post);
+        return null;
     }
 
     public void deletePost(Long id) {
