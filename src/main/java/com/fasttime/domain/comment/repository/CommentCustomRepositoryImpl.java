@@ -11,11 +11,11 @@ import javax.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CommentCustomRepository {
+public class CommentCustomRepositoryImpl {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public CommentCustomRepository(EntityManager entityManager) {
+    public CommentCustomRepositoryImpl(EntityManager entityManager) {
         this.jpaQueryFactory = new JPAQueryFactory(entityManager);
     }
 
