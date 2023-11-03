@@ -2,10 +2,14 @@ package com.fasttime.domain.article.service;
 
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.repository.ArticleRepository;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,27 +17,42 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ArticleQueryService implements ArticleQueryUseCase {
 
+    private final ArticleSettingProvider articleSettingProvider;
     private final ArticleRepository articleRepository;
 
-    public ArticleQueryService(ArticleRepository articleRepository) {
+    public ArticleQueryService(ArticleSettingProvider articleSettingProvider, ArticleRepository articleRepository) {
+        this.articleSettingProvider = articleSettingProvider;
         this.articleRepository = articleRepository;
     }
 
     @Override
     public ArticleResponse queryById(Long id) {
-        return ArticleResponse.entityToDto(articleRepository.findById(id)
-            .orElseThrow(() -> new ArticleNotFoundException(
-                String.format("Article Not Found From Persistence Layer / articleId = %d", id))));
+        Article targetArticle = articleRepository.findById(id)
+            .orElseThrow(() -> new ArticleNotFoundException(id));
+
+        return ArticleResponse.builder()
+            .id(targetArticle.getId())
+            .title(targetArticle.getTitle())
+            .content(targetArticle.getContent())
+            .nickname(targetArticle.isAnonymity() ?
+                articleSettingProvider.getAnonymousNickname() : targetArticle.getMember().getNickname())
+            .anonymity(targetArticle.isAnonymity())
+            .likeCount(targetArticle.getLikeCount())
+            .hateCount(targetArticle.getHateCount())
+            .createdAt(targetArticle.getCreatedAt())
+            .lastModifiedAt(targetArticle.getUpdatedAt())
+            .build();
     }
 
     @Override
-    public List<ArticlesResponse> search(ArticleSearchCondition articleSearchCondition) {
-        return articleRepository.search(articleSearchCondition)
+    public List<ArticlesResponse> search(ArticlesSearchServiceRequest request) {
+        return articleRepository.search(request)
             .stream()
             .map(repositoryDto -> ArticlesResponse.builder()
                 .id(repositoryDto.getId())
                 .title(repositoryDto.getTitle())
-                .nickname(repositoryDto.getNickname())
+                .nickname(repositoryDto.isAnonymity() ? articleSettingProvider.getAnonymousNickname()
+                    : repositoryDto.getNickname())
                 .anonymity(repositoryDto.isAnonymity())
                 .likeCount(repositoryDto.getLikeCount())
                 .hateCount(repositoryDto.getHateCount())
@@ -42,5 +61,26 @@ public class ArticleQueryService implements ArticleQueryUseCase {
                 .lastModifiedAt(repositoryDto.getLastModifiedAt())
                 .build())
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchServiceRequest request) {
+        return articleRepository
+            .findAllByReportStatus(cretePageRequest(request), request.getReportStatus())
+            .stream()
+            .map(result -> ArticlesResponse.builder()
+                .id(result.getId())
+                .title(result.getTitle())
+                .likeCount(result.getLikeCount())
+                .hateCount(result.getHateCount())
+                .createdAt(result.getCreatedAt())
+                .lastModifiedAt(result.getCreatedAt())
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    private PageRequest cretePageRequest(ReportedArticlesSearchServiceRequest request) {
+        return PageRequest.of(request.getPageNum(), request.getPageNum(),
+            Sort.by(articleSettingProvider.getDefaultOrderField()).descending());
     }
 }

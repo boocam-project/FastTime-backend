@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
+import com.fasttime.domain.article.service.ArticleSettingProvider;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
@@ -16,9 +17,9 @@ import com.fasttime.domain.article.exception.NotArticleWriterException;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleDeleteServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleUpdateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -40,42 +41,45 @@ class ArticleCommandServiceTest {
     private MemberService memberService;
 
     @Mock
+    private ArticleSettingProvider articleSettingProvider;
+
+    @Mock
     private ArticleRepository postRepository;
 
-    @DisplayName("writePost()는")
+    @DisplayName("createArticle()는")
     @Nested
-    class Context_writePost {
+    class Context_createArticle {
 
         @DisplayName("게시글을 DB에 성공적으로 저장한다.")
         @Test
         void _willSuccess() {
             // given
             Member member = Member.builder().id(1L).nickname("패캠러").build();
-            Article mockPost = createMockPost("title", "content", member);
+            Article mockArticle = createMockArticle("title", "content", member);
             ArticleCreateServiceRequest dto = new ArticleCreateServiceRequest(1L, "title",
                 "content", true);
 
             given(memberService.getMember(1L)).willReturn(member);
-            given(postRepository.save(any(Article.class))).willReturn(mockPost);
+            given(postRepository.save(any(Article.class))).willReturn(mockArticle);
 
             // when
             ArticleResponse response = postCommandService.write(dto);
 
             // then
             assertThat(response).extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
-                .containsExactly(1L, "title", "content", "패캠러", true, 0, 0);
+                .containsExactly(1L, "title", "content", articleSettingProvider.getAnonymousNickname(), true, 0, 0);
         }
 
         @DisplayName("회원 정보가 DB에 없는 경우 UserNotFoundException을 던진다.")
         @Test
         void member_notExist_throwIllArgumentException() {
             // given
-            Article mockPost = createMockPost("title", "content", null);
+            Article mockArticle = createMockArticle("title", "content", null);
             ArticleCreateServiceRequest dto = new ArticleCreateServiceRequest(1L, "title",
                 "content", true);
 
             given(memberService.getMember(1L)).willThrow(UserNotFoundException.class);
-            given(postRepository.save(any(Article.class))).willReturn(mockPost);
+            given(postRepository.save(any(Article.class))).willReturn(mockArticle);
 
             // when then
             assertThatThrownBy(() -> postCommandService.write(dto))
@@ -83,21 +87,21 @@ class ArticleCommandServiceTest {
         }
     }
 
-    @DisplayName("updatePost()는")
+    @DisplayName("updateArticle()는")
     @Nested
-    class Context_updatePost {
+    class Context_updateArticle {
 
         @DisplayName("게시글을 DB에 성공적으로 업데이트한다.")
         @Test
         void _willSuccess() {
             // given
             Member member = Member.builder().id(1L).build();
-            Article mockPost = createMockPost(member, "title", "content");
+            Article mockArticle = createMockArticle(member, "title", "content");
             ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L, 1L,
-                "new title", "newContent");
+                "new title", true, "newContent");
 
             given(memberService.getMember(1L)).willReturn(member);
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
 
             // when
             ArticleResponse response = postCommandService.update(serviceDto);
@@ -108,12 +112,12 @@ class ArticleCommandServiceTest {
                 .containsExactly(1L, "new title", "newContent", true, 0, 0);
         }
 
-        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
+        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 ArticleNotFoundException을 던진다.")
         @Test
         void post_notExist_throwIllArgumentException() {
             // given
             ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L, 1L,
-                "newTitle", "newContent");
+                "newTitle", true, "newContent");
 
             given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
@@ -122,17 +126,17 @@ class ArticleCommandServiceTest {
                 .isInstanceOf(ArticleNotFoundException.class);
         }
 
-        @DisplayName("게시글 작성자가 아닌 경우 NotPostWriterException을 던진다.")
+        @DisplayName("게시글 작성자가 아닌 경우 NotArticleWriterException을 던진다.")
         @Test
         void member_validateFail_throwIllArgumentException() {
             // given
             Member writer = Member.builder().id(1L).build();
             Member notAuthorizedMember = Member.builder().id(100L).build();
-            Article mockPost = createMockPost(writer, "title", "content");
+            Article mockArticle = createMockArticle(writer, "title", "content");
             ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L, notAuthorizedMember.getId(),
-                "newTitle", "newContent");
+                "newTitle", true, "newContent");
 
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
@@ -141,11 +145,11 @@ class ArticleCommandServiceTest {
         }
     }
 
-    @DisplayName("deletePost()는")
+    @DisplayName("deleteArticle()는")
     @Nested
-    class Context_deletePost {
+    class Context_deleteArticle {
 
-        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 PostNotFoundException을 던진다.")
+        @DisplayName("수정할 게시글 정보가 DB에 없는 경우 ArticleNotFoundException을 던진다.")
         @Test
         void post_notExist_throwIllArgumentException() {
             // given
@@ -168,8 +172,8 @@ class ArticleCommandServiceTest {
             Member notAuthorizedMember = Member.builder().id(100L).build();
 
             ArticleDeleteServiceRequest serviceDto = new ArticleDeleteServiceRequest(1L, notAuthorizedMember.getId(), deletedAt);
-            Article mockPost = createMockPost(writer, "title", "content");
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockPost));
+            Article mockArticle = createMockArticle(writer, "title", "content");
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
@@ -178,7 +182,7 @@ class ArticleCommandServiceTest {
         }
     }
 
-    private Article createMockPost(String title, String content, Member member) {
+    private Article createMockArticle(String title, String content, Member member) {
         return Article.builder()
             .id(1L)
             .title(title)
@@ -191,7 +195,7 @@ class ArticleCommandServiceTest {
             .build();
     }
 
-    private Article createMockPost(Member member, String title, String content) {
+    private Article createMockArticle(Member member, String title, String content) {
         return Article.builder()
             .id(1L)
             .member(member)

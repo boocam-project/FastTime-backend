@@ -1,6 +1,5 @@
 package com.fasttime.domain.article.dto.service.response;
 
-import com.fasttime.domain.article.entity.Article;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,19 +30,4 @@ public class ArticleResponse {
         this.createdAt = createdAt;
         this.lastModifiedAt = lastModifiedAt;
     }
-
-    public static ArticleResponse entityToDto(Article post) {
-        return ArticleResponse.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .nickname(post.getMember().getNickname())
-            .anonymity(post.isAnonymity())
-            .likeCount(post.getLikeCount())
-            .hateCount(post.getHateCount())
-            .createdAt(post.getCreatedAt())
-            .lastModifiedAt(post.getUpdatedAt())
-            .build();
-    }
-
 }

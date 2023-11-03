@@ -1,9 +1,7 @@
-package com.fasttime.domain.article.service;
+package com.fasttime.domain.article.service.usecase;
 
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import java.time.LocalDateTime;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Getter;
 
 public interface ArticleCommandUseCase {
@@ -19,15 +17,9 @@ public interface ArticleCommandUseCase {
     @Getter
     class ArticleCreateServiceRequest {
 
-        @NotNull
         private final Long memberId;
-
-        @NotBlank
         private final String title;
-
-        @NotBlank
         private final String content;
-
         private final boolean anonymity;
 
         public ArticleCreateServiceRequest(Long memberId, String title, String content, boolean anonymity) {
@@ -44,12 +36,15 @@ public interface ArticleCommandUseCase {
         private final Long articleId;
         private final Long memberId;
         private final String title;
+        private final boolean isAnonymity;
         private final String content;
 
-        public ArticleUpdateServiceRequest(Long articleId, Long memberId, String title, String content) {
+        public ArticleUpdateServiceRequest(Long articleId, Long memberId, String title,
+            boolean isAnonymity, String content) {
             this.articleId = articleId;
             this.memberId = memberId;
             this.title = title;
+            this.isAnonymity = isAnonymity;
             this.content = content;
         }
     }

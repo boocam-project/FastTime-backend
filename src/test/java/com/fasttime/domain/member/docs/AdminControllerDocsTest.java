@@ -28,7 +28,7 @@ import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
