@@ -111,7 +111,6 @@ public class AdminControllerTest {
             Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/api/v1/admin/{article_id}", post1.getId()))
                 .andExpect(status().isOk())
@@ -191,7 +190,6 @@ public class AdminControllerTest {
             Article post1 = postRepository.findById(newPost.getId()).get();
 
             post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}/pass", post1.getId()))
                 .andExpect(status().isOk())

@@ -63,8 +63,6 @@ public class AdminServiceTest {
             Article post2 = postRepository.findById(newPost2.getId()).get();
             post1.transToWaitForReview();
             post2.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
-            post2.approveReport(LocalDateTime.now());
 
             // when
             List<ArticlesResponse> postList = adminService.findReportedPost(0);

@@ -1,18 +1,15 @@
 package com.fasttime.domain.comment.service;
 
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
-import com.fasttime.domain.comment.dto.request.DeleteCommentRequestDTO;
+import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
-import com.fasttime.domain.comment.dto.response.MyPageCommentResponseDTO;
-import com.fasttime.domain.comment.dto.response.PostCommentResponseDTO;
+import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.repository.CommentRepository;
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.article.dto.service.response.ArticleResponse;
-import com.fasttime.domain.article.entity.Article;
-import com.fasttime.domain.article.service.ArticleQueryService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,63 +21,45 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class CommentService {
-  
+
     private final CommentRepository commentRepository;
     private final ArticleQueryService postQueryService;
     private final MemberService memberService;
 
-    public void createComment(CreateCommentRequestDTO createCommentRequestDTO, Long memberId) {
-        Comment parentComment = isCommentOfComment(createCommentRequestDTO) ? getComment(
-            createCommentRequestDTO.getParentCommentId()) : null;
-        commentRepository.save(Comment.builder().article(Article.builder()
-                    .id(postQueryService.queryById(createCommentRequestDTO.getPostId()).getId()).build())
+    public CommentResponseDTO createComment(long articleId, long memberId,
+        CreateCommentRequestDTO createCommentRequestDTO) {
+        boolean isChildComment = createCommentRequestDTO.getParentCommentId() != null;
+        Comment parentComment =
+            isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
+        return commentRepository.save(Comment.builder()
+                .article(Article.builder().id(postQueryService.queryById(articleId).getId()).build())
                 .member(memberService.getMember(memberId)).content(createCommentRequestDTO.getContent())
                 .anonymity(createCommentRequestDTO.getAnonymity()).parentComment(parentComment).build())
-            .toPostCommentResponseDTO();
+            .toCommentResponseDTO();
     }
 
-    public List<MyPageCommentResponseDTO> getCommentsByMemberId(Long memberId) {
-        return getCommentsByMember(memberService.getMember(memberId));
+    public List<CommentResponseDTO> getComments(GetCommentsRequestDTO getCommentsRequestDTO) {
+        List<CommentResponseDTO> comments = new ArrayList<>();
+        commentRepository.findAllBySearchCondition(getCommentsRequestDTO).forEach(comment -> {
+            comments.add(comment.toCommentResponseDTO());
+        });
+        return comments;
     }
 
-    public List<PostCommentResponseDTO> getCommentsByPostId(long postId) {
-        ArticleResponse postResponse = postQueryService.queryById(postId);
-        return getCommentsByPost(Article.builder().id(postResponse.getId()).build());
-    }
-
-    public void updateComment(UpdateCommentRequestDTO updateCommentRequestDTO) {
-        Comment comment = getComment(updateCommentRequestDTO.getId());
+    public CommentResponseDTO updateComment(long commentId,
+        UpdateCommentRequestDTO updateCommentRequestDTO) {
+        Comment comment = getComment(commentId);
         comment.updateContent(updateCommentRequestDTO.getContent());
+        return comment.toCommentResponseDTO();
     }
 
-    public void deleteComment(DeleteCommentRequestDTO deleteCommentRequestDTO) {
-        Comment comment = getComment(deleteCommentRequestDTO.getId());
+    public CommentResponseDTO deleteComment(long commentId) {
+        Comment comment = getComment(commentId);
         comment.delete(LocalDateTime.now());
+        return comment.toCommentResponseDTO();
     }
 
     public Comment getComment(Long id) {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
-    }
-
-    public List<PostCommentResponseDTO> getCommentsByPost(Article post) {
-        List<PostCommentResponseDTO> comments = new ArrayList<>();
-        List<Comment> list = commentRepository.findAllByArticle(post).orElseGet(ArrayList::new);
-        for (Comment comment : list) {
-            comments.add(comment.toPostCommentResponseDTO());
-        }
-        return comments;
-    }
-
-    public List<MyPageCommentResponseDTO> getCommentsByMember(Member member) {
-        List<MyPageCommentResponseDTO> comments = new ArrayList<>();
-        List<Comment> list = commentRepository.findAllByMember(member).orElseGet(ArrayList::new);
-        for (Comment comment : list) {
-            comments.add(comment.toMyPageCommentResponseDTO());
-        }
-        return comments;
-    }
-
-    private boolean isCommentOfComment(CreateCommentRequestDTO createCommentRequestDTO) {
-        return createCommentRequestDTO.getParentCommentId() != null;
     }
 }

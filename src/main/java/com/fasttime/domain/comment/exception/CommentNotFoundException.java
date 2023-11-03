@@ -10,8 +10,4 @@ public class CommentNotFoundException extends ApplicationException {
     public CommentNotFoundException() {
         super(ERROR_CODE);
     }
-
-    public CommentNotFoundException(String message) {
-        super(ERROR_CODE, message);
-    }
 }
