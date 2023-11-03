@@ -5,12 +5,12 @@ import com.fasttime.domain.article.dto.controller.request.ArticleDeleteRequest;
 import com.fasttime.domain.article.dto.controller.request.ArticleUpdateRequest;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
-import com.fasttime.domain.article.service.ArticleCommandUseCase;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleDeleteServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleUpdateServiceRequest;
-import com.fasttime.domain.article.service.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.ArticleQueryUseCase.ArticleSearchCondition;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,9 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,7 +46,7 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<ArticleResponse>> writeArticle(HttpSession session,
+    public ResponseEntity<ResponseDTO<ArticleResponse>> createArticle(HttpSession session,
         @RequestBody @Valid ArticleCreateRequest requestDto) {
 
         Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
@@ -63,7 +63,7 @@ public class ArticleController {
                     requestDto.isAnonymity()))));
     }
 
-    @PatchMapping
+    @PutMapping
     public ResponseEntity<ResponseDTO<ArticleResponse>> updateArticle(HttpSession session,
         @RequestBody @Valid ArticleUpdateRequest requestDto) {
 
@@ -79,7 +79,7 @@ public class ArticleController {
                     memberId,
                     requestDto.getMemberId(),
                     requestDto.getTitle(),
-                    requestDto.getContent()
+                    requestDto.isAnonymity(), requestDto.getContent()
                 ))));
     }
 
@@ -102,12 +102,12 @@ public class ArticleController {
             .body(ResponseDTO.res(HttpStatus.OK, null, null));
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<ResponseDTO<ArticleResponse>> getArticle(@PathVariable long postId) {
+    @GetMapping("/{articleId}")
+    public ResponseEntity<ResponseDTO<ArticleResponse>> getArticle(@PathVariable long articleId) {
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK,
-                articleQueryUseCase.queryById(postId)));
+                articleQueryUseCase.queryById(articleId)));
     }
 
     @GetMapping
@@ -119,7 +119,7 @@ public class ArticleController {
         @RequestParam(defaultValue = "0") int page) {
 
         List<ArticlesResponse> serviceResponse = articleQueryUseCase.search(
-            ArticleSearchCondition.builder()
+            ArticlesSearchServiceRequest.builder()
                 .title(title)
                 .nickname(nickname)
                 .likeCount(likeCount)

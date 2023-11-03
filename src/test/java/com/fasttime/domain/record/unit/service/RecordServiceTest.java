@@ -13,7 +13,7 @@ import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
 import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;

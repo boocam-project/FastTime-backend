@@ -1,7 +1,8 @@
-package com.fasttime.domain.article.service;
+package com.fasttime.domain.article.service.usecase;
 
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.entity.ReportStatus;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +11,12 @@ public interface ArticleQueryUseCase {
 
     ArticleResponse queryById(Long id);
 
-    List<ArticlesResponse> search(ArticleSearchCondition articleSearchCondition);
+    List<ArticlesResponse> search(ArticlesSearchServiceRequest request);
+
+    List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchServiceRequest searchCondition);
 
     @Getter
-    class ArticleSearchCondition {
+    class ArticlesSearchServiceRequest {
 
         private final String nickname;
         private final String title;
@@ -22,7 +25,7 @@ public interface ArticleQueryUseCase {
         private final int page;
 
         @Builder
-        private ArticleSearchCondition(String nickname, String title, int likeCount, int pageSize,
+        private ArticlesSearchServiceRequest(String nickname, String title, int likeCount, int pageSize,
             int page) {
             this.nickname = nickname;
             this.title = title;
@@ -30,5 +33,13 @@ public interface ArticleQueryUseCase {
             this.pageSize = pageSize;
             this.page = page;
         }
+    }
+
+    @Getter
+    class ReportedArticlesSearchServiceRequest {
+
+        private int pageNum;
+        private int pageSize;
+        private ReportStatus reportStatus;
     }
 }
