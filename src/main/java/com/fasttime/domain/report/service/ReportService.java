@@ -55,7 +55,7 @@ public class ReportService {
 
     private void checkHowManyReportsOfPost(List<Report> reports, Article post) {
         if (is10thReport(reports)) {
-            post.report();
+            post.transToWaitForReview();
         } else if (is20thReport(reports)) {
             post.approveReport(LocalDateTime.now());
         }

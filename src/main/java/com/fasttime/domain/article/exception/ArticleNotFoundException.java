@@ -10,6 +10,10 @@ public class ArticleNotFoundException extends ApplicationException {
         super(ERROR_CODE);
     }
 
+    public ArticleNotFoundException(Long articleId) {
+        super(ERROR_CODE, String.format("Article Not Found / articleId = %d", articleId));
+    }
+
     public ArticleNotFoundException(String message) {
         super(ERROR_CODE, message);
     }

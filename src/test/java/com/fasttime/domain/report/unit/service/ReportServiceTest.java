@@ -85,7 +85,7 @@ public class ReportServiceTest {
             // given
             CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
-            Optional<Article> post = Optional.of(Article.builder().id(1L).build());
+            Optional<Article> post = Optional.of(Article.builder().id(1L).reportStatus(ReportStatus.NORMAL).build());
             Member member = Member.builder().id(1L).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 10L; i++) {
@@ -112,7 +112,7 @@ public class ReportServiceTest {
             // given
             CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(0L)
                 .build();
-            Optional<Article> post = Optional.of(Article.builder().id(0L).build());
+            Optional<Article> post = Optional.of(Article.builder().id(0L).reportStatus(ReportStatus.NORMAL).build());
             Member member = Member.builder().id(0L).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 20L; i++) {
@@ -159,7 +159,7 @@ public class ReportServiceTest {
             CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L)
                 .build();
             Optional<Article> post = Optional.of(
-                Article.builder().id(1L).reportStatus(ReportStatus.REPORTED).build());
+                Article.builder().id(1L).reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW).build());
             post.get().approveReport(LocalDateTime.now());
             given(postRepository.findById(any(Long.class))).willReturn(post);
 

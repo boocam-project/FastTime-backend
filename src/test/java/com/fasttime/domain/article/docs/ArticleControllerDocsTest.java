@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -20,6 +19,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasttime.docs.RestDocsSupport;
@@ -27,12 +27,12 @@ import com.fasttime.domain.article.controller.ArticleController;
 import com.fasttime.domain.article.dto.controller.request.ArticleDeleteRequest;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
-import com.fasttime.domain.article.service.ArticleCommandUseCase;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleDeleteServiceRequest;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleUpdateServiceRequest;
-import com.fasttime.domain.article.service.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.ArticleQueryUseCase.ArticleSearchCondition;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +54,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 작성 API 문서화")
     @Test
-    void articleWrite() throws Exception {
+    void createArticle() throws Exception {
 
         // given
         ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
@@ -113,10 +113,10 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 목록 조회 API 문서화")
     @Test
-    void articlesSearch() throws Exception {
+    void searchArticles() throws Exception {
 
         // given
-        ArticleSearchCondition.builder()
+        ArticlesSearchServiceRequest.builder()
             .title("패스")
             .nickname("패캠러")
             .likeCount(10)
@@ -124,7 +124,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .page(0)
             .build();
 
-        when(articleQueryUseCase.search(any(ArticleSearchCondition.class)))
+        when(articleQueryUseCase.search(any(ArticlesSearchServiceRequest.class)))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
                     .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
@@ -183,7 +183,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 상세 조회 API 문서화")
     @Test
-    void articleDetailSearch() throws Exception {
+    void searchArticle() throws Exception {
 
         // given
         ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
@@ -233,11 +233,11 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 수정 API 문서화")
     @Test
-    void articleUpdate() throws Exception {
+    void updateArticle() throws Exception {
 
         // given
         ArticleUpdateServiceRequest requestDto = new ArticleUpdateServiceRequest(1L, 1L, "새로운 게시글 제목입니다.",
-            "새로운 게시글 본문입니다.");
+            true, "새로운 게시글 본문입니다.");
 
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
@@ -256,7 +256,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .build());
 
         // when then
-        mockMvc.perform(patch("/api/v1/article")
+        mockMvc.perform(put("/api/v1/article")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto))
                 .session(session)
@@ -270,7 +270,8 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자"),
                     fieldWithPath("title").type(JsonFieldType.STRING).description("제목")
                         .attributes(new Attribute("constraints", "50자 이하")),
-                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
+                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
@@ -295,7 +296,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 삭제 API 문서화")
     @Test
-    void articleDelete() throws Exception {
+    void deleteArticle() throws Exception {
 
         // given
         ArticleDeleteRequest requestDto = new ArticleDeleteRequest(1L, 1L);

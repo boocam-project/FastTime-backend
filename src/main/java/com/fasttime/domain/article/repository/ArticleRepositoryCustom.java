@@ -1,13 +1,13 @@
 package com.fasttime.domain.article.repository;
 
-import com.fasttime.domain.article.service.ArticleQueryUseCase.ArticleSearchCondition;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 
 public interface ArticleRepositoryCustom {
 
-    List<ArticleQueryResponse> search(ArticleSearchCondition articleSearchCondition);
+    List<ArticleQueryResponse> search(ArticlesSearchServiceRequest searchCondition);
 
     @Getter
     class ArticleQueryResponse {

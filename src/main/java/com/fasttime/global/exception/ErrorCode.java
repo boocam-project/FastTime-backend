@@ -12,9 +12,10 @@ public enum ErrorCode {
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),
 
-    // POST
+    // ARTICLE
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
-    ARTICLE_IS_REPORTED(HttpStatus.UNAUTHORIZED, "해당 게시글은 수정할 수 있는 상태가 아닙니다."),
+    BAD_REPORT_STATUS(HttpStatus.BAD_REQUEST, "신고 후처리를 할 수 없습니다."),
+    REPORT_ACCEPTED_ARTICLE(HttpStatus.UNAUTHORIZED, "신고 처리된 게시글입니다."),
     HAS_NO_PERMISSION_WITH_THIS_ARTICLE(HttpStatus.UNAUTHORIZED, "해당 게시글에 대한 권한이 없습니다."),
 
     // COMMENT

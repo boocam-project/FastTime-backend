@@ -15,6 +15,8 @@ public class ArticleUpdateRequest {
     @NotNull
     private final Long memberId;
 
+    private final boolean isAnonymity;
+
     @NotBlank
     private final String title;
 
@@ -25,10 +27,12 @@ public class ArticleUpdateRequest {
     public ArticleUpdateRequest(
         @JsonProperty("articleId") Long articleId,
         @JsonProperty("memberId") Long memberId,
+        @JsonProperty("anonymity") boolean isAnonymity,
         @JsonProperty("title") String title,
         @JsonProperty("content") String content) {
         this.articleId = articleId;
         this.memberId = memberId;
+        this.isAnonymity = isAnonymity;
         this.title = title;
         this.content = content;
     }

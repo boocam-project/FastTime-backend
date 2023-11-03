@@ -12,7 +12,7 @@ import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import java.time.LocalDateTime;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,8 +62,8 @@ public class AdminControllerTest {
             ArticleResponse result2 = postCommandService.write(dto2);
             Article postFromDB1 = postRepository.findById(result1.getId()).get();
             Article postFromDB2 = postRepository.findById(result2.getId()).get();
-            postFromDB1.report();
-            postFromDB2.report();
+            postFromDB1.transToWaitForReview();
+            postFromDB2.transToWaitForReview();
             postFromDB1.approveReport(LocalDateTime.now());
             postFromDB2.approveReport(LocalDateTime.now());
 
@@ -110,10 +110,10 @@ public class AdminControllerTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
+            post1.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{article_id}", post1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").exists())
                 .andDo(print());
@@ -130,7 +130,7 @@ public class AdminControllerTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
+            post1.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}", 1000L))
@@ -170,7 +170,7 @@ public class AdminControllerTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
+            post1.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}/delete", post1.getId()))
@@ -190,7 +190,7 @@ public class AdminControllerTest {
             ArticleResponse newPost = postCommandService.write(dto1);
             Article post1 = postRepository.findById(newPost.getId()).get();
 
-            post1.report();
+            post1.transToWaitForReview();
             post1.approveReport(LocalDateTime.now());
             //when, then
             mockMvc.perform(get("/api/v1/admin/{post_id}/pass", post1.getId()))

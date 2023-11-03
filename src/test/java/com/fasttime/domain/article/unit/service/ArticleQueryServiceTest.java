@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
+import com.fasttime.domain.article.service.ArticleSettingProvider;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
@@ -25,13 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @SpringBootTest
-public class PostQueryServiceTest {
+public class ArticleQueryServiceTest {
 
     @InjectMocks
     private ArticleQueryService postQueryService;
 
     @Mock
     private ArticleRepository postRepository;
+
+    @Mock
+    private ArticleSettingProvider articleSettingProvider;
 
     @DisplayName("searchById()는")
     @Nested
@@ -66,7 +70,7 @@ public class PostQueryServiceTest {
             // then
             assertThat(response)
                 .extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
-                .containsExactly(id, title, content, nickname, anonymity, likeCount, hateCount);
+                .containsExactly(id, title, content, anonymity ? articleSettingProvider.getAnonymousNickname() : nickname, anonymity, likeCount, hateCount);
         }
 
         @DisplayName("DB에 해당 id 를 가지는 게시글이 없다면 IllegalArgumentException을 던진다.")

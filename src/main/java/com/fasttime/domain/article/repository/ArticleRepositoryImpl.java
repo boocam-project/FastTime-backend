@@ -3,7 +3,7 @@ package com.fasttime.domain.article.repository;
 
 import static com.fasttime.domain.article.entity.QArticle.article;
 
-import com.fasttime.domain.article.service.ArticleQueryUseCase.ArticleSearchCondition;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,7 +19,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleQueryResponse> search(ArticleSearchCondition articleSearchCondition) {
+    public List<ArticleQueryResponse> search(ArticlesSearchServiceRequest searchCondition) {
         return jpaQueryFactory
             .select(Projections.fields(ArticleQueryResponse.class,
                 article.id,
@@ -35,14 +35,14 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 article.deletedAt
             ))
             .from(article)
-            .where(createSearchConditionBuilder(articleSearchCondition))
-            .offset((long) articleSearchCondition.getPage() * articleSearchCondition.getPageSize())
-            .limit(articleSearchCondition.getPageSize())
+            .where(createSearchConditionBuilder(searchCondition))
+            .offset((long) searchCondition.getPage() * searchCondition.getPageSize())
+            .limit(searchCondition.getPageSize())
             .orderBy(article.createdAt.desc())
             .fetch();
     }
 
-    private BooleanBuilder createSearchConditionBuilder(ArticleSearchCondition searchCondition) {
+    private BooleanBuilder createSearchConditionBuilder(ArticlesSearchServiceRequest searchCondition) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (!isEmpty(searchCondition.getTitle())) {
