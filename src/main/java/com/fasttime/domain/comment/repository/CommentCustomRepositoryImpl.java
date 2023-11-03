@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CommentCustomRepositoryImpl {
+public class CommentCustomRepositoryImpl implements CommentCustomRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
