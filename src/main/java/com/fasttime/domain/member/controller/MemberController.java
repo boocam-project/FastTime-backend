@@ -17,6 +17,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
@@ -38,6 +39,7 @@ public class MemberController {
 
     @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
+        log.info("join 성공");
         ResponseDTO<Object> response = memberService.registerOrRecoverMember(memberDto);
         return ResponseEntity.status(HttpStatus.valueOf(response.getCode())).body(response);
     }
@@ -135,15 +137,12 @@ public class MemberController {
 
 
     @PostMapping("/api/v1/login")
-    public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
-        , HttpSession session) {
+    public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto) {
 
         MemberResponse response = memberService.loginMember(dto);
-        session.setAttribute("MEMBER", response.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "로그인이 완료되었습니다.", response));
     }
-
     @GetMapping("/api/v1/logout")
     public ResponseEntity<ResponseDTO> logOut(HttpSession session) {
         if (session.getAttribute("ADMIN") != null) {
