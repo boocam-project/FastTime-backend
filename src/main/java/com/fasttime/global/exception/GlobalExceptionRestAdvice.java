@@ -1,6 +1,7 @@
 package com.fasttime.global.exception;
 
 import com.fasttime.global.util.ResponseDTO;
+import java.nio.file.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -44,5 +45,12 @@ public class GlobalExceptionRestAdvice {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러!"));
+    }
+    @ExceptionHandler
+    public ResponseEntity<ResponseDTO<Object>> AuthenticationException(AccessDeniedException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(ResponseDTO.res(HttpStatus.FORBIDDEN, "인가 실패"));
     }
 }
