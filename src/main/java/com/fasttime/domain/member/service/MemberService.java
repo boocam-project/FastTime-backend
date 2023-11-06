@@ -44,7 +44,6 @@ public class MemberService {
                 memberDto.getEmail(), oneYearAgo);
 
             if (softDeletedMember.isPresent()) {
-                
 
                 Member member = softDeletedMember.get();
 
@@ -76,6 +75,7 @@ public class MemberService {
         member.setEmail(memberDto.getEmail());
         member.setNickname(memberDto.getNickname());
         member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
+        member.setRole("ROLE_MEMBER");
         memberRepository.save(member);
     }
 
