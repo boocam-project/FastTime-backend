@@ -8,6 +8,7 @@ import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
+import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.service.MemberService;
 import java.time.LocalDateTime;
@@ -46,15 +47,21 @@ public class CommentService {
         return comments;
     }
 
-    public CommentResponseDTO updateComment(long commentId,
+    public CommentResponseDTO updateComment(long commentId, long memberId,
         UpdateCommentRequestDTO updateCommentRequestDTO) {
         Comment comment = getComment(commentId);
+        if(memberId != comment.getMember().getId()){
+            throw new NotCommentAuthorException();
+        }
         comment.updateContent(updateCommentRequestDTO.getContent());
         return comment.toCommentResponseDTO();
     }
 
-    public CommentResponseDTO deleteComment(long commentId) {
+    public CommentResponseDTO deleteComment(long commentId, long memberId) {
         Comment comment = getComment(commentId);
+        if(memberId != comment.getMember().getId()){
+            throw new NotCommentAuthorException();
+        }
         comment.delete(LocalDateTime.now());
         return comment.toCommentResponseDTO();
     }

@@ -55,16 +55,16 @@ public class CommentRestController {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<ResponseDTO<Object>> updateComment(@PathVariable long commentId,
-        @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO) {
+        @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO, HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
-                commentService.updateComment(commentId, updateCommentRequestDTO)));
+                commentService.updateComment(commentId, (long) session.getAttribute("MEMBER"), updateCommentRequestDTO)));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ResponseDTO<Object>> deleteComment(@PathVariable long commentId) {
+    public ResponseEntity<ResponseDTO<Object>> deleteComment(@PathVariable long commentId, HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
-                commentService.deleteComment(commentId)));
+                commentService.deleteComment(commentId, (long) session.getAttribute("MEMBER"))));
     }
 }

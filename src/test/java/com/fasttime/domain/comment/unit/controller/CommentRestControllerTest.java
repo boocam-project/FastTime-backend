@@ -1,6 +1,7 @@
 package com.fasttime.domain.comment.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -388,7 +389,9 @@ public class CommentRestControllerTest {
             // given
             String content = new ObjectMapper().writeValueAsString(
                 UpdateCommentRequestDTO.builder().content("content2").build());
-            given(commentService.updateComment(any(long.class),
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
+            given(commentService.updateComment(any(long.class), any(long.class),
                 any(UpdateCommentRequestDTO.class))).willReturn(
                 CommentResponseDTO.builder()
                     .commentId(1L)
@@ -406,6 +409,7 @@ public class CommentRestControllerTest {
 
             // when, then
             mockMvc.perform(patch("/api/v1/comments/{commentId}", 1L)
+                    .session(session)
                     .content(content)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -425,7 +429,7 @@ public class CommentRestControllerTest {
                 .andExpect(jsonPath("$.data.deletedAt").isEmpty())
                 .andDo(print());
             verify(commentService, times(1)).updateComment(any(long.class),
-                any(UpdateCommentRequestDTO.class));
+                any(long.class), any(UpdateCommentRequestDTO.class));
         }
 
         @Nested
@@ -440,8 +444,11 @@ public class CommentRestControllerTest {
                     UpdateCommentRequestDTO.builder()
                         .content(null)
                         .build());
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
                 // when, then
                 mockMvc.perform(patch("/api/v1/comments/{commentId}", 1L)
+                        .session(session)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
@@ -450,7 +457,7 @@ public class CommentRestControllerTest {
                     .andExpect(jsonPath("$.data").isEmpty())
                     .andDo(print());
                 verify(commentService, never()).updateComment(any(long.class),
-                    any(UpdateCommentRequestDTO.class));
+                    any(long.class), any(UpdateCommentRequestDTO.class));
             }
 
             @Test
@@ -461,8 +468,11 @@ public class CommentRestControllerTest {
                     UpdateCommentRequestDTO.builder()
                         .content(" ")
                         .build());
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
                 // when, then
                 mockMvc.perform(patch("/api/v1/comments/{commentId}", 1L)
+                        .session(session)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isBadRequest())
@@ -471,7 +481,7 @@ public class CommentRestControllerTest {
                     .andExpect(jsonPath("$.data").isEmpty())
                     .andDo(print());
                 verify(commentService, never()).updateComment(any(long.class),
-                    any(UpdateCommentRequestDTO.class));
+                    any(long.class), any(UpdateCommentRequestDTO.class));
             }
         }
     }
@@ -484,7 +494,9 @@ public class CommentRestControllerTest {
         @DisplayName("댓글을 삭제할 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            given(commentService.deleteComment(any(long.class))).willReturn(
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
+            given(commentService.deleteComment(any(long.class), any(long.class))).willReturn(
                 CommentResponseDTO.builder()
                     .commentId(1L)
                     .articleId(1L)
@@ -501,6 +513,7 @@ public class CommentRestControllerTest {
 
             // when, then
             mockMvc.perform(delete("/api/v1/comments/{commentId}", 1L)
+                    .session(session)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").isNumber())
@@ -518,7 +531,7 @@ public class CommentRestControllerTest {
                 .andExpect(jsonPath("$.data.updatedAt").isString())
                 .andExpect(jsonPath("$.data.deletedAt").isString())
                 .andDo(print());
-            verify(commentService, times(1)).deleteComment(any(long.class));
+            verify(commentService, times(1)).deleteComment(any(long.class), any(long.class));
         }
     }
 }

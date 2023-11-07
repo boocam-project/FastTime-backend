@@ -31,6 +31,7 @@ import com.fasttime.domain.comment.service.CommentService;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.AnnotationUtils;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
@@ -150,7 +151,6 @@ public class CommentControllerDocsTest extends RestDocsSupport {
                 .createdAt("2024-01-01 14:00:00")
                 .updatedAt(null)
                 .deletedAt(null)
-
                 .build(),
             CommentResponseDTO.builder()
                 .commentId(4L)
@@ -214,7 +214,10 @@ public class CommentControllerDocsTest extends RestDocsSupport {
         String content = objectMapper.writeValueAsString(UpdateCommentRequestDTO.builder()
             .content("얼마나 걸리셨을까요?")
             .build());
-        given(commentService.updateComment(any(long.class), any(UpdateCommentRequestDTO.class)))
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
+        given(commentService.updateComment(any(long.class), any(long.class),
+            any(UpdateCommentRequestDTO.class)))
             .willReturn(CommentResponseDTO.builder()
                 .commentId(1L)
                 .articleId(1L)
@@ -231,6 +234,7 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(patch("/api/v1/comments/{commentId}", 1L)
+                .session(session)
                 .content(content)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -268,7 +272,9 @@ public class CommentControllerDocsTest extends RestDocsSupport {
     @Test
     void postDelete() throws Exception {
         // given
-        given(commentService.deleteComment(any(long.class))).willReturn(
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("MEMBER", 1L);
+        given(commentService.deleteComment(any(long.class), any(long.class))).willReturn(
             CommentResponseDTO.builder()
                 .commentId(1L)
                 .articleId(1L)
@@ -285,9 +291,11 @@ public class CommentControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(delete("/api/v1/comments/{commentId}", 1L)
-            .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(
-            document("comment-delete", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
+                .session(session)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("comment-delete",
+                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),

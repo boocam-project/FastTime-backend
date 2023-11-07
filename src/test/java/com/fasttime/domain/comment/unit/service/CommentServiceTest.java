@@ -20,6 +20,7 @@ import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
+import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.domain.member.entity.Member;
@@ -30,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
-import org.hibernate.sql.Update;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -515,7 +515,7 @@ public class CommentServiceTest {
 
             // when
             CommentResponseDTO commentResponseDTO = commentService.updateComment(1L,
-                updateCommentRequestDTO);
+                1L, updateCommentRequestDTO);
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
@@ -535,9 +535,34 @@ public class CommentServiceTest {
 
             // when, then
             Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
-                commentService.updateComment(1L, updateCommentRequestDTO);
+                commentService.updateComment(1L, 1L, updateCommentRequestDTO);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
+            verify(commentRepository, times(1)).findById(any(Long.class));
+        }
+
+        @Test
+        @DisplayName("댓글 작성자가 아니면 댓글을 수정할 수 없다.")
+        void CommentUnauthorized_willFail() {
+            // given
+            UpdateCommentRequestDTO updateCommentRequestDTO = UpdateCommentRequestDTO.builder()
+                .content("content2")
+                .build();
+            given(commentRepository.findById(any(Long.class))).willReturn(Optional.of(
+                Comment.builder()
+                    .id(1L)
+                    .article(newArticle())
+                    .member(newMember())
+                    .content("content1")
+                    .anonymity(false)
+                    .parentComment(null)
+                    .build()));
+
+            // when, then
+            Throwable exception = assertThrows(NotCommentAuthorException.class, () -> {
+                commentService.updateComment(1L, 2L, updateCommentRequestDTO);
+            });
+            assertEquals("댓글 작성자만 해당 댓글 수정/삭제가 가능합니다.", exception.getMessage());
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
     }
@@ -561,7 +586,7 @@ public class CommentServiceTest {
                     .build()));
 
             // when
-            CommentResponseDTO commentResponseDTO = commentService.deleteComment(1L);
+            CommentResponseDTO commentResponseDTO = commentService.deleteComment(1L, 1L);
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
@@ -578,9 +603,31 @@ public class CommentServiceTest {
 
             // when, then
             Throwable exception = assertThrows(CommentNotFoundException.class, () -> {
-                commentService.deleteComment(1L);
+                commentService.deleteComment(1L, 1L);
             });
             assertEquals("존재하지 않는 댓글입니다.", exception.getMessage());
+            verify(commentRepository, times(1)).findById(any(Long.class));
+        }
+
+        @Test
+        @DisplayName("댓글 작성자가 아니면 댓글을 삭제할 수 없다.")
+        void CommentUnauthorized_willFail() {
+            // given
+            given(commentRepository.findById(any(Long.class))).willReturn(Optional.of(
+                Comment.builder()
+                    .id(1L)
+                    .article(newArticle())
+                    .member(newMember())
+                    .content("content1")
+                    .anonymity(false)
+                    .parentComment(null)
+                    .build()));
+
+            // when, then
+            Throwable exception = assertThrows(NotCommentAuthorException.class, () -> {
+                commentService.deleteComment(1L, 2L);
+            });
+            assertEquals("댓글 작성자만 해당 댓글 수정/삭제가 가능합니다.", exception.getMessage());
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
     }
