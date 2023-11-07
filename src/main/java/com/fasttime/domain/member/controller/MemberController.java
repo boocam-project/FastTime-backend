@@ -9,17 +9,22 @@ import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.jwt.JwtProperties;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -137,11 +142,12 @@ public class MemberController {
 
 
     @PostMapping("/api/v1/login")
-    public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto) {
-
-        MemberResponse response = memberService.loginMember(dto);
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "로그인이 완료되었습니다.", response));
+    public ResponseEntity<ResponseDTO> logIn
+        (@Validated @RequestBody LoginRequestDTO dto, HttpServletResponse response) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JwtProperties.COOKIE_NAME, JwtProperties.TOKEN_PREFIX+memberService.loginMember(dto));
+        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(ResponseDTO.res
+            (HttpStatus.OK, "로그인이 완료되었습니다."));
     }
     @GetMapping("/api/v1/logout")
     public ResponseEntity<ResponseDTO> logOut(HttpSession session) {
@@ -157,10 +163,10 @@ public class MemberController {
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request, HttpSession session) {
-
+        (@Validated @RequestBody RePasswordRequest request, Authentication authentication) {
+        Member member = (Member) authentication.getPrincipal();
         MemberResponse response =
-            memberService.rePassword(request, (Long) session.getAttribute("MEMBER"));
+            memberService.rePassword(request, member.getId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "패스워드 재설정이 완료되었습니다", response));
     }
