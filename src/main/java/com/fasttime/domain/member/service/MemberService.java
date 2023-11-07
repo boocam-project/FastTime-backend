@@ -1,6 +1,9 @@
 package com.fasttime.domain.member.service;
 
+import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
+import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
@@ -44,28 +47,25 @@ public class MemberService {
                 memberDto.getEmail(), oneYearAgo);
 
             if (softDeletedMember.isPresent()) {
-                
-
                 Member member = softDeletedMember.get();
-
                 member.restore();
                 member.setNickname(memberDto.getNickname());
                 save(member);
                 return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
-            } 
+            }
 
             if (isEmailExistsInMember(memberDto.getEmail())) {
-
-                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다.");
+                throw new EmailAlreadyExistsException(ErrorCode.MEMBER_ALREADY_REGISTERED);
             } else if (checkDuplicateNickname(memberDto.getNickname())) {
-                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다.");
+                throw new NicknameAlreadyExistsException(ErrorCode.DUPLICATE_NICKNAME);
             }
 
             save(memberDto);
             return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
-
+        } catch (EmailAlreadyExistsException | NicknameAlreadyExistsException e) {
+            return ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getMessage());
         } catch (Exception e) {
-            return ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패 " + e.getMessage());
+            return ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패: " + e.getMessage());
         }
     }
 
