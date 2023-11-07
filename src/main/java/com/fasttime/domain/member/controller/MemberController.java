@@ -9,6 +9,7 @@ import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.EditResponse;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    private final MemberRepository memberRepository;
 
     @PostMapping("/api/v1/join")
     public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
@@ -44,37 +44,23 @@ public class MemberController {
 
     @PutMapping("/api/v1/retouch-member")
     public ResponseEntity<ResponseDTO<EditResponse>> updateMember(
-        @RequestBody EditRequest editRequest,
+        @Valid @RequestBody EditRequest editRequest,
         HttpSession session) {
-        Long memberId = (Long) session.getAttribute("MEMBER");
-        if (memberId != null) {
-            Optional<Member> memberOptional = memberRepository.findById(memberId);
-            if (memberOptional.isPresent()) {
-                Member member = memberOptional.get();
 
-                if (!member.getNickname().equals(editRequest.getNickname()) &&
-                    memberService.checkDuplicateNickname(editRequest.getNickname())) {
-                    return ResponseEntity.badRequest().body(
-                        ResponseDTO.res(HttpStatus.BAD_REQUEST, new EditResponse("중복된 닉네임입니다.")));
-                }
-
-                member.setNickname(editRequest.getNickname());
-                member.setImage(editRequest.getImage());
-
-                memberRepository.save(member);
-
-                EditResponse memberResponse = new EditResponse(member);
-                return ResponseEntity.ok(
-                    ResponseDTO.res(HttpStatus.OK, "회원 정보가 업데이트되었습니다.", memberResponse));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseDTO.res(HttpStatus.NOT_FOUND,
-                        new EditResponse("해당 회원을 찾을 수 없습니다.")));
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, new EditResponse("로그인 상태가 아닙니다.")));
-        }
+        return memberService.updateMemberInfo(editRequest, session)
+            .map(updatedMember -> ResponseEntity.ok(
+                ResponseDTO.<EditResponse>res(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus(),
+                    ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage(),
+                    new EditResponse(updatedMember.getEmail(),
+                        updatedMember.getNickname(),
+                        updatedMember.getImage()))
+            ))
+            .orElseGet(() -> ResponseEntity
+                .status(ErrorCode.MEMBER_NOT_FOUND.getHttpStatus())
+                .body(ResponseDTO.<EditResponse>res(ErrorCode.MEMBER_NOT_FOUND.getHttpStatus(),
+                    ErrorCode.MEMBER_NOT_FOUND.getMessage(),
+                    null))
+            );
     }
 
 

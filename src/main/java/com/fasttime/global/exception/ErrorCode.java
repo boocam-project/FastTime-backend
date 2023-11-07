@@ -10,6 +10,10 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     MEMBER_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."),
+    ACCOUNT_RECOVERY_SUCCESSFUL(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"),
+    REGISTRATION_SUCCESS(HttpStatus.OK, "가입 성공!"),
+    REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패"),
+    MEMBER_UPDATE_SUCCESS(HttpStatus.OK, "회원 정보가 업데이트되었습니다."),
 
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),

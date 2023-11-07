@@ -47,5 +47,11 @@ public class Member extends BaseTimeEntity {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
+    public void update(String nickname, String image) {
+        this.nickname = nickname;
+        this.image = image;
+
+    }
+
 
 }
