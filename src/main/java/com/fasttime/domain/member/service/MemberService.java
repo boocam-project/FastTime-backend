@@ -4,8 +4,12 @@ import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.global.jwt.JwtProperties;
+import com.fasttime.global.jwt.JwtProvider;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
+import javax.servlet.http.Cookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +34,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final FcMemberRepository fcMemberRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final JwtProvider provider;
 
     public void deleteExpiredSoftDeletedMembers() {
         LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
@@ -109,7 +113,7 @@ public class MemberService {
             .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
-    public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+    public String  loginMember(LoginRequestDTO dto) throws UserNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
             () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
         if (member.getDeletedAt() != null) {
@@ -119,7 +123,8 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         }
-        return new MemberResponse(member.getId(), member.getNickname());
+        String token = provider.createToken(member.getEmail());
+        return token;
 
     }
 
