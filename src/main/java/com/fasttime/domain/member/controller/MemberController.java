@@ -109,8 +109,8 @@ public class MemberController {
             Long memberId = (Long) session.getAttribute("MEMBER");
 
             if (memberId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED, "사용자가 로그인되어 있지 않습니다."));
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ResponseDTO.res(HttpStatus.FORBIDDEN, "사용자가 로그인되어 있지 않습니다."));
             }
 
             Member member = memberService.getMember(memberId);
