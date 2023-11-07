@@ -112,8 +112,7 @@ public class MemberService {
         return memberRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
-
-    public String  loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+    public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
             () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
         if (member.getDeletedAt() != null) {
@@ -123,8 +122,7 @@ public class MemberService {
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");
         }
-        String token = provider.createToken(member.getEmail());
-        return token;
+        return new MemberResponse(member.getId(), member.getNickname());
 
     }
 
@@ -137,6 +135,21 @@ public class MemberService {
         throw new BadCredentialsException("Not Match RePassword!");
 
     }
+
+//    public String  loginMemberForToken(LoginRequestDTO dto) throws UserNotFoundException {
+//        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
+//            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+//        if (member.getDeletedAt() != null) {
+//            throw new UserNotFoundException("이미 탈퇴한 계정입니다");
+//        }
+//
+//        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
+//            throw new BadCredentialsException("Not match password!");
+//        }
+//        String token = provider.createToken(member.getEmail());
+//        return token;
+//
+//    }
 
 
 }

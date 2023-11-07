@@ -46,6 +46,7 @@ public class JwtProvider {
             .compact();
     }
 
+
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = memberSecurityService.loadUserByUsername(getEmail(token));
         log.info("[getAuthentication] JwtProvider:토큰 인증 정보 조회 완료: ", userDetails.getUsername());
@@ -64,7 +65,7 @@ public class JwtProvider {
 
     public String resolveToken(HttpServletRequest request) {
         log.info("[resolveToken] JwtProvider: HTTP 헤더에서 Token 값 추출");
-        return request.getHeader(JwtProperties.COOKIE_NAME);
+        return request.getHeader(JwtProperties.HEADER_STRING);
     }
 
     public boolean validateToken(String token) {
