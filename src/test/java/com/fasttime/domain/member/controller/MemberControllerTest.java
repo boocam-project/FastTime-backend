@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
@@ -194,7 +195,6 @@ public class MemberControllerTest {
                 editRequest.setNickname("newNickname");
                 editRequest.setImage("newImage");
 
-
                 Member updatedMember = new Member();
                 updatedMember.setId(member.getId());
                 updatedMember.setEmail(member.getEmail());
@@ -204,7 +204,6 @@ public class MemberControllerTest {
 
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", member.getId());
-
 
                 given(
                     memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
@@ -247,48 +246,58 @@ public class MemberControllerTest {
                     .andDo(print());
             }
         }
+    }
 
 
-        @Nested
-        @DisplayName("마이페이지 조회")
-        class MyPage {
+    @Nested
+    @DisplayName("마이페이지 조회")
+    class MyPage {
 
-            @Test
-            @DisplayName("성공한다. : 로그인된 사용자 정보 조회")
-            public void testGetMyPageInfoWhenLoggedIn() throws Exception {
-                Member loggedInMember = new Member();
-                loggedInMember.setId(1L);
-                loggedInMember.setNickname("testuser");
-                loggedInMember.setEmail("test@example.com");
-                loggedInMember.setImage("testImage");
+        @Test
+        @DisplayName("성공한다. : 로그인된 사용자 정보 조회")
+        public void testGetMyPageInfoWhenLoggedIn() throws Exception {
+            // Given
+            Member loggedInMember = new Member();
+            loggedInMember.setId(1L);
+            loggedInMember.setNickname("testuser");
+            loggedInMember.setEmail("test@example.com");
+            loggedInMember.setImage("testImage");
 
-                MockHttpSession session = new MockHttpSession();
-                session.setAttribute("MEMBER", loggedInMember.getId());
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", loggedInMember.getId());
 
-                given(memberService.getMember(loggedInMember.getId())).willReturn(loggedInMember);
+            MyPageInfoDTO myPageInfoDto = new MyPageInfoDTO(
+                loggedInMember.getNickname(),
+                loggedInMember.getImage(),
+                loggedInMember.getEmail()
+            );
 
-                mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
-                    .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
-                    .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
-                    .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.data.profileImageUrl")
-                            .value("testImage"));
-            }
+            given(memberService.getMyPageInfoById(any(Long.class))).willReturn(myPageInfoDto);
 
-            @Test
-            @DisplayName("실패한다. : 로그인하지 않은 사용자 정보 조회")
-            public void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
-                MockHttpSession session = new MockHttpSession();
+            // Then
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.image").value("testImage"));
 
-                mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
-                    .andExpect(status().isUnauthorized())
-                    .andExpect(jsonPath("$.message")
-                        .value("사용자가 로그인되어 있지 않습니다."));
-            }
+        }
+
+        @Test
+        @DisplayName("실패한다. : 로그인하지 않은 사용자 정보 조회")
+        public void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
+            // Given
+            MockHttpSession session = new MockHttpSession();
+
+            // Then
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
+
         }
     }
+
 }
 
 
