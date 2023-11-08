@@ -143,11 +143,15 @@ public class MemberController {
 
     @PostMapping("/api/v1/login")
     public ResponseEntity<ResponseDTO> logIn
-        (@Validated @RequestBody LoginRequestDTO dto, HttpServletResponse response) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(JwtProperties.COOKIE_NAME, JwtProperties.TOKEN_PREFIX+memberService.loginMember(dto));
-        return ResponseEntity.status(HttpStatus.OK).headers(headers).body(ResponseDTO.res
-            (HttpStatus.OK, "로그인이 완료되었습니다."));
+        (@Validated @RequestBody LoginRequestDTO dto, HttpSession session) {
+        MemberResponse memberResponse = memberService.loginMember(dto);
+        session.setAttribute("MEMBER",memberResponse);
+//        토큰 기반
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(JwtProperties.HEADER_STRING,
+//        JwtProperties.TOKEN_PREFIX+memberService.loginMember(dto));
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
+            (HttpStatus.OK, "로그인이 완료되었습니다.",memberResponse));
     }
     @GetMapping("/api/v1/logout")
     public ResponseEntity<ResponseDTO> logOut(HttpSession session) {
@@ -163,10 +167,10 @@ public class MemberController {
 
     @PostMapping("/api/v1/RePassword")
     public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request, Authentication authentication) {
-        Member member = (Member) authentication.getPrincipal();
+        (@Validated @RequestBody RePasswordRequest request, HttpSession session) {
+
         MemberResponse response =
-            memberService.rePassword(request, member.getId());
+            memberService.rePassword(request, (long)session.getAttribute("MEMBER"));
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "패스워드 재설정이 완료되었습니다", response));
     }
