@@ -4,7 +4,6 @@ import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
@@ -13,10 +12,6 @@ import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
 
     @PostMapping("/api/v1/join")
