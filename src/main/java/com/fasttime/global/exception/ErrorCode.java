@@ -14,6 +14,7 @@ public enum ErrorCode {
     REGISTRATION_SUCCESS(HttpStatus.OK, "가입 성공!"),
     REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패"),
     MEMBER_UPDATE_SUCCESS(HttpStatus.OK, "회원 정보가 업데이트되었습니다."),
+    MY_PAGE_RETRIEVED_SUCCESS(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다."),
 
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),

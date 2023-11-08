@@ -2,7 +2,9 @@ package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
@@ -88,35 +90,23 @@ public class MemberController {
         }
     }
 
+
     @GetMapping("/api/v1/mypage")
     public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
-        try {
 
-            Long memberId = (Long) session.getAttribute("MEMBER");
+        Long memberId = (Long) session.getAttribute("MEMBER");
+        // 프론트 측에서 요청한 예외 처리 ->403
+        if (memberId == null) {
 
-            if (memberId == null) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ResponseDTO.res(HttpStatus.FORBIDDEN, "사용자가 로그인되어 있지 않습니다."));
-            }
-
-            Member member = memberService.getMember(memberId);
-
-            String nickname = member.getNickname();
-            String email = member.getEmail();
-            String profileImageUrl = member.getImage();
-
-            Map<String, String> userInfo = new HashMap<>();
-            userInfo.put("nickname", nickname);
-            userInfo.put("email", email);
-            userInfo.put("profileImageUrl", profileImageUrl);
-
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.", userInfo));
-        } catch (Exception e) {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 정보 조회 중 오류가 발생했습니다."));
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ResponseDTO.res(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."));
         }
+
+        MyPageInfoDTO myPageInfoDto = memberService.getMyPageInfoById(memberId);
+        return ResponseEntity.ok(
+            ResponseDTO.res(HttpStatus.OK, ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage(),
+                myPageInfoDto));
     }
 
 

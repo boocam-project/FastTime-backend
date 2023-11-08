@@ -1,5 +1,6 @@
 package com.fasttime.domain.member.service;
 
+import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
@@ -26,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -108,6 +110,18 @@ public class MemberService {
             member.update(editRequest.getNickname(), editRequest.getImage());
             return memberRepository.save(member);
         });
+    }
+
+    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws UserNotFoundException {
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return new MyPageInfoDTO(
+            member.getNickname(),
+            member.getImage(),
+            member.getEmail()
+        );
     }
 
 
