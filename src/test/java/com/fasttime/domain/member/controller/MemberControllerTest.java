@@ -8,14 +8,17 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
@@ -31,6 +34,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,6 +50,9 @@ public class MemberControllerTest {
 
     @MockBean
     private MemberRepository memberRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @Nested
@@ -173,8 +180,9 @@ public class MemberControllerTest {
         class UpdateMember {
 
             @Test
-            @DisplayName("성공한다. : 프로필 수정")
-            public void UpdateMember_Success() throws Exception {
+            @DisplayName("성공한다: 프로필 수정")
+            public void updateMember_Success() throws Exception {
+                // Given
                 Member member = new Member();
                 member.setId(1L);
                 member.setEmail("test@example.com");
@@ -186,48 +194,58 @@ public class MemberControllerTest {
                 editRequest.setNickname("newNickname");
                 editRequest.setImage("newImage");
 
+
+                Member updatedMember = new Member();
+                updatedMember.setId(member.getId());
+                updatedMember.setEmail(member.getEmail());
+                updatedMember.setPassword(member.getPassword());
+                updatedMember.setNickname(editRequest.getNickname());
+                updatedMember.setImage(editRequest.getImage());
+
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", member.getId());
 
-                given(memberService.getMember(member.getId())).willReturn(member);
-                given(memberService.checkDuplicateNickname("newNickname")).willReturn(false);
 
-                given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+                given(
+                    memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
+                    .willReturn(Optional.of(updatedMember));
 
+                // When & Then
                 mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nickname\": \"newNickname\", \"image\": \"newImage\"}")
+                        .content(objectMapper.writeValueAsString(editRequest))
                         .session(session))
                     .andExpect(status().isOk())
                     .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.data.nickname").value("newNickname"));
+                        MockMvcResultMatchers.jsonPath("$.data.nickname").value("newNickname"))
+                    .andDo(print());
             }
+
 
             @Test
-            @DisplayName("실패한다. : 중복된 닉네임으로 변경")
-            public void UpdateMemberWithDuplicateNickname() throws Exception {
-                Member member = new Member();
-                member.setId(1L);
-                member.setEmail("test@example.com");
-                member.setPassword("password");
-                member.setNickname("oldNickname");
-                member.setImage("oldImage");
+            @DisplayName("실패한다: 사용자를 찾을 수 없음")
+            public void updateMember_NotFound() throws Exception {
+                // Given
+                EditRequest editRequest = new EditRequest();
+                editRequest.setNickname("newNickname");
+                editRequest.setImage("newImage");
 
                 MockHttpSession session = new MockHttpSession();
-                session.setAttribute("MEMBER", member.getId());
+                session.setAttribute("MEMBER", 1L);
 
-                given(memberService.checkDuplicateNickname("newNickname")).willReturn(true);
+                given(
+                    memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
+                    .willReturn(Optional.empty());
 
-                given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
-
+                // When & Then
                 mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"nickname\": \"newNickname\", \"image\": \"newImage\"}")
+                        .content(objectMapper.writeValueAsString(editRequest))
                         .session(session))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.data.message").value("중복된 닉네임입니다."));
+                    .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                    .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_NOT_FOUND.getMessage()))
+                    .andDo(print());
             }
-
         }
 
 
