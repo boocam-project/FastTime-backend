@@ -8,6 +8,9 @@ public enum ErrorCode {
 
     // MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+    MEMBER_NOT_MATCH_INFO(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 일치하지 않습니다."),
+    MEMBER_NOT_MATCH_RE_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호 재확인이 일치하지 않습니다."),
+    MEMBER_SOFT_DELETED(HttpStatus.NOT_FOUND, "이미 탈퇴한 회원입니다."),
 
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),
