@@ -5,9 +5,11 @@ import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
+import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
+import com.fasttime.domain.comment.exception.MultipleSearchConditionException;
 import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.service.MemberService;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,24 +37,36 @@ public class CommentService {
         Comment parentComment =
             isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
         return commentRepository.save(Comment.builder()
-                .article(Article.builder().id(postQueryService.queryById(articleId).getId()).build())
-                .member(memberService.getMember(memberId)).content(createCommentRequestDTO.getContent())
-                .anonymity(createCommentRequestDTO.getAnonymity()).parentComment(parentComment).build())
+                .article(Article.builder()
+                    .id(postQueryService.queryById(articleId).getId())
+                    .build())
+                .member(memberService.getMember(memberId))
+                .content(createCommentRequestDTO.getContent())
+                .anonymity(createCommentRequestDTO.getAnonymity())
+                .parentComment(parentComment)
+                .build())
             .toCommentResponseDTO();
     }
 
-    public List<CommentResponseDTO> getComments(GetCommentsRequestDTO getCommentsRequestDTO) {
+    public CommentListResponseDTO getComments(GetCommentsRequestDTO getCommentsRequestDTO,
+        Pageable pageable) {
+        checkDuplicateCondition(getCommentsRequestDTO);
         List<CommentResponseDTO> comments = new ArrayList<>();
-        commentRepository.findAllBySearchCondition(getCommentsRequestDTO).forEach(comment -> {
-            comments.add(comment.toCommentResponseDTO());
-        });
-        return comments;
+        Page<Comment> commentsFromDB = commentRepository.findAllBySearchCondition(
+            getCommentsRequestDTO, pageable);
+        commentsFromDB.forEach(comment -> comments.add(comment.toCommentResponseDTO()));
+        return CommentListResponseDTO.builder()
+            .totalPages(commentsFromDB.getTotalPages())
+            .isLastPage(commentsFromDB.isLast())
+            .totalComments(getTotalComments(getCommentsRequestDTO, commentsFromDB))
+            .comments(comments)
+            .build();
     }
 
     public CommentResponseDTO updateComment(long commentId, long memberId,
         UpdateCommentRequestDTO updateCommentRequestDTO) {
         Comment comment = getComment(commentId);
-        if(memberId != comment.getMember().getId()){
+        if (memberId != comment.getMember().getId()) {
             throw new NotCommentAuthorException();
         }
         comment.updateContent(updateCommentRequestDTO.getContent());
@@ -59,7 +75,7 @@ public class CommentService {
 
     public CommentResponseDTO deleteComment(long commentId, long memberId) {
         Comment comment = getComment(commentId);
-        if(memberId != comment.getMember().getId()){
+        if (memberId != comment.getMember().getId()) {
             throw new NotCommentAuthorException();
         }
         comment.delete(LocalDateTime.now());
@@ -68,5 +84,39 @@ public class CommentService {
 
     public Comment getComment(Long id) {
         return commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+    }
+
+    private void checkDuplicateCondition(GetCommentsRequestDTO getCommentsRequestDTO) {
+        int count = 0;
+        if (isFindByArticleId(getCommentsRequestDTO)) {
+            count++;
+        }
+        if (isFindByMemberId(getCommentsRequestDTO)) {
+            count++;
+        }
+        if (isFindByParentCommentId(getCommentsRequestDTO)) {
+            count++;
+        }
+        if (count > 1) {
+            throw new MultipleSearchConditionException();
+        }
+    }
+
+    private long getTotalComments(GetCommentsRequestDTO getCommentsRequestDTO,
+        Page<Comment> commentsFromDB) {
+        return isFindByArticleId(getCommentsRequestDTO) ? commentRepository.countByArticleId(
+            getCommentsRequestDTO.getArticleId()) : commentsFromDB.getTotalElements();
+    }
+
+    private boolean isFindByArticleId(GetCommentsRequestDTO getCommentsRequestDTO) {
+        return getCommentsRequestDTO.getArticleId() != null;
+    }
+
+    private boolean isFindByMemberId(GetCommentsRequestDTO getCommentsRequestDTO) {
+        return getCommentsRequestDTO.getMemberId() != null;
+    }
+
+    private boolean isFindByParentCommentId(GetCommentsRequestDTO getCommentsRequestDTO) {
+        return getCommentsRequestDTO.getParentCommentId() != null;
     }
 }
