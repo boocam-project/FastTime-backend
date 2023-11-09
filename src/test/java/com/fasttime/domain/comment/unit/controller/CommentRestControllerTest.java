@@ -1,7 +1,6 @@
 package com.fasttime.domain.comment.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -19,6 +18,7 @@ import com.fasttime.domain.comment.controller.CommentRestController;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
+import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.service.CommentService;
 import java.util.List;
@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
@@ -198,33 +199,39 @@ public class CommentRestControllerTest {
         @DisplayName("해당 회원의 댓글을 조회할 수 있다.")
         void getCommentsByMemberId_willSuccess() throws Exception {
             // given
-            given(commentService.getComments(any(GetCommentsRequestDTO.class))).willReturn(List.of(
-                CommentResponseDTO.builder()
-                    .commentId(1L)
-                    .articleId(1L)
-                    .memberId(1L)
-                    .nickname("nickname")
-                    .content("content1")
-                    .anonymity(false)
-                    .parentCommentId(-1L)
-                    .childCommentCount(2)
-                    .createdAt("2024-01-01 12:00:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build(),
-                CommentResponseDTO.builder()
-                    .commentId(2L)
-                    .articleId(2L)
-                    .memberId(1L)
-                    .nickname("nickname")
-                    .content("content2")
-                    .anonymity(false)
-                    .parentCommentId(-1L)
-                    .childCommentCount(1)
-                    .createdAt("2024-01-01 13:00:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build()));
+            given(commentService.getComments(any(GetCommentsRequestDTO.class), any(Pageable.class)))
+                .willReturn(CommentListResponseDTO.builder()
+                    .totalPages(1)
+                    .isLastPage(true)
+                    .totalComments(2)
+                    .comments(List.of(
+                        CommentResponseDTO.builder()
+                            .commentId(1L)
+                            .articleId(1L)
+                            .memberId(1L)
+                            .nickname("nickname")
+                            .content("content1")
+                            .anonymity(false)
+                            .parentCommentId(-1L)
+                            .childCommentCount(2)
+                            .createdAt("2024-01-01 12:00:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build(),
+                        CommentResponseDTO.builder()
+                            .commentId(2L)
+                            .articleId(2L)
+                            .memberId(1L)
+                            .nickname("nickname")
+                            .content("content2")
+                            .anonymity(false)
+                            .parentCommentId(-1L)
+                            .childCommentCount(1)
+                            .createdAt("2024-01-01 13:00:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build()))
+                    .build());
 
             // when, then
             mockMvc.perform(get("/api/v1/comments")
@@ -234,54 +241,65 @@ public class CommentRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").isNumber())
                 .andExpect(jsonPath("$.message").isString())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0]").isMap())
-                .andExpect(jsonPath("$.data[0].commentId").isNumber())
-                .andExpect(jsonPath("$.data[0].articleId").isNumber())
-                .andExpect(jsonPath("$.data[0].memberId").isNumber())
-                .andExpect(jsonPath("$.data[0].nickname").isString())
-                .andExpect(jsonPath("$.data[0].content").isString())
-                .andExpect(jsonPath("$.data[0].anonymity").isBoolean())
-                .andExpect(jsonPath("$.data[0].parentCommentId").isNumber())
-                .andExpect(jsonPath("$.data[0].childCommentCount").isNumber())
-                .andExpect(jsonPath("$.data[0].createdAt").isString())
-                .andExpect(jsonPath("$.data[0].updatedAt").isEmpty())
-                .andExpect(jsonPath("$.data[0].deletedAt").isEmpty())
+                .andExpect(jsonPath("$.data").isMap())
+                .andExpect(jsonPath("$.data.totalPages").isNumber())
+                .andExpect(jsonPath("$.data.isLastPage").isBoolean())
+                .andExpect(jsonPath("$.data.totalComments").isNumber())
+                .andExpect(jsonPath("$.data.comments").isArray())
+                .andExpect(jsonPath("$.data.comments[0]").isMap())
+                .andExpect(jsonPath("$.data.comments[0].commentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].articleId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].memberId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].nickname").isString())
+                .andExpect(jsonPath("$.data.comments[0].content").isString())
+                .andExpect(jsonPath("$.data.comments[0].anonymity").isBoolean())
+                .andExpect(jsonPath("$.data.comments[0].parentCommentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].childCommentCount").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].createdAt").isString())
+                .andExpect(jsonPath("$.data.comments[0].updatedAt").isEmpty())
+                .andExpect(jsonPath("$.data.comments[0].deletedAt").isEmpty())
                 .andDo(print());
-            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class));
+            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class),
+                any(Pageable.class));
         }
 
         @Test
         @DisplayName("해당 게시물의 댓글을 조회할 수 있다.")
         void getCommentsByArticleId_willSuccess() throws Exception {
             // given
-            given(commentService.getComments(any(GetCommentsRequestDTO.class))).willReturn(List.of(
-                CommentResponseDTO.builder()
-                    .commentId(1L)
-                    .articleId(1L)
-                    .memberId(1L)
-                    .nickname("nickname1")
-                    .content("content1")
-                    .anonymity(false)
-                    .parentCommentId(-1L)
-                    .childCommentCount(1)
-                    .createdAt("2024-01-01 12:00:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build(),
-                CommentResponseDTO.builder()
-                    .commentId(3L)
-                    .articleId(1L)
-                    .memberId(3L)
-                    .nickname("nickname3")
-                    .content("content3")
-                    .anonymity(false)
-                    .parentCommentId(-1L)
-                    .childCommentCount(0)
-                    .createdAt("2024-01-01 13:00:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build()));
+            given(commentService.getComments(any(GetCommentsRequestDTO.class), any(Pageable.class)))
+                .willReturn(CommentListResponseDTO.builder()
+                    .totalPages(1)
+                    .isLastPage(true)
+                    .totalComments(2)
+                    .comments(List.of(
+                        CommentResponseDTO.builder()
+                            .commentId(1L)
+                            .articleId(1L)
+                            .memberId(1L)
+                            .nickname("nickname1")
+                            .content("content1")
+                            .anonymity(false)
+                            .parentCommentId(-1L)
+                            .childCommentCount(1)
+                            .createdAt("2024-01-01 12:00:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build(),
+                        CommentResponseDTO.builder()
+                            .commentId(3L)
+                            .articleId(1L)
+                            .memberId(3L)
+                            .nickname("nickname3")
+                            .content("content3")
+                            .anonymity(false)
+                            .parentCommentId(-1L)
+                            .childCommentCount(0)
+                            .createdAt("2024-01-01 13:00:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build()))
+                    .build());
 
             // when, then
             mockMvc.perform(get("/api/v1/comments")
@@ -291,67 +309,78 @@ public class CommentRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").isNumber())
                 .andExpect(jsonPath("$.message").isString())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0]").isMap())
-                .andExpect(jsonPath("$.data[0].commentId").isNumber())
-                .andExpect(jsonPath("$.data[0].articleId").isNumber())
-                .andExpect(jsonPath("$.data[0].memberId").isNumber())
-                .andExpect(jsonPath("$.data[0].nickname").isString())
-                .andExpect(jsonPath("$.data[0].content").isString())
-                .andExpect(jsonPath("$.data[0].anonymity").isBoolean())
-                .andExpect(jsonPath("$.data[0].parentCommentId").isNumber())
-                .andExpect(jsonPath("$.data[0].childCommentCount").isNumber())
-                .andExpect(jsonPath("$.data[0].createdAt").isString())
-                .andExpect(jsonPath("$.data[0].updatedAt").isEmpty())
-                .andExpect(jsonPath("$.data[0].deletedAt").isEmpty())
+                .andExpect(jsonPath("$.data").isMap())
+                .andExpect(jsonPath("$.data.totalPages").isNumber())
+                .andExpect(jsonPath("$.data.isLastPage").isBoolean())
+                .andExpect(jsonPath("$.data.totalComments").isNumber())
+                .andExpect(jsonPath("$.data.comments").isArray())
+                .andExpect(jsonPath("$.data.comments[0]").isMap())
+                .andExpect(jsonPath("$.data.comments[0].commentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].articleId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].memberId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].nickname").isString())
+                .andExpect(jsonPath("$.data.comments[0].content").isString())
+                .andExpect(jsonPath("$.data.comments[0].anonymity").isBoolean())
+                .andExpect(jsonPath("$.data.comments[0].parentCommentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].childCommentCount").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].createdAt").isString())
+                .andExpect(jsonPath("$.data.comments[0].updatedAt").isEmpty())
+                .andExpect(jsonPath("$.data.comments[0].deletedAt").isEmpty())
                 .andDo(print());
-            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class));
+            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class), any(
+                Pageable.class));
         }
 
         @Test
         @DisplayName("해당 댓글의 대댓글을 조회할 수 있다.")
         void getCommentsByParentCommentId_willSuccess() throws Exception {
             // given
-            given(commentService.getComments(any(GetCommentsRequestDTO.class))).willReturn(List.of(
-                CommentResponseDTO.builder()
-                    .commentId(2L)
-                    .articleId(1L)
-                    .memberId(2L)
-                    .nickname("nickname2")
-                    .content("content2")
-                    .anonymity(false)
-                    .parentCommentId(1L)
-                    .childCommentCount(0)
-                    .createdAt("2024-01-01 12:30:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build(),
-                CommentResponseDTO.builder()
-                    .commentId(4L)
-                    .articleId(1L)
-                    .memberId(1L)
-                    .nickname("nickname1")
-                    .content("content4")
-                    .anonymity(false)
-                    .parentCommentId(1L)
-                    .childCommentCount(0)
-                    .createdAt("2024-01-01 12:40:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build(),
-                CommentResponseDTO.builder()
-                    .commentId(5L)
-                    .articleId(1L)
-                    .memberId(2L)
-                    .nickname("nickname2")
-                    .content("content5")
-                    .anonymity(false)
-                    .parentCommentId(1L)
-                    .childCommentCount(0)
-                    .createdAt("2024-01-01 12:50:00")
-                    .updatedAt(null)
-                    .deletedAt(null)
-                    .build()));
+            given(commentService.getComments(any(GetCommentsRequestDTO.class), any(Pageable.class)))
+                .willReturn(CommentListResponseDTO.builder()
+                    .totalPages(1)
+                    .isLastPage(true)
+                    .totalComments(3)
+                    .comments(List.of(
+                        CommentResponseDTO.builder()
+                            .commentId(2L)
+                            .articleId(1L)
+                            .memberId(2L)
+                            .nickname("nickname2")
+                            .content("content2")
+                            .anonymity(false)
+                            .parentCommentId(1L)
+                            .childCommentCount(0)
+                            .createdAt("2024-01-01 12:30:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build(),
+                        CommentResponseDTO.builder()
+                            .commentId(4L)
+                            .articleId(1L)
+                            .memberId(1L)
+                            .nickname("nickname1")
+                            .content("content4")
+                            .anonymity(false)
+                            .parentCommentId(1L)
+                            .childCommentCount(0)
+                            .createdAt("2024-01-01 12:40:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build(),
+                        CommentResponseDTO.builder()
+                            .commentId(5L)
+                            .articleId(1L)
+                            .memberId(2L)
+                            .nickname("nickname2")
+                            .content("content5")
+                            .anonymity(false)
+                            .parentCommentId(1L)
+                            .childCommentCount(0)
+                            .createdAt("2024-01-01 12:50:00")
+                            .updatedAt(null)
+                            .deletedAt(null)
+                            .build()))
+                    .build());
 
             // when, then
             mockMvc.perform(get("/api/v1/comments")
@@ -361,21 +390,26 @@ public class CommentRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").isNumber())
                 .andExpect(jsonPath("$.message").isString())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0]").isMap())
-                .andExpect(jsonPath("$.data[0].commentId").isNumber())
-                .andExpect(jsonPath("$.data[0].articleId").isNumber())
-                .andExpect(jsonPath("$.data[0].memberId").isNumber())
-                .andExpect(jsonPath("$.data[0].nickname").isString())
-                .andExpect(jsonPath("$.data[0].content").isString())
-                .andExpect(jsonPath("$.data[0].anonymity").isBoolean())
-                .andExpect(jsonPath("$.data[0].parentCommentId").isNumber())
-                .andExpect(jsonPath("$.data[0].childCommentCount").isNumber())
-                .andExpect(jsonPath("$.data[0].createdAt").isString())
-                .andExpect(jsonPath("$.data[0].updatedAt").isEmpty())
-                .andExpect(jsonPath("$.data[0].deletedAt").isEmpty())
+                .andExpect(jsonPath("$.data").isMap())
+                .andExpect(jsonPath("$.data.totalPages").isNumber())
+                .andExpect(jsonPath("$.data.isLastPage").isBoolean())
+                .andExpect(jsonPath("$.data.totalComments").isNumber())
+                .andExpect(jsonPath("$.data.comments").isArray())
+                .andExpect(jsonPath("$.data.comments[0]").isMap())
+                .andExpect(jsonPath("$.data.comments[0].commentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].articleId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].memberId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].nickname").isString())
+                .andExpect(jsonPath("$.data.comments[0].content").isString())
+                .andExpect(jsonPath("$.data.comments[0].anonymity").isBoolean())
+                .andExpect(jsonPath("$.data.comments[0].parentCommentId").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].childCommentCount").isNumber())
+                .andExpect(jsonPath("$.data.comments[0].createdAt").isString())
+                .andExpect(jsonPath("$.data.comments[0].updatedAt").isEmpty())
+                .andExpect(jsonPath("$.data.comments[0].deletedAt").isEmpty())
                 .andDo(print());
-            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class));
+            verify(commentService, times(1)).getComments(any(GetCommentsRequestDTO.class), any(
+                Pageable.class));
         }
     }
 
