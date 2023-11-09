@@ -1,12 +1,13 @@
 package com.fasttime.domain.comment.controller;
 
+import com.fasttime.domain.comment.dto.request.CommentPageRequestDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
+import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.global.util.ResponseDTO;
-import java.util.List;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,28 +42,39 @@ public class CommentRestController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<CommentResponseDTO>>> getComments(
+    public ResponseEntity<ResponseDTO<CommentListResponseDTO>> getComments(
         @RequestParam(required = false) Long articleId,
         @RequestParam(required = false) Long memberId,
         @RequestParam(required = false) Long parentCommentId,
-        @RequestParam(defaultValue = "10") int pageSize,
-        @RequestParam(defaultValue = "0") int page) {
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int pageSize) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 조회했습니다.", commentService.getComments(
-                GetCommentsRequestDTO.builder().articleId(articleId).memberId(memberId)
-                    .parentCommentId(parentCommentId).pageSize(pageSize).page(page).build())));
+                GetCommentsRequestDTO.builder()
+                    .articleId(articleId)
+                    .memberId(memberId)
+                    .parentCommentId(parentCommentId)
+                    .build(),
+                CommentPageRequestDTO.builder()
+                    .page(page)
+                    .size(pageSize)
+                    .build().of()
+            )));
     }
 
     @PatchMapping("/{commentId}")
-    public ResponseEntity<ResponseDTO<Object>> updateComment(@PathVariable long commentId,
+    public ResponseEntity<ResponseDTO<CommentResponseDTO>> updateComment(
+        @PathVariable long commentId,
         @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO, HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
-                commentService.updateComment(commentId, (long) session.getAttribute("MEMBER"), updateCommentRequestDTO)));
+                commentService.updateComment(commentId, (long) session.getAttribute("MEMBER"),
+                    updateCommentRequestDTO)));
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<ResponseDTO<Object>> deleteComment(@PathVariable long commentId, HttpSession session) {
+    public ResponseEntity<ResponseDTO<CommentResponseDTO>> deleteComment(
+        @PathVariable long commentId, HttpSession session) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
                 commentService.deleteComment(commentId, (long) session.getAttribute("MEMBER"))));
