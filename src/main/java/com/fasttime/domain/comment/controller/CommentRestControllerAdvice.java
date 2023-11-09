@@ -1,5 +1,6 @@
 package com.fasttime.domain.comment.controller;
 
+import com.fasttime.domain.comment.exception.MultipleSearchConditionException;
 import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.global.util.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,13 @@ public class CommentRestControllerAdvice {
         log.error(e.getMessage(), e);
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
+    }
 
+    @ExceptionHandler
+    public ResponseEntity<ResponseDTO<Object>> multipleSearchConditionException(
+        MultipleSearchConditionException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
 }
