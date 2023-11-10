@@ -1,26 +1,24 @@
 package com.fasttime.domain.member.service;
 
+import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.UserNotMatchInfoException;
+import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.UserSoftDeletedException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
+import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.exception.UserNotFoundException;
-
-import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -44,7 +42,6 @@ public class MemberService {
                 memberDto.getEmail(), oneYearAgo);
 
             if (softDeletedMember.isPresent()) {
-                
 
                 Member member = softDeletedMember.get();
 
@@ -52,7 +49,7 @@ public class MemberService {
                 member.setNickname(memberDto.getNickname());
                 save(member);
                 return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
-            } 
+            }
 
             if (isEmailExistsInMember(memberDto.getEmail())) {
 
@@ -111,13 +108,13 @@ public class MemberService {
 
     public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+            () -> new UserNotMatchInfoException());
         if (member.getDeletedAt() != null) {
-            throw new UserNotFoundException("이미 탈퇴한 계정입니다");
+            throw new UserSoftDeletedException();
         }
 
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new BadCredentialsException("Not match password!");
+            throw new UserNotMatchInfoException();
         }
         return new MemberResponse(member.getId(), member.getNickname());
 
@@ -129,7 +126,7 @@ public class MemberService {
             member.setPassword(passwordEncoder.encode(request.getPassword()));
             return new MemberResponse(member.getId(), member.getNickname());
         }
-        throw new BadCredentialsException("Not Match RePassword!");
+        throw new UserNotMatchRePasswordException();
 
     }
 

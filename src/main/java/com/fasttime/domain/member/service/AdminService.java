@@ -4,6 +4,8 @@ import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
@@ -93,12 +95,11 @@ public class AdminService {
     }
 
 
-    public ArticleResponse findOneReportedPost(Long id) throws AccessException {
+    public ArticleResponse findOneReportedPost(Long id) {
         Article post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
-        System.out.println(post.getReportStatus());
+            .orElseThrow(() -> new ArticleNotFoundException());
         if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
-            throw new AccessException("잘못된 접근입니다.");
+            throw new BadArticleReportStatusException();
         }
         return ArticleResponse.builder()
             .id(post.getId())
@@ -115,13 +116,13 @@ public class AdminService {
 
     public void deletePost(Long id) {
         Article post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+            .orElseThrow(() -> new ArticleNotFoundException());
         postRepository.delete(post);
     }
 
     public void passPost(Long id) {
         Article post = postRepository.findById(id).
-            orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+            orElseThrow(() -> new ArticleNotFoundException());
         post.rejectReport();
     }
 

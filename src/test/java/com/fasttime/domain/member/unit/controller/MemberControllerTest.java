@@ -1,27 +1,41 @@
-package com.fasttime.domain.member.controller;
+package com.fasttime.domain.member.unit.controller;
 
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.UserNotMatchInfoException;
+import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.UserSoftDeletedException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
+import com.fasttime.domain.member.request.RePasswordRequest;
+import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.interceptor.LoginCheckInterceptor;
 import com.fasttime.global.util.ResponseDTO;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,12 +44,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(MemberController.class)
 public class MemberControllerTest {
 
     @Autowired
@@ -47,6 +58,8 @@ public class MemberControllerTest {
     @MockBean
     private MemberRepository memberRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Nested
     @DisplayName("회원가입은")
@@ -271,6 +284,207 @@ public class MemberControllerTest {
             }
         }
     }
+
+    @DisplayName("loginMember()는")
+    @Nested
+    class Login {
+
+        @DisplayName("로그인을 성공한다.")
+        @Test
+        void _willSuccess() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
+            MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+            when(memberService.loginMember(any(LoginRequestDTO.class))).thenReturn(memberResponse);
+            String data = objectMapper.writeValueAsString(dto);
+
+            //when,then
+            mockMvc.perform(post("/api/v1/login")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").isNumber())
+                .andExpect(jsonPath("$.data.nickname").isString())
+                .andDo(print());
+
+        }
+
+        @DisplayName("로그인을 검증으로 인해 실패한다.")
+        @Test
+        void Validation_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("", "testPassword");
+            String data = objectMapper.writeValueAsString(dto);
+            //when,then
+            mockMvc.perform(post("/api/v1/login")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("must not be blank"))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(print());
+        }
+
+        @DisplayName("로그인을 등록되지않는 이메일로 인해 실패한다.")
+        @Test
+        void Email_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
+            String data = objectMapper.writeValueAsString(dto);
+            when(memberService.loginMember(any(LoginRequestDTO.class)))
+                .thenThrow(new UserNotMatchInfoException());
+            //when,then
+            mockMvc.perform(post("/api/v1/login")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message")
+                    .value("아이디 또는 비밀번호가 일치하지 않습니다."))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(print());
+        }
+
+        @DisplayName("로그인을 비밀번호가 달라 실패한다.")
+        @Test
+        void password_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
+            String data = objectMapper.writeValueAsString(dto);
+            when(memberService.loginMember(any(LoginRequestDTO.class)))
+                .thenThrow(new UserNotMatchInfoException());
+            //when,then
+            mockMvc.perform(post("/api/v1/login")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message")
+                    .value("아이디 또는 비밀번호가 일치하지 않습니다."))
+                .andDo(print());
+        }
+
+        @DisplayName("로그인을 이미 탈퇴한 회원이라서 실패한다.")
+        @Test
+        void softDeleted_willFail() throws Exception {
+            //given
+            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
+            String data = objectMapper.writeValueAsString(dto);
+            when(memberService.loginMember(any(LoginRequestDTO.class)))
+                .thenThrow(new UserSoftDeletedException());
+            //when,then
+            mockMvc.perform(post("/api/v1/login")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message")
+                    .value("이미 탈퇴한 회원입니다."))
+                .andDo(print());
+        }
+
+    }
+
+    @DisplayName("logout()은 ")
+    @Nested
+    class LogOut {
+
+        @DisplayName("로그아웃을 성공한다.")
+        @Test
+        void _willSuccess() throws Exception {
+            //given
+            MockHttpSession session = new MockHttpSession();
+
+            //when, then
+            session.setAttribute("MEMBER", "test@naver.com");
+            mockMvc.perform(get("/api/v1/logout")
+                    .session(session))
+                .andExpect(status().isOk());
+        }
+
+        @DisplayName("인터셉터로 인해 실패한다.")
+        @Test
+        void Interceptor_willFail() throws Exception {
+            //given
+            mockMvc = MockMvcBuilders.standaloneSetup
+                    (new MemberController(memberService, memberRepository))
+                .addInterceptors(new LoginCheckInterceptor()).build();
+
+            //when, then
+            mockMvc.perform(get("/api/v1/logout"))
+                .andExpect(status().isForbidden());
+        }
+    }
+
+    @DisplayName("rePassword()는")
+    @Nested
+    class RePassword {
+
+        @DisplayName("비밀번호 재설정을 성공한다.")
+        @Test
+        void _willSuccess() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("newPassword", "newPassword");
+            MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+            when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
+                .thenReturn(memberResponse);
+
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
+
+            String data = objectMapper.writeValueAsString(request);
+
+            //when, then
+            mockMvc.perform(post("/api/v1/RePassword")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").exists())
+                .andExpect(jsonPath("$.data.nickname").exists())
+                .andDo(print());
+        }
+
+        @DisplayName("비밀번호 재설정을 검증으로 인해 실패한다.")
+        @Test
+        void validation_willFail() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("", "newPassword");
+
+            String data = objectMapper.writeValueAsString(request);
+
+            //when, then
+            mockMvc.perform(post("/api/v1/RePassword")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("must not be blank"))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andDo(print());
+        }
+
+        @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
+        @Test
+        void Re_willFail() throws Exception {
+            //given
+            RePasswordRequest request = new RePasswordRequest
+                ("newPassword", "new");
+            when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
+                .thenThrow(new UserNotMatchRePasswordException());
+            String data = objectMapper.writeValueAsString(request);
+
+            MockHttpSession session = new MockHttpSession();
+            session.setAttribute("MEMBER", 1L);
+
+            //when, then
+            mockMvc.perform(post("/api/v1/RePassword")
+                    .content(data)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .session(session))
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.message").value("비밀번호 재확인이 일치하지 않습니다."))
+                .andDo(print());
+
+        }
+    }
+
 }
 
 
