@@ -21,6 +21,7 @@ public enum ErrorCode {
     // COMMENT
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
     HAS_NO_PERMISSION_WITH_THIS_COMMENT(HttpStatus.UNAUTHORIZED, "댓글 작성자만 해당 댓글 수정/삭제가 가능합니다."),
+    CANNOT_MULTIPLE_SEARCH_CONDITION(HttpStatus.BAD_REQUEST, "다중 조건 검색은 불가합니다."),
 
     // RECORD
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좋아요/싫어요 입니다."),

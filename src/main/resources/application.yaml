@@ -5,13 +5,13 @@ spring:
     username: root
     password: 1234
   jpa:
+    show-sql: true
     hibernate:
-      show-sql: true
       jdbc:
         time_zone: Asia/Seoul
   mail:
-    username: fasttime123
-    password: dnwnrlfls123
+    username:
+    password:
   scheduling:
     enabled: true
 

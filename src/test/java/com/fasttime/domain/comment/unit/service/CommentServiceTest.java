@@ -14,9 +14,11 @@ import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.comment.dto.request.CommentPageRequestDTO;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
+import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
@@ -38,6 +40,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
@@ -339,6 +343,10 @@ public class CommentServiceTest {
             GetCommentsRequestDTO getCommentsRequestDTO = GetCommentsRequestDTO.builder()
                 .articleId(1L)
                 .build();
+            Pageable pageable = CommentPageRequestDTO.builder()
+                .page(0)
+                .size(10)
+                .build().of();
             Comment comment1 = Comment.builder()
                 .id(1L)
                 .article(newArticle())
@@ -365,21 +373,22 @@ public class CommentServiceTest {
                 .build();
             comment1.getChildComments().add(comment2);
             given(commentRepository.findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class))).willReturn(List.of(comment1, comment3));
+                any(GetCommentsRequestDTO.class), any(Pageable.class))).willReturn(
+                new PageImpl<>(List.of(comment1, comment3)));
 
             // when
-            List<CommentResponseDTO> result = commentService.getComments(getCommentsRequestDTO);
+            CommentListResponseDTO result = commentService.getComments(getCommentsRequestDTO,
+                pageable);
 
             // then
-            assertThat(result).isNotEmpty();
-            assertThat(result.get(0)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content1", false, -1L, 1);
-            assertThat(result.get(1)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(1)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(3L, 1L, 1L, "nickname", "content3", false, -1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class));
+                any(GetCommentsRequestDTO.class), any(Pageable.class));
         }
 
         @Test
@@ -389,6 +398,10 @@ public class CommentServiceTest {
             GetCommentsRequestDTO getCommentsRequestDTO = GetCommentsRequestDTO.builder()
                 .memberId(1L)
                 .build();
+            Pageable pageable = CommentPageRequestDTO.builder()
+                .page(0)
+                .size(10)
+                .build().of();
             Comment comment1 = Comment.builder()
                 .id(1L)
                 .article(newArticle())
@@ -414,25 +427,25 @@ public class CommentServiceTest {
                 .build();
             comment1.getChildComments().add(comment2);
             given(commentRepository.findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class))).willReturn(
-                List.of(comment1, comment2, comment3));
+                any(GetCommentsRequestDTO.class), any(Pageable.class))).willReturn(
+                new PageImpl<>(List.of(comment1, comment2, comment3)));
 
             // when
-            List<CommentResponseDTO> result = commentService.getComments(getCommentsRequestDTO);
+            CommentListResponseDTO result = commentService.getComments(getCommentsRequestDTO,
+                pageable);
 
             // then
-            assertThat(result).isNotEmpty();
-            assertThat(result.get(0)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content1", false, -1L, 1);
-            assertThat(result.get(1)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(1)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", false, 1L, 0);
-            assertThat(result.get(2)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(2)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(3L, 1L, 1L, "nickname", "content3", false, -1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class));
+                any(GetCommentsRequestDTO.class), any(Pageable.class));
         }
 
         @Test
@@ -442,6 +455,10 @@ public class CommentServiceTest {
             GetCommentsRequestDTO getCommentsRequestDTO = GetCommentsRequestDTO.builder()
                 .parentCommentId(1L)
                 .build();
+            Pageable pageable = CommentPageRequestDTO.builder()
+                .page(0)
+                .size(10)
+                .build().of();
             Comment comment1 = Comment.builder()
                 .id(1L)
                 .article(newArticle())
@@ -460,35 +477,41 @@ public class CommentServiceTest {
                 .build();
             comment1.getChildComments().add(comment2);
             given(commentRepository.findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class))).willReturn(List.of(comment2));
+                any(GetCommentsRequestDTO.class), any(Pageable.class))).willReturn(
+                new PageImpl<>(List.of(comment2)));
 
             // when
-            List<CommentResponseDTO> result = commentService.getComments(getCommentsRequestDTO);
+            CommentListResponseDTO result = commentService.getComments(getCommentsRequestDTO,
+                pageable);
 
             // then
-            assertThat(result).isNotEmpty();
-            assertThat(result.get(0)).extracting("commentId", "articleId", "memberId", "nickname",
-                    "content", "anonymity", "parentCommentId", "childCommentCount")
+            assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", false, 1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class));
+                any(GetCommentsRequestDTO.class), any(Pageable.class));
         }
 
         @Test
         @DisplayName("댓글을 찾을 수 없으면 빈 리스트를 반환한다.")
         void CommentNotFound_willFail() {
             // given
+            Pageable pageable = CommentPageRequestDTO.builder()
+                .page(0)
+                .size(10)
+                .build().of();
             given(commentRepository.findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class))).willReturn(new ArrayList<>());
+                any(GetCommentsRequestDTO.class), any(Pageable.class))).willReturn(
+                new PageImpl<>(new ArrayList<>()));
 
             // when
-            List<CommentResponseDTO> result = commentService.getComments(
-                GetCommentsRequestDTO.builder().articleId(1L).build());
+            CommentListResponseDTO result = commentService.getComments(
+                GetCommentsRequestDTO.builder().articleId(1L).build(), pageable);
 
             // then
-            assertThat(result).isEmpty();
+            assertThat(result.getComments()).isEmpty();
             verify(commentRepository, times(1)).findAllBySearchCondition(
-                any(GetCommentsRequestDTO.class));
+                any(GetCommentsRequestDTO.class), any(Pageable.class));
         }
     }
 
