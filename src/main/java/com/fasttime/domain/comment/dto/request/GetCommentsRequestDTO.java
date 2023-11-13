@@ -9,16 +9,11 @@ public class GetCommentsRequestDTO {
     private final Long articleId;
     private final Long memberId;
     private final Long parentCommentId;
-    private final int pageSize;
-    private final int page;
 
     @Builder
-    private GetCommentsRequestDTO(Long articleId, Long memberId, Long parentCommentId, int pageSize,
-        int page) {
+    private GetCommentsRequestDTO(Long articleId, Long memberId, Long parentCommentId) {
         this.articleId = articleId;
         this.memberId = memberId;
         this.parentCommentId = parentCommentId;
-        this.pageSize = pageSize;
-        this.page = page;
     }
 }
