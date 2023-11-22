@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Deprecated(since = "2023-11-22", forRemoval = false)
 public class ApplicationEnvConfig {
+
     private final Environment env;
 
     @Autowired
