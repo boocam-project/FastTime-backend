@@ -50,7 +50,7 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         github_token: ${{ github.token }}
 
-    - name: Deploy to AWS Lightsail
+    - name: Deploy to AWS Lightsail - File Transfer
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
         SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
@@ -59,9 +59,13 @@ jobs:
         SOURCE: 'build/libs/'
         TARGET: '~/app/boocam'
         EXCLUDE: '/**/*.jar'
-      with:
-        args: |
+
+    - name: Execute additional commands on remote server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} << EOF
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
           cd ~/app/boocam
           java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar
-
+        EOF
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
