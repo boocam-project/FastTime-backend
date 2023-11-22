@@ -57,7 +57,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.LIGHTSAIL_HOST }}
         REMOTE_USER: ${{ secrets.LIGHTSAIL_USERNAME }}
         SOURCE: 'build/libs/'
-        TARGET: '/app/boocam'
+        TARGET: '~/app/boocam'
         EXCLUDE: '/**/*.jar'
       with:
         args: |
