@@ -100,14 +100,14 @@ bootJar {
 }
 
 task copyDevelopConfig(type: Copy) {
-    onlyIf { project(hasProperty('develop')) }
+    onlyIf { project.hasProperty('develop') }
     from 'src/main/resources'
     include 'application-develop.yml'
     into "$buildDir/resources/main"
 }
 
 task copyProdConfig(type: Copy) {
-    onlyIf { project(hasProperty('prod')) }
+    onlyIf { project.hasProperty('prod') }
     from 'src/main/resources'
     include 'application-prod.yml'
     into "$buildDir/resources/main"
