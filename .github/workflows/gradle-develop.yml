@@ -50,6 +50,11 @@ jobs:
         report_paths: '**/build/test-results/test/TEST-*.xml'
         github_token: ${{ github.token }}
 
+    - name: SSH Agent 설정
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+
     - name: Deploy to AWS Lightsail - File Transfer
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
