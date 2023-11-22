@@ -55,7 +55,7 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
         REMOTE_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        REMOTE_USERNAME: ${{ secrets.LIGHTSAIL_USERNAME }}
+        REMOTE_USER: ${{ secrets.LIGHTSAIL_USERNAME }}
         SOURCE: 'build/libs/'
         TARGET: '/app/boocam'
         EXCLUDE: '/**/*.jar'
