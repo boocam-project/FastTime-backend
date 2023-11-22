@@ -70,7 +70,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} << EOF
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
           cd ~/app/boocam
-          java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar
+          nohup java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
         EOF
       env:
         SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
