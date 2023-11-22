@@ -28,7 +28,6 @@ jobs:
 
       env:
         DEVELOP_CONFIG: ${{ secrets.DEVELOP_CONFIG }}
-        PROD_CONFIG: ${{ secrets.PROD_CONFIG }}
 
 
     - name: gradlew 접근권한 설정
