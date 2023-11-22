@@ -100,28 +100,18 @@ bootJar {
 }
 
 task copyDevelopConfig(type: Copy) {
+    onlyIf { project(hasProperty('develop')) }
     from 'src/main/resources'
     include 'application-develop.yml'
     into "$buildDir/resources/main"
 }
 
 task copyProdConfig(type: Copy) {
+    onlyIf { project(hasProperty('prod')) }
     from 'src/main/resources'
     include 'application-prod.yml'
     into "$buildDir/resources/main"
 }
 
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':copyDevelopConfig')) {
-        processResources.dependsOn copyDevelopConfig
-    }
-    if (taskGraph.hasTask(':copyProdConfig')) {
-        processResources.dependsOn copyProdConfig
-    }
-}
-
-if (project.hasProperty('develop')) {
-    copyDevelopConfig.execute()
-} else if (project.hasProperty('prod')) {
-    copyProdConfig.execute()
-}
+processResources.dependsOn copyDevelopConfig
+processResources.dependsOn copyProdConfig
