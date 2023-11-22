@@ -62,6 +62,6 @@ jobs:
       with:
         args: |
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
-          cd /app/boocam
+          cd ~/app/boocam
           java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar
 
