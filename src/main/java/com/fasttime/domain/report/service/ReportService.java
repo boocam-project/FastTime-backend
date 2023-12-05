@@ -13,7 +13,7 @@ import com.fasttime.domain.report.repository.ReportRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
