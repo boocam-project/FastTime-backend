@@ -27,14 +27,17 @@ import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
 import java.util.Optional;
+import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -220,26 +223,23 @@ public class MemberControllerDocsTest extends RestDocsSupport {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
 
-        Member member = new Member();
-        member.setId(1L);
-        member.setNickname("NewNickname");
-        member.setEmail("test@example.com");
-        member.setImage("newimageURL");
-
-        when(memberService.getMember(1L)).thenReturn(member);
+        MyPageInfoDTO myPageInfoDTO = new MyPageInfoDTO("NewNickname", "newimageURL",
+            "test@example.com");
+        when(memberService.getMyPageInfoById(1L)).thenReturn(myPageInfoDTO);
 
         // When
         ResultActions result = mockMvc.perform(get("/api/v1/mypage").session(session)
-            .contentType(MediaType.APPLICATION_JSON_UTF8));
+            .contentType(MediaType.APPLICATION_JSON));
 
         // Then
         result.andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
             .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
+            .andExpect(
+                jsonPath("$.message").value(ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage()))
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
+            .andExpect(jsonPath("$.data.image").value("newimageURL"))
             .andExpect(jsonPath("$.data.email").value("test@example.com"))
-            .andExpect(jsonPath("$.data.profileImageUrl").value("newimageURL"))
             .andDo(document("member-getMyPageInfo",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -248,9 +248,9 @@ public class MemberControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                     fieldWithPath("data.nickname").description("사용자 닉네임")
                         .type(JsonFieldType.STRING),
-                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING),
-                    fieldWithPath("data.profileImageUrl").description("프로필 이미지 URL")
-                        .type(JsonFieldType.STRING)
+                    fieldWithPath("data.image").description("프로필 이미지 URL")
+                        .type(JsonFieldType.STRING),
+                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
                 )
             ));
     }
@@ -269,37 +269,46 @@ public class MemberControllerDocsTest extends RestDocsSupport {
 
         Member member = new Member();
         member.setId(1L);
-        member.setNickname("OldNickname");
-        member.setImage("old-image-url");
+        member.setNickname("NewNickname");
+        member.setImage("new-image-url");
 
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
-        when(memberService.checkDuplicateNickname("NewNickname")).thenReturn(false);
+        member.setEmail(null);
+
+        when(memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
+            .thenReturn(Optional.of(member));
 
         // When
         ResultActions result = mockMvc.perform(
-            put("/api/v1/retouch-member").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(editRequest)).session(session));
+            put("/api/v1/retouch-member")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(editRequest))
+                .session(session));
 
         // Then
         result.andExpect(status().isOk())
+            .andExpect(
+                jsonPath("$.code").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus().value()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage()))
+            .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
+            .andExpect(jsonPath("$.data.image").value("new-image-url"))
+            .andExpect(
+                jsonPath("$.data.email").doesNotExist()) // Expect email to not exist if it's null
             .andDo(document("member-update",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
                     fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
                     fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
-                    fieldWithPath("data.email").description("변경된 이메일").type(JsonFieldType.STRING)
-                        .optional(),
                     fieldWithPath("data.nickname").description("변경된 닉네임")
                         .type(JsonFieldType.STRING),
                     fieldWithPath("data.image").description("변경된 이미지 URL")
                         .type(JsonFieldType.STRING),
-                    fieldWithPath("data.message").description("변경된 메시지").type(JsonFieldType.NULL)
-                        .optional()
+
+                    fieldWithPath("data.email").description("이메일 (변경되지 않았을 수 있음)")
+                        .type(JsonFieldType.STRING).optional()
                 )
             ));
-
-
     }
+
 
 }

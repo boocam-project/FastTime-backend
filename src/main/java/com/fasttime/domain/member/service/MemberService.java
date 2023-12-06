@@ -1,7 +1,12 @@
 package com.fasttime.domain.member.service;
 
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
+import com.fasttime.domain.member.request.EditRequest;
+import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
+import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
+import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.exception.UserNotMatchInfoException;
@@ -13,9 +18,9 @@ import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
+import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,27 +47,29 @@ public class MemberService {
                 memberDto.getEmail(), oneYearAgo);
 
             if (softDeletedMember.isPresent()) {
-
                 Member member = softDeletedMember.get();
-
                 member.restore();
                 member.setNickname(memberDto.getNickname());
                 save(member);
-                return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
+                return ResponseDTO.res(ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getHttpStatus(),
+                    ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getMessage());
             }
 
             if (isEmailExistsInMember(memberDto.getEmail())) {
-
-                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다.");
+                throw new EmailAlreadyExistsException(ErrorCode.MEMBER_ALREADY_REGISTERED);
             } else if (checkDuplicateNickname(memberDto.getNickname())) {
-                return ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다.");
+                throw new NicknameAlreadyExistsException(ErrorCode.DUPLICATE_NICKNAME);
             }
 
             save(memberDto);
-            return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
+            return ResponseDTO.res(ErrorCode.REGISTRATION_SUCCESS.getHttpStatus(),
+                ErrorCode.REGISTRATION_SUCCESS.getMessage());
 
+        } catch (EmailAlreadyExistsException | NicknameAlreadyExistsException e) {
+            return ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage());
         } catch (Exception e) {
-            return ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패 " + e.getMessage());
+            return ResponseDTO.res(ErrorCode.REGISTRATION_FAILED.getHttpStatus(),
+                ErrorCode.REGISTRATION_FAILED.getMessage() + ": " + e.getMessage());
         }
     }
 
@@ -87,6 +94,30 @@ public class MemberService {
 
     public void save(Member member) {
         memberRepository.save(member);
+    }
+
+    public Optional<Member> updateMemberInfo(EditRequest editRequest, HttpSession session) {
+        Long memberId = (Long) session.getAttribute("MEMBER");
+        if (memberId == null) {
+            return Optional.empty();
+        }
+
+        return memberRepository.findById(memberId).map(member -> {
+            member.update(editRequest.getNickname(), editRequest.getImage());
+            return memberRepository.save(member);
+        });
+    }
+
+    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws UserNotFoundException {
+
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+
+        return new MyPageInfoDTO(
+            member.getNickname(),
+            member.getImage(),
+            member.getEmail()
+        );
     }
 
 
