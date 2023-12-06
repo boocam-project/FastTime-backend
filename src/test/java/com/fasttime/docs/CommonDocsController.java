@@ -2,9 +2,9 @@ package com.fasttime.docs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasttime.global.util.ResponseDTO;
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

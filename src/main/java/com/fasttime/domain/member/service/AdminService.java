@@ -21,7 +21,7 @@ import java.rmi.AccessException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
