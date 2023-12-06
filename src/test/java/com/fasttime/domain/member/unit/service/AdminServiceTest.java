@@ -1,149 +1,158 @@
 package com.fasttime.domain.member.unit.service;
 
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.service.AdminService;
-import com.fasttime.domain.member.service.MemberService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
-import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
-import java.rmi.AccessException;
-import java.time.LocalDateTime;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.service.AdminService;
+import java.util.ArrayList;
 import java.util.List;
-import javax.transaction.Transactional;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
 @Transactional
+@ExtendWith(MockitoExtension.class)
 public class AdminServiceTest {
 
-    @Autowired
+    @InjectMocks
     private AdminService adminService;
-    @Autowired
-    private ArticleCommandService postCommandService;
-    @Autowired
+
+    @Mock
     private ArticleRepository postRepository;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private MemberRepository memberRepository;
 
-    @BeforeEach
-    void addMember(){
-        memberService.save(new MemberDto("test","test","test"));
-    }
 
-    @DisplayName("신고된 게시물들을(이)")
+    @DisplayName("findReportedPost()는 ")
     @Nested
-    class PostList{
-        @DisplayName("조회할 수 있다. ")
+    class PostList {
+
+        @DisplayName("신고된 게시물들을 조회할 수 있다. ")
         @Test
-        void _willSuccess(){
+        void _willSuccess() {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-          
-            ArticleResponse newPost1 = postCommandService.write(dto1);
-            ArticleResponse newPost2 = postCommandService.write(dto2);
-            Article post1 = postRepository.findById(newPost1.getId()).get();
-            Article post2 = postRepository.findById(newPost2.getId()).get();
-            post1.transToWaitForReview();
-            post2.transToWaitForReview();
+            Member member = Member.builder().id(1L).email("testEmail").password("testPassword")
+                .nickname("testNickname").build();
+
+            Article article1 = Article.builder()
+                .id(1L)
+                .member(member)
+                .title("testTitle1")
+                .anonymity(true)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            Article article2 = Article.builder()
+                .id(2L)
+                .member(member)
+                .title("testTitle2")
+                .anonymity(true)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            List<Article> articles = new ArrayList<>();
+            articles.add(article1);
+            articles.add(article2);
+
+            given(
+                postRepository.findAllByReportStatus(any(Pageable.class), any(ReportStatus.class)))
+                .willReturn(articles);
 
             // when
             List<ArticlesResponse> postList = adminService.findReportedPost(0);
-            System.out.println(postList.size());
 
             //then
-            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(post1.getTitle());
-            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(post2.getTitle());
+            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(article1.getTitle());
+            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(article2.getTitle());
         }
-        @DisplayName("없어 조회 할 수 없다.")
-        @Test
-        void _willFail(){
-            //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle2", "testContent2", false);
 
+        @DisplayName("신고된 게시물들이 없어 조회 할 수 없다.")
+        @Test
+        void _willFail() {
             // when
             List<ArticlesResponse> postList = adminService.findReportedPost(0);
             //then
             Assertions.assertThat(postList.isEmpty()).isTrue();
         }
     }
-    @DisplayName("게시물을")
+
+    @DisplayName("findOneReportedPost()는")
     @Nested
-    class PostDetail{
-        @DisplayName("삭제할 수 있다.")
+    class PostDetail {
+
+        @DisplayName("신고된 게시글을 조회 할 수 있다.")
         @Test
-        void Delete_willSuccess() throws AccessException {
+        void _willSuccess() {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
+            Member member = Member.builder().id(1L).email("testEmail").password("testPassword")
+                .nickname("testNickname").build();
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
-
-            post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
+            Article article1 = Article.builder()
+                .id(1L)
+                .member(member)
+                .title("testTitle1")
+                .anonymity(true)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when
-            adminService.deletePost(newPost.getId());
-            //then
-            Assertions.assertThat(postRepository.findById(newPost.getId()).isEmpty()).isTrue();
-        }
-        @DisplayName("검토완료로 바꿀 수 있다.")
-        @Test
-        void Pass_willSuccess() throws AccessException {
-            //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
-
-            post1.transToWaitForReview();
-
-            //when
-            adminService.passPost(post1.getId());
+            ArticleResponse oneReportedPost = adminService.findOneReportedPost(1L);
 
             //then
-            Assertions.assertThat(postRepository.findById(post1.getId()).get().getReportStatus())
-                .isEqualTo(ReportStatus.REPORT_REJECT);
+            Assertions.assertThat(oneReportedPost.getTitle()).isEqualTo(article1.getTitle());
         }
-        //IllegalArgumentException
-        @DisplayName("잘못된 접근으로 바꿀 수 없다.")
+
+        @DisplayName("신고된 게시글이 존재하지 않아 조회 할 수 없다.")
         @Test
-        void _willFail() throws IllegalArgumentException {
+        void NotFound_willFail() {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
+            given(postRepository.findById(anyLong())).willThrow(new ArticleNotFoundException());
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+            //when, then
+            Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
+                ArticleNotFoundException.class).hasMessage("존재하지 않는 게시글입니다.");
+        }
 
+        @DisplayName("게시글이 신고된 상태가 아니라 조회 할 수 없다.")
+        @Test
+        void NoReported_willFail() {
+            //given
+            Member member = Member.builder().id(1L).email("testEmail").password("testPassword")
+                .nickname("testNickname").build();
+
+            Article article1 = Article.builder()
+                .id(1L)
+                .member(member)
+                .title("testTitle1")
+                .anonymity(true)
+                .reportStatus(ReportStatus.NORMAL)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when ,then
-            Assertions.assertThatThrownBy(() -> adminService.passPost(100L));
+            Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
+                BadArticleReportStatusException.class).hasMessage("신고 후처리를 할 수 없습니다.");
+
         }
     }
 

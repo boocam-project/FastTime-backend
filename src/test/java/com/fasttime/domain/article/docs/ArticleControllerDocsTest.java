@@ -16,7 +16,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -149,7 +149,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .andDo(document("articles-search",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                requestParameters(
+                queryParameters(
                     parameterWithName("title").description("제목").optional(),
                     parameterWithName("nickname").description("작성자 닉네임").optional(),
                     parameterWithName("likeCount").description("최소 좋아요 수").optional()

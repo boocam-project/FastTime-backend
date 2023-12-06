@@ -8,13 +8,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -74,19 +74,20 @@ public class Comment extends BaseTimeEntity {
     }
 
     public CommentResponseDTO toCommentResponseDTO() {
-        long parentCommentId = -1L;
         boolean isChildComment = this.parentComment != null;
         int deletedChildCommentCount = 0;
-        if (isChildComment) {
-            parentCommentId = this.parentComment.getId();
-        }
+        long parentCommentId = isChildComment? this.parentComment.getId() : -1;
         for (Comment comment : this.childComments) {
             if (comment.isDeleted()) {
                 deletedChildCommentCount++;
             }
         }
-        return CommentResponseDTO.builder().commentId(this.id).articleId(this.article.getId())
-            .memberId(this.member.getId()).nickname(this.member.getNickname()).content(this.content)
+        return CommentResponseDTO.builder()
+            .commentId(this.id)
+            .articleId(this.article.getId())
+            .memberId(this.member.getId())
+            .nickname(this.member.getNickname())
+            .content(this.content)
             .anonymity(this.anonymity).parentCommentId(parentCommentId)
             .childCommentCount(this.childComments.size() - deletedChildCommentCount)
             .createdAt(dateTimeParse(this.getCreatedAt()))
