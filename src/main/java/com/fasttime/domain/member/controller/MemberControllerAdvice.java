@@ -40,7 +40,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> memberNotMatchInfoException(
         MemberNotMatchInfoException e) {
-        log.error("userNotMatchInfoException: ", e.getMessage());
+        log.error("memberNotMatchInfoException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
@@ -48,7 +48,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> memberSoftDeletedException(
         MemberSoftDeletedException e) {
-        log.error("userSoftDeletedException: ", e.getMessage());
+        log.error("memberSoftDeletedException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
@@ -56,7 +56,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ResponseDTO<Object>> memberNotMatchRePasswordException(
         MemberNotMatchRePasswordException e) {
-        log.error("userNotMatchRePasswordException: ", e.getMessage());
+        log.error("memberNotMatchRePasswordException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
