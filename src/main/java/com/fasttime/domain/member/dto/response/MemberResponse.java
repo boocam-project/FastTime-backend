@@ -1,4 +1,4 @@
-package com.fasttime.domain.member.response;
+package com.fasttime.domain.member.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

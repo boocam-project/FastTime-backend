@@ -1,14 +1,14 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.EditResponse;
-import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.domain.member.dto.request.EditRequest;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.EditResponse;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
@@ -35,8 +35,8 @@ public class MemberController {
 
 
     @PostMapping("/api/v1/join")
-    public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
-        ResponseDTO<Object> response = memberService.registerOrRecoverMember(memberDto);
+    public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody CreateMemberDTO createMemberDTO) {
+        ResponseDTO<Object> response = memberService.registerOrRecoverMember(createMemberDTO);
         return ResponseEntity.status(HttpStatus.valueOf(response.getCode())).body(response);
     }
 

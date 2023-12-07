@@ -1,12 +1,11 @@
 package com.fasttime.domain.member.service;
 
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.global.exception.ErrorCode;
+import com.fasttime.domain.member.dto.request.EditRequest;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
@@ -14,8 +13,8 @@ import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import jakarta.servlet.http.HttpSession;
@@ -42,35 +41,35 @@ public class MemberService {
     }
 
 
-    public ResponseDTO<Object> registerOrRecoverMember(MemberDto memberDto) {
+    public ResponseDTO<Object> registerOrRecoverMember(CreateMemberDTO createMemberDTO) {
 
         LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
         Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
-            memberDto.getEmail(), oneYearAgo);
+            createMemberDTO.getEmail(), oneYearAgo);
 
         if (softDeletedMember.isPresent()) {
             Member member = softDeletedMember.get();
             member.restore();
-            member.setNickname(memberDto.getNickname());
+            member.setNickname(createMemberDTO.getNickname());
             save(member);
             return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
         }
-        if (isEmailExistsInMember(memberDto.getEmail())) {
+        if (isEmailExistsInMember(createMemberDTO.getEmail())) {
             throw new EmailAlreadyExistsException();
-        } else if (checkDuplicateNickname(memberDto.getNickname())) {
+        } else if (checkDuplicateNickname(createMemberDTO.getNickname())) {
             throw new NicknameAlreadyExistsException();
         }
-        save(memberDto);
+        save(createMemberDTO);
         return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
     }
 
 
-    public void save(MemberDto memberDto) {
+    public void save(CreateMemberDTO createMemberDTO) {
 
         Member member = new Member();
-        member.setEmail(memberDto.getEmail());
-        member.setNickname(memberDto.getNickname());
-        member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
+        member.setEmail(createMemberDTO.getEmail());
+        member.setNickname(createMemberDTO.getNickname());
+        member.setPassword(passwordEncoder.encode(createMemberDTO.getPassword()));
         memberRepository.save(member);
     }
 

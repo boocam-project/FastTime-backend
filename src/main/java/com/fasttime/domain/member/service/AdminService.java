@@ -7,7 +7,7 @@ import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.entity.Admin;
@@ -51,7 +51,7 @@ public class AdminService {
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
             throw new AdminNotFoundException("Admin not found");
         }
-        memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
+        memberService.save(new CreateMemberDTO(dto.getEmail(), dto.getPassword(), dto.getEmail()));
         adminRepository.save(Admin.builder().member(memberRepository.findByEmail
             (dto.getEmail()).get()).build());
     }

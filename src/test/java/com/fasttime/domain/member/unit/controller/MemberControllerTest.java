@@ -15,16 +15,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasttime.domain.member.controller.MemberController;
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.MemberSoftDeletedException;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.domain.member.dto.request.EditRequest;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.interceptor.LoginCheckInterceptor;
 import com.fasttime.global.util.ResponseDTO;
@@ -56,13 +56,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             @Test
             @DisplayName("이미 가입된 회원일 때")
             void alreadyRegisteredMember() throws Exception {
-                MemberDto memberDto = new MemberDto();
-                memberDto.setEmail("test@example.com");
-                memberDto.setPassword("password");
-                memberDto.setNickname("testuser");
+                CreateMemberDTO createMemberDTO = new CreateMemberDTO();
+                createMemberDTO.setEmail("test@example.com");
+                createMemberDTO.setPassword("password");
+                createMemberDTO.setNickname("testuser");
 
                 when(
-                    memberService.registerOrRecoverMember(any(MemberDto.class)))
+                    memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
@@ -84,12 +84,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             @Test
             @DisplayName("닉네임이 중복일 때")
             void duplicateNickname() throws Exception {
-                MemberDto memberDto = new MemberDto();
-                memberDto.setEmail("test@example.com");
-                memberDto.setPassword("password");
-                memberDto.setNickname("testuser");
+                CreateMemberDTO createMemberDTO = new CreateMemberDTO();
+                createMemberDTO.setEmail("test@example.com");
+                createMemberDTO.setPassword("password");
+                createMemberDTO.setNickname("testuser");
 
-                when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+                when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
@@ -116,12 +116,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             @Test
             @DisplayName("회원가입 성공")
             void join_Success() throws Exception {
-                MemberDto memberDto = new MemberDto();
-                memberDto.setEmail("test@example.com");
-                memberDto.setPassword("password");
-                memberDto.setNickname("testuser");
+                CreateMemberDTO createMemberDTO = new CreateMemberDTO();
+                createMemberDTO.setEmail("test@example.com");
+                createMemberDTO.setPassword("password");
+                createMemberDTO.setNickname("testuser");
 
-                when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+                when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
                 ResultActions resultActions = mockMvc.perform(

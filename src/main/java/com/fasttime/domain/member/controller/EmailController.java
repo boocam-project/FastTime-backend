@@ -1,6 +1,6 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.request.EmailRequest;
+import com.fasttime.domain.member.dto.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
 import com.fasttime.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;

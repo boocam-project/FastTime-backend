@@ -3,7 +3,6 @@ package com.fasttime.domain.member.controller;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.fasttime.domain.member.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
 import com.fasttime.domain.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;

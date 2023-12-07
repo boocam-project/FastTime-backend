@@ -25,14 +25,14 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.MemberController;
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.MemberResponse;
+import com.fasttime.domain.member.dto.request.EditRequest;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
@@ -135,13 +135,13 @@ public class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void join() throws Exception {
         //given
-        MemberDto memberDto = new MemberDto("test@gmail.com", "testPassword", "testNickname");
+        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword", "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
-        String data = new ObjectMapper().writeValueAsString(memberDto);
+        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
@@ -169,13 +169,13 @@ public class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void recover() throws Exception {
         //given
-        MemberDto memberDto = new MemberDto("test@gmail.com", "testPassword", "testNickname");
+        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword", "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(MemberDto.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
 
-        String data = new ObjectMapper().writeValueAsString(memberDto);
+        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
