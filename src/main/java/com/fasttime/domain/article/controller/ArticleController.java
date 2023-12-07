@@ -58,8 +58,8 @@ public class ArticleController {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, articleCommandUseCase.write(
                 new ArticleCreateServiceRequest(memberId,
-                    requestDto.getTitle(),
-                    requestDto.getContent(),
+                    requestDto.title(),
+                    requestDto.content(),
                     requestDto.isAnonymity()))));
     }
 
@@ -77,9 +77,9 @@ public class ArticleController {
             .body(ResponseDTO.res(HttpStatus.OK, articleCommandUseCase.update(
                 new ArticleUpdateServiceRequest(
                     memberId,
-                    requestDto.getMemberId(),
-                    requestDto.getTitle(),
-                    requestDto.isAnonymity(), requestDto.getContent()
+                    requestDto.memberId(),
+                    requestDto.title(),
+                    requestDto.isAnonymity(), requestDto.content()
                 ))));
     }
 
@@ -94,7 +94,7 @@ public class ArticleController {
         }
 
         articleCommandUseCase.delete(new ArticleDeleteServiceRequest(
-            requestDto.getArticleId(),
+            requestDto.articleId(),
             memberId,
             LocalDateTime.now()
         ));

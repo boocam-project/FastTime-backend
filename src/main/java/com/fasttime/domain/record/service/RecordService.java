@@ -39,14 +39,14 @@ public class RecordService {
         ArticleResponse postResponse = postQueryService.queryById(
             createRecordRequestDTO.getPostId());
         Member member = memberService.getMember(memberId);
-        checkDuplicateRecords(member.getId(), postResponse.getId(),
+        checkDuplicateRecords(member.getId(), postResponse.id(),
             createRecordRequestDTO.getIsLike());
 
         recordRepository.save(
-            Record.builder().member(member).article(Article.builder().id(postResponse.getId()).build())
+            Record.builder().member(member).article(Article.builder().id(postResponse.id()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());
 
-        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.getId(),
+        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.id(),
             createRecordRequestDTO.getIsLike(), true));
     }
 
