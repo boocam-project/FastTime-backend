@@ -13,7 +13,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,7 +36,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class CommentControllerDocsTest extends RestDocsSupport {
+class CommentControllerDocsTest extends RestDocsSupport {
 
     private final CommentService commentService = mock(CommentService.class);
 
@@ -179,7 +179,7 @@ public class CommentControllerDocsTest extends RestDocsSupport {
             .andExpect(status().isOk())
             .andDo(document("comments-search",
                 preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
-                requestParameters(
+                queryParameters(
                     parameterWithName("articleId").description("게시글 식별자").optional(),
                     parameterWithName("memberId").description("회원 식별자").optional(),
                     parameterWithName("parentCommentId").description("대댓글을 조회할 댓글 식별자").optional(),
