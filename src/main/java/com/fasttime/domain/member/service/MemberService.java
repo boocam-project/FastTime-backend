@@ -9,9 +9,9 @@ import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
-import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
-import com.fasttime.domain.member.exception.UserSoftDeletedException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.request.RePasswordRequest;
@@ -41,36 +41,27 @@ public class MemberService {
         memberRepository.deleteByDeletedAtBefore(oneYearAgo);
     }
 
+
     public ResponseDTO<Object> registerOrRecoverMember(MemberDto memberDto) {
-        try {
-            LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-            Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
-                memberDto.getEmail(), oneYearAgo);
 
-            if (softDeletedMember.isPresent()) {
-                Member member = softDeletedMember.get();
-                member.restore();
-                member.setNickname(memberDto.getNickname());
-                save(member);
-                return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
-            }
+        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+        Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
+            memberDto.getEmail(), oneYearAgo);
 
-            if (isEmailExistsInMember(memberDto.getEmail())) {
-                throw new EmailAlreadyExistsException(ErrorCode.MEMBER_ALREADY_REGISTERED);
-            } else if (checkDuplicateNickname(memberDto.getNickname())) {
-                throw new NicknameAlreadyExistsException(ErrorCode.DUPLICATE_NICKNAME);
-            }
-
-            save(memberDto);
-            return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
-
-
-        } catch (EmailAlreadyExistsException | NicknameAlreadyExistsException e) {
-            return ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage());
-        } catch (Exception e) {
-            return ResponseDTO.res(ErrorCode.REGISTRATION_FAILED.getHttpStatus(),
-                ErrorCode.REGISTRATION_FAILED.getMessage() + ": " + e.getMessage());
+        if (softDeletedMember.isPresent()) {
+            Member member = softDeletedMember.get();
+            member.restore();
+            member.setNickname(memberDto.getNickname());
+            save(member);
+            return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
         }
+        if (isEmailExistsInMember(memberDto.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        } else if (checkDuplicateNickname(memberDto.getNickname())) {
+            throw new NicknameAlreadyExistsException();
+        }
+        save(memberDto);
+        return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
     }
 
 
@@ -139,13 +130,13 @@ public class MemberService {
 
     public MemberResponse loginMember(LoginRequestDTO dto) throws MemberNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotMatchInfoException());
+            () -> new MemberNotMatchInfoException());
         if (member.getDeletedAt() != null) {
-            throw new UserSoftDeletedException();
+            throw new MemberSoftDeletedException();
         }
 
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new UserNotMatchInfoException();
+            throw new MemberNotMatchInfoException();
         }
         return new MemberResponse(member.getId(), member.getNickname());
 
@@ -157,7 +148,7 @@ public class MemberService {
             member.setPassword(passwordEncoder.encode(request.getPassword()));
             return new MemberResponse(member.getId(), member.getNickname());
         }
-        throw new UserNotMatchRePasswordException();
+        throw new MemberNotMatchRePasswordException();
 
     }
 

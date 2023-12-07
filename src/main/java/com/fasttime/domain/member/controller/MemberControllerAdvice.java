@@ -1,9 +1,11 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
-import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
-import com.fasttime.domain.member.exception.UserSoftDeletedException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
+import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.global.util.ResponseDTO;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 @Slf4j
 @RestControllerAdvice(basePackages = "com.fasttime.domain.member")
 public class MemberControllerAdvice {
@@ -26,31 +29,55 @@ public class MemberControllerAdvice {
             .contentType(MediaType.APPLICATION_JSON)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, message));
     }
+
     @ExceptionHandler
     public ResponseEntity<ResponseDTO> memberNotFoundException(MemberNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
             ResponseDTO.res(HttpStatus.NOT_FOUND,
                 e.getMessage()));
     }
+
     @ExceptionHandler
-    public ResponseEntity<ResponseDTO<Object>> userNotMatchInfoException(UserNotMatchInfoException e){
-        log.error("userNotMatchInfoException: ",e.getMessage());
+    public ResponseEntity<ResponseDTO<Object>> memberNotMatchInfoException(
+        MemberNotMatchInfoException e) {
+        log.error("userNotMatchInfoException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
+
     @ExceptionHandler
-    public ResponseEntity<ResponseDTO<Object>> userSoftDeletedException(UserSoftDeletedException e){
-        log.error("userSoftDeletedException: ",e.getMessage());
+    public ResponseEntity<ResponseDTO<Object>> memberSoftDeletedException(
+        MemberSoftDeletedException e) {
+        log.error("userSoftDeletedException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
+
     @ExceptionHandler
-    public ResponseEntity<ResponseDTO<Object>> userNotMatchRePasswordException(
-        UserNotMatchRePasswordException e){
-        log.error("userNotMatchRePasswordException: ",e.getMessage());
+    public ResponseEntity<ResponseDTO<Object>> memberNotMatchRePasswordException(
+        MemberNotMatchRePasswordException e) {
+        log.error("userNotMatchRePasswordException: ", e.getMessage());
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ResponseDTO<Object>> handleEmailAlreadyExistsException(
+        EmailAlreadyExistsException e) {
+        return ResponseEntity
+            .status(e.getErrorCode().getHttpStatus())
+            .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
+    }
+
+    @ExceptionHandler(NicknameAlreadyExistsException.class)
+    public ResponseEntity<ResponseDTO<Object>> handleNicknameAlreadyExistsException(
+        NicknameAlreadyExistsException e) {
+        return ResponseEntity
+            .status(e.getErrorCode().getHttpStatus())
+            .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
+    }
+
+
 }
 
 

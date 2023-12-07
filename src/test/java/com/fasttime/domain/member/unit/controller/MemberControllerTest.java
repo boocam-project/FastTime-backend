@@ -19,9 +19,9 @@ import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
-import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
-import com.fasttime.domain.member.exception.UserSoftDeletedException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.request.EditRequest;
 import com.fasttime.domain.member.request.RePasswordRequest;
 import com.fasttime.domain.member.response.MemberResponse;
@@ -330,7 +330,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new UserNotMatchInfoException());
+                .thenThrow(new MemberNotMatchInfoException());
             //when,then
             mockMvc.perform(post("/api/v1/login")
                     .content(data)
@@ -349,7 +349,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new UserNotMatchInfoException());
+                .thenThrow(new MemberNotMatchInfoException());
             //when,then
             mockMvc.perform(post("/api/v1/login")
                     .content(data)
@@ -367,7 +367,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new UserSoftDeletedException());
+                .thenThrow(new MemberSoftDeletedException());
             //when,then
             mockMvc.perform(post("/api/v1/login")
                     .content(data)
@@ -466,7 +466,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
             RePasswordRequest request = new RePasswordRequest
                 ("newPassword", "new");
             when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
-                .thenThrow(new UserNotMatchRePasswordException());
+                .thenThrow(new MemberNotMatchRePasswordException());
             String data = objectMapper.writeValueAsString(request);
 
             MockHttpSession session = new MockHttpSession();
