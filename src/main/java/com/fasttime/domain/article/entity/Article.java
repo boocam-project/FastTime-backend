@@ -6,9 +6,6 @@ import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -23,6 +20,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -117,17 +117,9 @@ public class Article extends BaseTimeEntity {
 
     public void likeOrHate(boolean isLike, boolean increase) {
         if (isLike) {
-            if (increase) {
-                this.likeCount++;
-            } else {
-                this.likeCount--;
-            }
+            this.likeCount += increase ? 1 : -1;
         } else {
-            if (increase) {
-                this.hateCount++;
-            } else {
-                this.hateCount--;
-            }
+            this.hateCount += increase ? 1 : -1;
         }
     }
 
