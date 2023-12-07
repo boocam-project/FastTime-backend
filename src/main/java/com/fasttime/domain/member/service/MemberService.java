@@ -35,17 +35,10 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public void deleteExpiredSoftDeletedMembers() {
-        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-        memberRepository.deleteByDeletedAtBefore(oneYearAgo);
-    }
-
-
     public ResponseDTO<Object> registerOrRecoverMember(CreateMemberDTO createMemberDTO) {
 
-        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
         Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
-            createMemberDTO.getEmail(), oneYearAgo);
+            createMemberDTO.getEmail(), LocalDateTime.now().minusYears(1));
 
         if (softDeletedMember.isPresent()) {
             Member member = softDeletedMember.get();
