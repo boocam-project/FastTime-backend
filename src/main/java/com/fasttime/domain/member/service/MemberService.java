@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +52,7 @@ public class MemberService {
                 member.restore();
                 member.setNickname(memberDto.getNickname());
                 save(member);
-                return ResponseDTO.res(ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getHttpStatus(),
-                    ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getMessage());
+                return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
             }
 
             if (isEmailExistsInMember(memberDto.getEmail())) {
@@ -62,8 +62,8 @@ public class MemberService {
             }
 
             save(memberDto);
-            return ResponseDTO.res(ErrorCode.REGISTRATION_SUCCESS.getHttpStatus(),
-                ErrorCode.REGISTRATION_SUCCESS.getMessage());
+            return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
+
 
         } catch (EmailAlreadyExistsException | NicknameAlreadyExistsException e) {
             return ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage());

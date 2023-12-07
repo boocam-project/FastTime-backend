@@ -47,8 +47,7 @@ public class MemberController {
 
         return memberService.updateMemberInfo(editRequest, session)
             .map(updatedMember -> ResponseEntity.ok(
-                ResponseDTO.<EditResponse>res(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus(),
-                    ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage(),
+                ResponseDTO.<EditResponse>res(HttpStatus.OK, "회원 정보가 업데이트되었습니다.",
                     new EditResponse(updatedMember.getEmail(),
                         updatedMember.getNickname(),
                         updatedMember.getImage()))
@@ -101,7 +100,7 @@ public class MemberController {
 
         MyPageInfoDTO myPageInfoDto = memberService.getMyPageInfoById(memberId);
         return ResponseEntity.ok(
-            ResponseDTO.res(HttpStatus.OK, ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage(),
+            ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.",
                 myPageInfoDto));
     }
 
