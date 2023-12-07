@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.article.service.ArticleSettingProvider;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
@@ -78,12 +78,12 @@ class ArticleCommandServiceTest {
             ArticleCreateServiceRequest dto = new ArticleCreateServiceRequest(1L, "title",
                 "content", true);
 
-            given(memberService.getMember(1L)).willThrow(UserNotFoundException.class);
+            given(memberService.getMember(1L)).willThrow(MemberNotFoundException.class);
             given(postRepository.save(any(Article.class))).willReturn(mockArticle);
 
             // when then
             assertThatThrownBy(() -> postCommandService.write(dto))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(MemberNotFoundException.class);
         }
     }
 

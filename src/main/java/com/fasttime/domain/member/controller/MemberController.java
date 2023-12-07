@@ -65,20 +65,11 @@ public class MemberController {
     public ResponseEntity<ResponseDTO<Object>> deleteMember(HttpSession httpSession) {
         Long memberId = (Long) httpSession.getAttribute("MEMBER");
         if (memberId != null) {
-            try {
-                Member member = memberService.getMember(memberId);
-                memberService.softDeleteMember(member);
-                httpSession.invalidate();
-
-                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
-            } catch (Exception e) {
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR,
-                        "회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage()));
-            }
+            Member member = memberService.getMember(memberId);
+            memberService.softDeleteMember(member);
+            httpSession.invalidate();
+            return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
         } else {
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED,
                     "세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요."));

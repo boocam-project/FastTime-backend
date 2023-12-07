@@ -8,7 +8,7 @@ import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.exception.UserNotMatchInfoException;
 import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.UserSoftDeletedException;
@@ -108,10 +108,10 @@ public class MemberService {
         });
     }
 
-    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws UserNotFoundException {
+    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws MemberNotFoundException {
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException());
 
         return new MyPageInfoDTO(
             member.getNickname(),
@@ -132,12 +132,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member getMember(Long id) throws UserNotFoundException {
+    public Member getMember(Long id) throws MemberNotFoundException {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+            .orElseThrow(() -> new MemberNotFoundException("User not found with id: " + id));
     }
 
-    public MemberResponse loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+    public MemberResponse loginMember(LoginRequestDTO dto) throws MemberNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
             () -> new UserNotMatchInfoException());
         if (member.getDeletedAt() != null) {

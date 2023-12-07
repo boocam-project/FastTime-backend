@@ -1,7 +1,6 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.comment.exception.NotCommentAuthorException;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.exception.UserNotMatchInfoException;
 import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.UserSoftDeletedException;
@@ -28,9 +27,9 @@ public class MemberControllerAdvice {
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, message));
     }
     @ExceptionHandler
-    public ResponseEntity<ResponseDTO> userNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            ResponseDTO.res(HttpStatus.BAD_REQUEST,
+    public ResponseEntity<ResponseDTO> memberNotFoundException(MemberNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            ResponseDTO.res(HttpStatus.NOT_FOUND,
                 e.getMessage()));
     }
     @ExceptionHandler

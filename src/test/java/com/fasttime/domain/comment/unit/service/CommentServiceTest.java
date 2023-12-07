@@ -26,7 +26,7 @@ import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -296,10 +296,10 @@ public class CommentServiceTest {
             given(articleQueryService.queryById(any(Long.class))).willReturn(
                 newArticleResponse());
             given(memberService.getMember(any(Long.class))).willThrow(
-                new UserNotFoundException("User not found with id: 1L"));
+                new MemberNotFoundException("User not found with id: 1L"));
 
             // when, then
-            Throwable exception = assertThrows(UserNotFoundException.class, () -> {
+            Throwable exception = assertThrows(MemberNotFoundException.class, () -> {
                 commentService.createComment(1L, 1L, createCommentRequestDTO);
             });
             assertEquals("User not found with id: 1L", exception.getMessage());

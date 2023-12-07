@@ -13,12 +13,10 @@ import com.fasttime.domain.member.dto.request.saveAdminDTO;
 import com.fasttime.domain.member.entity.Admin;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
 import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import java.rmi.AccessException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
@@ -61,7 +59,7 @@ public class AdminService {
     public Long loginAdmin(LoginRequestDTO dto) {
 
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+            () -> new MemberNotFoundException("User not found with email: " + dto.getEmail()));
 
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new BadCredentialsException("Not match password!");

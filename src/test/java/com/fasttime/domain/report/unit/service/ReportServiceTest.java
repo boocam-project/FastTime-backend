@@ -9,7 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
@@ -185,10 +185,10 @@ public class ReportServiceTest {
 
             given(postRepository.findById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willThrow(
-                new UserNotFoundException("User not found with id: 1L"));
+                new MemberNotFoundException("User not found with id: 1L"));
 
             // when, then
-            Throwable exception = assertThrows(UserNotFoundException.class, () -> {
+            Throwable exception = assertThrows(MemberNotFoundException.class, () -> {
                 reportService.createReport(request, 1L);
             });
             assertEquals("User not found with id: 1L", exception.getMessage());
