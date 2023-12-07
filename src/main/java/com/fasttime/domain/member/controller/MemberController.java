@@ -2,7 +2,7 @@ package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
+import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.dto.request.EditRequest;
