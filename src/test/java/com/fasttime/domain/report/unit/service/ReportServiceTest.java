@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -112,7 +112,7 @@ public class ReportServiceTest {
             // given
             CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(0L)
                 .build();
-            Optional<Article> post = Optional.of(Article.builder().id(0L).reportStatus(ReportStatus.NORMAL).build());
+            Optional<Article> post = Optional.of(Article.builder().id(0L).reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW).build());
             Member member = Member.builder().id(0L).build();
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             for (long i = 1L; i < 20L; i++) {

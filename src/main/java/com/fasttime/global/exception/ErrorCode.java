@@ -8,6 +8,16 @@ public enum ErrorCode {
 
     // MEMBER
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+    MEMBER_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."),
+    DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."),
+    ACCOUNT_RECOVERY_SUCCESSFUL(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"),
+    REGISTRATION_SUCCESS(HttpStatus.OK, "가입 성공!"),
+    REGISTRATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "회원가입 실패"),
+    MEMBER_UPDATE_SUCCESS(HttpStatus.OK, "회원 정보가 업데이트되었습니다."),
+    MY_PAGE_RETRIEVED_SUCCESS(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다."),
+    MEMBER_NOT_MATCH_INFO(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 일치하지 않습니다."),
+    MEMBER_NOT_MATCH_RE_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호 재확인이 일치하지 않습니다."),
+    MEMBER_SOFT_DELETED(HttpStatus.NOT_FOUND, "이미 탈퇴한 회원입니다."),
 
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),
@@ -20,6 +30,8 @@ public enum ErrorCode {
 
     // COMMENT
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
+    HAS_NO_PERMISSION_WITH_THIS_COMMENT(HttpStatus.UNAUTHORIZED, "댓글 작성자만 해당 댓글 수정/삭제가 가능합니다."),
+    CANNOT_MULTIPLE_SEARCH_CONDITION(HttpStatus.BAD_REQUEST, "다중 조건 검색은 불가합니다."),
 
     // RECORD
     RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 좋아요/싫어요 입니다."),

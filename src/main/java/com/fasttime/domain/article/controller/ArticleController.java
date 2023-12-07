@@ -14,8 +14,8 @@ import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesS
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.List;
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

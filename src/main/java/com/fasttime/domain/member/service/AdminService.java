@@ -1,5 +1,12 @@
 package com.fasttime.domain.member.service;
 
+import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
+import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.member.dto.MemberDto;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.saveAdminDTO;
@@ -10,15 +17,11 @@ import com.fasttime.domain.member.exception.UserNotFoundException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
 import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.article.dto.service.response.ArticleResponse;
-import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
-import com.fasttime.domain.article.entity.Article;
-import com.fasttime.domain.article.entity.ReportStatus;
-import com.fasttime.domain.article.repository.ArticleRepository;
 import java.rmi.AccessException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
@@ -92,26 +95,34 @@ public class AdminService {
     }
 
 
-    public ArticleResponse findOneReportedPost(Long id) throws AccessException {
+    public ArticleResponse findOneReportedPost(Long id) {
         Article post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
-        System.out.println(post.getReportStatus());
+            .orElseThrow(() -> new ArticleNotFoundException());
         if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
-            throw new AccessException("잘못된 접근입니다.");
+            throw new BadArticleReportStatusException();
         }
-//        return ArticleResponse.entityToDto(post);
-        return null;
+        return ArticleResponse.builder()
+            .id(post.getId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .nickname(post.getMember().getNickname())
+            .anonymity(post.isAnonymity())
+            .likeCount(post.getLikeCount())
+            .hateCount(post.getHateCount())
+            .createdAt(post.getCreatedAt())
+            .lastModifiedAt(post.getUpdatedAt())
+            .build();
     }
 
     public void deletePost(Long id) {
         Article post = postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+            .orElseThrow(() -> new ArticleNotFoundException());
         postRepository.delete(post);
     }
 
     public void passPost(Long id) {
         Article post = postRepository.findById(id).
-            orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+            orElseThrow(() -> new ArticleNotFoundException());
         post.rejectReport();
     }
 

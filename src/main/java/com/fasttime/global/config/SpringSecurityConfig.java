@@ -1,10 +1,12 @@
 package com.fasttime.global.config;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+
+
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
+
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
@@ -12,18 +14,21 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 /**
  * Security 설정 Config
  */
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+
 //    private final JwtProvider jwtProvider;
 //    private final AccessDeniedHandlerImpl accessDeniedHandler;
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // basic authentication
-        http.httpBasic().disable(); // basic authentication filter 비활성화 for 보안
-        // cors 허용, csrf 보안을 위한 필터
-        http.cors().and().csrf().disable();
+
+public class SpringSecurityConfig {
+    //    private final JwtProvider jwtProvider;
+//    private final AccessDeniedHandlerImpl accessDeniedHandler;
+
+    @Bean
+    SecurityFilterChain http(HttpSecurity http) throws Exception {
+        http.httpBasic(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable);
+
+        return http.build();
     }
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
@@ -51,7 +56,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
-
 
 
 }

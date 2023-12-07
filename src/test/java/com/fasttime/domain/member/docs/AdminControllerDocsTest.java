@@ -16,7 +16,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,7 +37,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 
-public class AdminControllerDocsTest extends RestDocsSupport {
+class AdminControllerDocsTest extends RestDocsSupport {
 
     private final AdminService adminService = mock(AdminService.class);
 
@@ -71,7 +71,7 @@ public class AdminControllerDocsTest extends RestDocsSupport {
             .andDo(document("reportedPosts-search",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
-                requestParameters(parameterWithName("page").description("조회 페이지").optional()),
+                queryParameters(parameterWithName("page").description("조회 페이지").optional()),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).optional()

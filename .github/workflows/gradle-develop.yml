@@ -1,0 +1,76 @@
+name: 개발 서버 CI/CD
+
+on:
+  push:
+    branches: [ "develop" ]
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repository 로딩
+      uses: actions/checkout@v3
+
+    - name: JDK 21 설치
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: 환경변수 생성
+      run: echo "$DEVELOP_CONFIG" > src/main/resources/application-develop.yml
+
+      env:
+        DEVELOP_CONFIG: ${{ secrets.DEVELOP_CONFIG }}
+
+
+    - name: gradlew 접근권한 설정
+      run: chmod +x gradlew
+
+    - name: Gradle Project 테스트
+      run: ./gradlew build -Pdevelop
+
+    - name: 테스트 결과 등록
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ github.token }}
+
+    - name: 테스트 실패 Lines 등록
+      uses: mikepenz/action-junit-report@v3
+      if: always()
+      with:
+        report_paths: '**/build/test-results/test/TEST-*.xml'
+        github_token: ${{ github.token }}
+
+    - name: SSH Agent 설정
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+
+    - name: AWS Lightsail 배포 - 파일전송
+      uses: easingthemes/ssh-deploy@v2.1.5
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        REMOTE_HOST: ${{ secrets.LIGHTSAIL_HOST }}
+        REMOTE_USER: ${{ secrets.LIGHTSAIL_USERNAME }}
+        SOURCE: 'build/libs/'
+        TARGET: '~/app/boocam'
+        EXCLUDE: '/**/*.jar'
+
+    - name: jar 파일 실행
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} << EOF
+          pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
+          cd ~/app/boocam
+          nohup java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+        EOF
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}

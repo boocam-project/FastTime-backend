@@ -1,206 +1,203 @@
 package com.fasttime.domain.member.unit.controller;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
+import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.entity.Article;
-import com.fasttime.domain.article.repository.ArticleRepository;
-import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
-import java.time.LocalDateTime;
-import javax.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.exception.BadArticleReportStatusException;
+import com.fasttime.domain.member.controller.AdminController;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.service.AdminService;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
+@WebMvcTest(AdminController.class)
 public class AdminControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    private ArticleCommandService postCommandService;
-    @Autowired
-    private ArticleRepository postRepository;
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private MemberRepository memberRepository;
+    private MockMvc mockMvc;
+    @MockBean
+    private AdminService adminService;
 
-    @BeforeEach
-    void addMember(){
-        memberService.save(new MemberDto("test","test","test"));
-    }
-
-    @DisplayName("신고된 게시물들을(이)")
+    @DisplayName("findReportedPost()는 ")
     @Nested
-    class PostList{
-        @DisplayName("조회할 수 있다. ")
-        @Test
-        void _willSuccess() throws Exception {
-            //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(), "testTitle2", "testContent2", false);
+    class PostList {
 
-            ArticleResponse result1 = postCommandService.write(dto1);
-            ArticleResponse result2 = postCommandService.write(dto2);
-            Article postFromDB1 = postRepository.findById(result1.getId()).get();
-            Article postFromDB2 = postRepository.findById(result2.getId()).get();
-            postFromDB1.transToWaitForReview();
-            postFromDB2.transToWaitForReview();
-            postFromDB1.approveReport(LocalDateTime.now());
-            postFromDB2.approveReport(LocalDateTime.now());
-
-            // when, then
-            mockMvc.perform(get("/api/v1/admin"))
-                .andExpect(jsonPath("$.data").exists())
-                .andDo(print());
-        }
-
-        @DisplayName("없으면 조회 할 수 없다.")
-        @Test
-        void _willFail() throws Exception {
-            //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
-            ArticleCreateServiceRequest dto2 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle2", "testContent2", false);
-          
-            ArticleResponse savedPost1 = postCommandService.write(dto1);
-            ArticleResponse savedPost2 = postCommandService.write(dto2);
-            Article postFromDB1 = postRepository.findById(savedPost1.getId()).get();
-            Article postFromDB2 = postRepository.findById(savedPost2.getId()).get();
-
-            // when, then
-            mockMvc.perform(get("/api/v1/admin"))
-                .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(print());
-        }
-    }
-    @DisplayName("게시물을")
-    @Nested
-    class PostDetail{
-        @DisplayName("조회할 수 있다.")
+        @DisplayName("신고된 게시물들을 조회할 수 있다. ")
         @Test
         void _willSuccess() throws Exception {
             //given
 
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
+            ArticlesResponse article1 = ArticlesResponse.builder()
+                .id(1L)
+                .title("testTitle1")
+                .nickname("땅땅띠라랑")
+                .anonymity(true)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            ArticlesResponse article2 = ArticlesResponse.builder()
+                .id(2L)
+                .nickname("땅땅띠라랑")
+                .title("testTitle2")
+                .anonymity(true)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
+            List<ArticlesResponse> articles = new ArrayList<>();
+            articles.add(article1);
+            articles.add(article2);
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+            when(adminService.findReportedPost(anyInt())).thenReturn(articles);
 
-            post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
-            //when, then
-            mockMvc.perform(get("/api/v1/admin/{article_id}", post1.getId()))
+            // when, then
+            mockMvc.perform(get("/api/v1/admin"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("신고가 10번이상된 게시글들을 보여줍니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andDo(print());
         }
-        // IllegalArgumentException Test Case
-        @DisplayName("URL 직접 접근으로 인해 조회할 수 없다.")
+    }
+
+    @DisplayName("findOneReportedPost()는")
+    @Nested
+    class PostDetail {
+
+        @DisplayName("신고된 게시글을 조회 할 수 있다.")
         @Test
-        void _willFail() throws Exception {
+        void _willSuccess() throws Exception {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+            ArticleResponse article1 = ArticleResponse.builder()
+                .id(1L)
+                .title("testTitle1")
+                .nickname("땅땅띠라랑")
+                .anonymity(true)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
 
-            post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
+            when(adminService.findOneReportedPost(anyLong())).thenReturn(article1);
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}", 1000L))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("게시글이 없습니다."))
-                .andExpect(jsonPath("$.data").isEmpty())
+            mockMvc.perform(get("/api/v1/admin/{article_id}", article1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").exists())
+                .andExpect(jsonPath("$.data.title").exists())
+                .andExpect(jsonPath("$.data.nickname").exists())
+                .andExpect(jsonPath("$.data.anonymity").exists())
                 .andDo(print());
         }
-        // AccessException
-        @DisplayName("신고처리가 되지않는 게시글 접근으로 인해 조회할 수 없다.")
-        @Test
-        void Access_willFail() throws Exception {
-            //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+        @DisplayName("신고된 게시글이 존재하지 않아 조회 할 수 없다.")
+        @Test
+        void NotFound_willFail() throws Exception {
+            //given
+
+            when(adminService.findOneReportedPost(anyLong())).thenThrow(
+                new ArticleNotFoundException());
 
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}",  post1.getId()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("잘못된 접근입니다."))
-                .andExpect(jsonPath("$.data").isEmpty())
+            mockMvc.perform(get("/api/v1/admin/{article_id}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 게시글입니다."))
                 .andDo(print());
         }
+
+        @DisplayName("게시글이 신고된 상태가 아니라 조회 할 수 없다.")
+        @Test
+        void NoReported_willFail() throws Exception {
+            //given
+
+            when(adminService.findOneReportedPost(anyLong())).thenThrow(
+                new BadArticleReportStatusException());
+
+            //when ,then
+            mockMvc.perform(get("/api/v1/admin/{article_id}", 1L))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("신고 후처리를 할 수 없습니다."))
+                .andDo(print());
+
+        }
+    }
+
+    @DisplayName("deletePost()는")
+    @Nested
+    class PostDelete {
 
         @DisplayName("삭제할 수 있다.")
         @Test
         void Delete_willSuccess() throws Exception {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
+            Member member = Member.builder().id(1L).email("testEmail").password("testPassword")
+                .nickname("testNickname").build();
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+            Article article1 = Article.builder()
+                .id(1L)
+                .member(member)
+                .title("testTitle1")
+                .anonymity(true)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
 
-            post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
+            doNothing().when(adminService).deletePost(anyLong());
+
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}/delete", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}/delete", article1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 삭제합니다."))
                 .andDo(print());
         }
+    }
+
+    @DisplayName("passPost()는")
+    @Nested
+    class PostPass {
+
         @DisplayName("검토완료로 바꿀 수 있다.")
         @Test
         void Pass_willSuccess() throws Exception {
             //given
-            ArticleCreateServiceRequest dto1 = new ArticleCreateServiceRequest
-                (memberRepository.findByEmail("test").get().getId(),
-                    "testTitle1", "testContent1", false);
+            Member member = Member.builder().id(1L).email("testEmail").password("testPassword")
+                .nickname("testNickname").build();
 
-            ArticleResponse newPost = postCommandService.write(dto1);
-            Article post1 = postRepository.findById(newPost.getId()).get();
+            Article article1 = Article.builder()
+                .id(1L)
+                .member(member)
+                .title("testTitle1")
+                .anonymity(true)
+                .reportStatus(ReportStatus.WAIT_FOR_REPORT_REVIEW)
+                .likeCount(0)
+                .hateCount(0)
+                .build();
 
-            post1.transToWaitForReview();
-            post1.approveReport(LocalDateTime.now());
+            doNothing().when(adminService).passPost(anyLong());
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}/pass", post1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{post_id}/pass", article1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 복구합니다."))
                 .andDo(print());
         }
     }
-
-
 
 }
