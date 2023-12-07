@@ -2,60 +2,39 @@ package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.member.dto.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailService;
-import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.util.ResponseDTO;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class EmailController {
 
     private final EmailService emailService;
-    private final MemberService memberService;
 
-    private final HttpSession session;
-
-    @PostMapping("/api/v1/emailconfirm")
-    public ResponseEntity<?> mailConfirm(@RequestBody EmailRequest emailRequest) throws Exception {
-        try {
-
-            if (!memberService.isEmailExistsInFcmember(emailRequest.getEmail())) {
-                return ResponseEntity.badRequest()
-                    .body("FastCampus에 등록된 이메일이 아닙니다.");
-            }
-
-            String code = emailService.sendSimpleMessage(emailRequest.getEmail());
-            session.setAttribute("emailCode", code);
-            return ResponseEntity.ok("success");
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("메일 발송 실패: " + e.getMessage());
-        }
+    @PostMapping("/api/v1/confirm")
+    public ResponseEntity<ResponseDTO<String>> mailConfirm(@RequestBody EmailRequest emailRequest)
+        throws Exception {
+        emailService.sendVerificationEmail(emailRequest.getEmail());
+        return ResponseEntity.ok(
+            ResponseDTO.res(HttpStatus.OK, "인증 이메일이 성공적으로 전송되었습니다.", null)
+        );
     }
 
+    @GetMapping("/api/v1/verify/{code}")
+    public ResponseEntity<ResponseDTO<Boolean>> verifyEmail(
+        @RequestParam("email") String email,
+        @PathVariable("code") String code) {
 
-    @GetMapping("/api/v1/verify/{code}") // 이메일 인증하기 버튼
-    public ResponseEntity<Map<String, Object>> verifyEmail(@PathVariable("code") String code,
-        HttpSession session) {
-        Map<String, Object> resultMap = new HashMap<>();
-        session.setMaxInactiveInterval(30 * 60);
-
-        String sessionCode = (String) session.getAttribute("emailCode");
-        if (sessionCode != null && sessionCode.equals(code)) {
-            // 인증 성공
-            resultMap.put("success", true);
-            return ResponseEntity.ok(resultMap);
+        boolean isVerified = emailService.verifyEmailCode(email, code);
+        if (isVerified) {
+            return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "이메일 인증 성공.", true));
         } else {
-            // 인증 실패
-            resultMap.put("success", false);
-            return ResponseEntity.ok(resultMap);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이메일 인증 실패.", false));
         }
     }
 }
