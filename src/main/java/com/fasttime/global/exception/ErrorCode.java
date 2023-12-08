@@ -18,6 +18,10 @@ public enum ErrorCode {
     MEMBER_NOT_MATCH_INFO(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호가 일치하지 않습니다."),
     MEMBER_NOT_MATCH_RE_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호 재확인이 일치하지 않습니다."),
     MEMBER_SOFT_DELETED(HttpStatus.NOT_FOUND, "이미 탈퇴한 회원입니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh Token 이 유효하지 않습니다."),
+    AUTHENTICATION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Security Context에 인증 정보가 없습니다."),
+    LOGGED_OUT(HttpStatus.UNAUTHORIZED, "로그아웃 된 회원 입니다."),
+    UNMATCHED_MEMBER(HttpStatus.UNAUTHORIZED, "토큰의 회원 정보가 일치하지 않습니다."),
 
     // ADMIN
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 관리자입니다"),
