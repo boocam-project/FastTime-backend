@@ -12,5 +12,6 @@ public class UserNotFoundException extends ApplicationException {
     public UserNotFoundException(String message) {
         super(errorCode, message);
     }
+    public UserNotFoundException(){ super(errorCode);}
 }
 
