@@ -8,6 +8,7 @@ import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.global.util.ResponseDTO;
+import com.fasttime.global.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentRestController {
 
     private final CommentService commentService;
+    private final SecurityUtil securityUtil;
 
     @PostMapping("/{articleId}")
     public ResponseEntity<ResponseDTO<Object>> createComment(@PathVariable long articleId,
-        @Valid @RequestBody CreateCommentRequestDTO createCommentRequestDTO, HttpSession session) {
+        @Valid @RequestBody CreateCommentRequestDTO createCommentRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
             ResponseDTO.res(HttpStatus.CREATED, "댓글을 성공적으로 등록했습니다.",
-                commentService.createComment(articleId, (long) session.getAttribute("MEMBER"),
+                commentService.createComment(articleId, securityUtil.getCurrentMemberId(),
                     createCommentRequestDTO)));
     }
 
@@ -65,18 +67,18 @@ public class CommentRestController {
     @PatchMapping("/{commentId}")
     public ResponseEntity<ResponseDTO<CommentResponseDTO>> updateComment(
         @PathVariable long commentId,
-        @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO, HttpSession session) {
+        @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
-                commentService.updateComment(commentId, (long) session.getAttribute("MEMBER"),
+                commentService.updateComment(commentId, securityUtil.getCurrentMemberId(),
                     updateCommentRequestDTO)));
     }
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ResponseDTO<CommentResponseDTO>> deleteComment(
-        @PathVariable long commentId, HttpSession session) {
+        @PathVariable long commentId) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
-                commentService.deleteComment(commentId, (long) session.getAttribute("MEMBER"))));
+                commentService.deleteComment(commentId, securityUtil.getCurrentMemberId())));
     }
 }
