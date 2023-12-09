@@ -38,7 +38,7 @@ public class CommentService {
             isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
         return commentRepository.save(Comment.builder()
                 .article(Article.builder()
-                    .id(postQueryService.queryById(articleId).getId())
+                    .id(postQueryService.queryById(articleId).id())
                     .build())
                 .member(memberService.getMember(memberId))
                 .content(createCommentRequestDTO.getContent())

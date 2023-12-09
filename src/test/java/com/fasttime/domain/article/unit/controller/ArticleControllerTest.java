@@ -20,7 +20,7 @@ class ArticleControllerTest extends ControllerUnitTestSupporter {
 
         @DisplayName("게시글을 저장할 수 있다.")
         @Test
-        void post_willSave() throws Exception {
+        void article_willSave() throws Exception {
 
             // given
             ArticleCreateRequest requestDto = new ArticleCreateRequest("title",
