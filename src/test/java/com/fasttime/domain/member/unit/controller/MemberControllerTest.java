@@ -43,7 +43,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
- class MemberControllerTest extends ControllerUnitTestSupporter {
+class MemberControllerTest extends ControllerUnitTestSupporter {
 
     @Nested
     @DisplayName("회원가입은")
@@ -169,7 +169,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
             @Test
             @DisplayName("성공한다: 프로필 수정")
-             void updateMember_Success() throws Exception {
+            void updateMember_Success() throws Exception {
                 // Given
                 Member member = new Member();
                 member.setId(1L);
@@ -272,7 +272,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
         @Test
         @DisplayName("실패한다. : 로그인하지 않은 사용자 정보 조회")
-         void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
+        void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
             // Given
             MockHttpSession session = new MockHttpSession();
 
