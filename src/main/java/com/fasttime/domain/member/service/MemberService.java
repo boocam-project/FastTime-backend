@@ -1,59 +1,41 @@
 package com.fasttime.domain.member.service;
 
-import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
+import com.fasttime.domain.member.dto.request.EditRequest;
+import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
 import com.fasttime.domain.member.dto.request.RefreshRequestDto;
 import com.fasttime.domain.member.dto.response.LogInResponseDto;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.dto.response.MemberResponseDto;
+import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
 import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.entity.RefreshToken;
 import com.fasttime.domain.member.entity.Role;
+import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
 import com.fasttime.domain.member.exception.InvalidRefreshTokenException;
 import com.fasttime.domain.member.exception.LoggedOutException;
-import com.fasttime.domain.member.exception.UnmatchedMemberException;
-import com.fasttime.domain.member.repository.RefreshTokenRepository;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.global.exception.ErrorCode;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.exception.EmailAlreadyExistsException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
-import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
-import com.fasttime.domain.member.exception.UserSoftDeletedException;
+import com.fasttime.domain.member.exception.UnmatchedMemberException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.MemberResponse;
-import com.fasttime.global.jwt.JwtProperties;
+import com.fasttime.domain.member.repository.RefreshTokenRepository;
 import com.fasttime.global.jwt.JwtProvider;
 import com.fasttime.global.util.ResponseDTO;
-import java.sql.Ref;
 import java.time.LocalDateTime;
-import jakarta.servlet.http.HttpSession;
 import java.util.Optional;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.exception.UserNotFoundException;
-
-import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -68,54 +50,35 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public void deleteExpiredSoftDeletedMembers() {
-        LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-        memberRepository.deleteByDeletedAtBefore(oneYearAgo);
-    }
+    public ResponseDTO<Object> registerOrRecoverMember(CreateMemberDTO createMemberDTO) {
 
-    public ResponseDTO<Object> registerOrRecoverMember(MemberDto memberDto) {
-        try {
-            LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
-            Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
-                memberDto.getEmail(), oneYearAgo);
+        Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
+            createMemberDTO.getEmail(), LocalDateTime.now().minusYears(1));
 
-            if (softDeletedMember.isPresent()) {
-                
+        if (softDeletedMember.isPresent()) {
+            Member member = softDeletedMember.get();
+            member.restore();
+            member.setNickname(createMemberDTO.getNickname());
+            save(member);
+            return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
 
-                Member member = softDeletedMember.get();
-
-                member.restore();
-                member.setNickname(memberDto.getNickname());
-                save(member);
-                return ResponseDTO.res(ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getHttpStatus(),
-                    ErrorCode.ACCOUNT_RECOVERY_SUCCESSFUL.getMessage());
-            }
-
-            if (isEmailExistsInMember(memberDto.getEmail())) {
-                throw new EmailAlreadyExistsException(ErrorCode.MEMBER_ALREADY_REGISTERED);
-            } else if (checkDuplicateNickname(memberDto.getNickname())) {
-                throw new NicknameAlreadyExistsException(ErrorCode.DUPLICATE_NICKNAME);
-            }
-
-            save(memberDto);
-            return ResponseDTO.res(ErrorCode.REGISTRATION_SUCCESS.getHttpStatus(),
-                ErrorCode.REGISTRATION_SUCCESS.getMessage());
-
-        } catch (EmailAlreadyExistsException | NicknameAlreadyExistsException e) {
-            return ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage());
-        } catch (Exception e) {
-            return ResponseDTO.res(ErrorCode.REGISTRATION_FAILED.getHttpStatus(),
-                ErrorCode.REGISTRATION_FAILED.getMessage() + ": " + e.getMessage());
         }
+        if (isEmailExistsInMember(createMemberDTO.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        } else if (checkDuplicateNickname(createMemberDTO.getNickname())) {
+            throw new NicknameAlreadyExistsException();
+        }
+        save(createMemberDTO);
+        return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
     }
 
 
-    public void save(MemberDto memberDto) {
+    public void save(CreateMemberDTO createMemberDTO) {
 
         Member member = new Member();
-        member.setEmail(memberDto.getEmail());
-        member.setNickname(memberDto.getNickname());
-        member.setPassword(passwordEncoder.encode(memberDto.getPassword()));
+        member.setEmail(createMemberDTO.getEmail());
+        member.setNickname(createMemberDTO.getNickname());
+        member.setPassword(passwordEncoder.encode(createMemberDTO.getPassword()));
         member.setRole(Role.ROLE_USER);
         memberRepository.save(member);
     }
@@ -141,10 +104,10 @@ public class MemberService {
         });
     }
 
-    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws UserNotFoundException {
+    public MyPageInfoDTO getMyPageInfoById(Long memberId) throws MemberNotFoundException {
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new MemberNotFoundException());
 
         return new MyPageInfoDTO(
             member.getNickname(),
@@ -165,29 +128,29 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public Member getMember(Long id) throws UserNotFoundException {
+    public Member getMember(Long id) throws MemberNotFoundException {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+            .orElseThrow(() -> new MemberNotFoundException("User not found with id: " + id));
     }
 
     public MemberResponse rePassword(RePasswordRequest request, Long id) {
         if (request.getPassword().equals(request.getRePassword())) {
-            Member member = memberRepository.findById(id).orElseThrow(UserNotFoundException::new);
+            Member member = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
             member.setPassword(passwordEncoder.encode(request.getPassword()));
             return new MemberResponse(member.getId(), member.getNickname());
         }
-        throw new UserNotMatchRePasswordException();
+        throw new MemberNotMatchRePasswordException();
 
     }
 
-    public LogInResponseDto loginMember(LoginRequestDTO dto) throws UserNotFoundException {
+    public LogInResponseDto loginMember(LoginRequestDTO dto) throws MemberNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
+            () -> new MemberNotFoundException("User not found with email: " + dto.getEmail()));
         if (member.getDeletedAt() != null) {
-            throw new UserNotFoundException("이미 탈퇴한 계정입니다");
+            throw new MemberNotFoundException("이미 탈퇴한 계정입니다");
         }
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new UserNotMatchInfoException();
+            throw new MemberNotMatchInfoException();
         }
         UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject()
@@ -222,6 +185,4 @@ public class MemberService {
             .token(tokenResponseDto)
             .build();
     }
-
-
 }

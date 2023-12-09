@@ -23,6 +23,7 @@ import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.service.RecordService;
+import com.fasttime.global.util.SecurityUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -32,13 +33,14 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-public class RecordControllerDocsTest extends RestDocsSupport {
+class RecordControllerDocsTest extends RestDocsSupport {
 
     private final RecordService recordService = mock(RecordService.class);
+    private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new RecordRestController(recordService);
+        return new RecordRestController(recordService, securityUtil);
     }
 
     ConstraintDescriptions createRecordRequestConstraints = new ConstraintDescriptions(

@@ -7,20 +7,18 @@ import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchServiceRequest;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +29,18 @@ public class AdminService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private final ArticleRepository postRepository;
+    private final ArticleQueryService articleQueryService;
+    private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
     private final AdminEmailRepository adminEmailRepository;
 
 
-    public void save(MemberDto dto) {
+    public void save(CreateMemberDTO dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
-            throw new UserNotMatchInfoException();
+            throw new MemberNotMatchInfoException();
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
             throw new AdminNotFoundException();
@@ -55,33 +54,14 @@ public class AdminService {
         memberRepository.save(member);
     }
 
-
     public List<ArticlesResponse> findReportedPost(int page) {
-        return postRepository.findAllByReportStatus(
-                createSortCondition(page, "createdAt"), ReportStatus.WAIT_FOR_REPORT_REVIEW)
-            .stream()
-            .map(post -> ArticlesResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .nickname(post.getMember().getNickname())
-                .anonymity(post.isAnonymity())
-                .likeCount(post.getLikeCount())
-                .hateCount(post.getHateCount())
-                .createdAt(post.getCreatedAt())
-                .lastModifiedAt(post.getUpdatedAt())
-                .build())
-            .collect(Collectors.toList());
+        return articleQueryService.findReportedArticles(
+            new ReportedArticlesSearchServiceRequest(page, DEFAULT_PAGE_SIZE,
+                ReportStatus.WAIT_FOR_REPORT_REVIEW));
     }
-
-    @NotNull
-    private static PageRequest createSortCondition(int searchPage, String propertyName) {
-        return PageRequest.of(searchPage, DEFAULT_PAGE_SIZE)
-            .withSort(Sort.by(propertyName).descending());
-    }
-
 
     public ArticleResponse findOneReportedPost(Long id) {
-        Article post = postRepository.findById(id)
+        Article post = articleRepository.findById(id)
             .orElseThrow(() -> new ArticleNotFoundException());
         if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new BadArticleReportStatusException();
@@ -100,15 +80,14 @@ public class AdminService {
     }
 
     public void deletePost(Long id) {
-        Article post = postRepository.findById(id)
+        Article article = articleRepository.findById(id)
             .orElseThrow(ArticleNotFoundException::new);
-        postRepository.delete(post);
+        articleRepository.delete(article);
     }
 
     public void passPost(Long id) {
-        Article post = postRepository.findById(id).
+        Article article = articleRepository.findById(id).
             orElseThrow(ArticleNotFoundException::new);
-        post.rejectReport();
+        article.rejectReport();
     }
-
 }

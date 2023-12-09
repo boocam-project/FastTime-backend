@@ -6,7 +6,6 @@ import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.service.RecordService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

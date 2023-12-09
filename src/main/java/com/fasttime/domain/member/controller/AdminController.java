@@ -1,12 +1,8 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.global.util.ResponseDTO;
-import java.rmi.AccessException;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,7 +53,7 @@ public class AdminController {
 
 
     @PostMapping("/join")
-    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid MemberDto dto) {
+    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid CreateMemberDTO dto) {
         adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "관리자 회원가입 완료"));

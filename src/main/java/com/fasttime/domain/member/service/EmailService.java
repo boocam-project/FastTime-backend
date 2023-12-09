@@ -1,11 +1,22 @@
 package com.fasttime.domain.member.service;
 
-import java.util.Random;
+import com.fasttime.domain.member.exception.EmailSendingException;
+import com.fasttime.domain.member.exception.EmailTemplateLoadException;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,71 +25,78 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EmailService {
 
-    private final JavaMailSender emailsender; // Bean 등록해둔 MailConfig 를 emailsender 라는 이름으로 autowired
-    private String authNum; // 인증번호
+    private final JavaMailSender javaMailSender;
 
-    //랜덤 인증 코드 생성
-    public void createCode() {
+
+    private String TEST_ID_EMAIL = "fasttime123@naver.com";
+
+    private final Map<String, String> verificationCodes = new HashMap<>();
+
+    public String sendVerificationEmail(String to) throws Exception {
+        String authCode = generateAuthCode();
+        MimeMessage message = createMessage(to, authCode);
+        try {
+            javaMailSender.send(message);
+            verificationCodes.put(to, authCode);
+            return authCode;
+        } catch (MailException ex) {
+            throw new EmailSendingException();
+        }
+    }
+
+    public boolean verifyEmailCode(String email, String code) {
+        String storedCode = verificationCodes.get(email);
+        return storedCode != null && storedCode.equals(code);
+    }
+
+    private String generateAuthCode() {
         Random random = new Random();
-        StringBuffer key = new StringBuffer();
-
+        StringBuilder key = new StringBuilder();
         for (int i = 0; i < 8; i++) {
             int index = random.nextInt(3);
-
             switch (index) {
                 case 0:
-                    key.append((char) ((int) random.nextInt(26) + 97));
+                    key.append((char) (random.nextInt(26) + 97));
                     break;
                 case 1:
-                    key.append((char) ((int) random.nextInt(26) + 65));
+                    key.append((char) (random.nextInt(26) + 65));
                     break;
                 case 2:
-                    key.append(random.nextInt(9));
+                    key.append(random.nextInt(10));
                     break;
             }
         }
-        authNum = key.toString();
+        return key.toString();
     }
 
-    // 메일 양식 작성
-    public MimeMessage createMessage(String to) throws MessagingException {
-        createCode();
-        String setFrom = "fasttime123@naver.com";
-        String title = "FastTime 인증 번호";
+    private MimeMessage createMessage(String to, String authCode)
+        throws MessagingException, UnsupportedEncodingException {
+        String setFrom = TEST_ID_EMAIL;
+        String title = "회원가입 인증 번호";
 
-        MimeMessage message = emailsender.createMimeMessage();
-        message.addRecipients(MimeMessage.RecipientType.TO, to); // 보내는 대상
-        message.setSubject(title);
-        message.setFrom(setFrom);
-        String n = "";
-        n += "<div style='margin:100px;'>";
-        n += "<h1> 안녕하세요 FastTime 입니다.</h1>";
-        n += "<p>아래 인증 코드를 웹 사이트로 돌아가 입력해주세요.<p>";
-        n += "<br>";
-        n += "<div align='center' style='border:1px solid black; font-family:verdana';>";
-        n += "<h3 style='color:#9AC1D1;'>인증 코드</h3>";
-        n += "<div style='font-size:130%'>";
-        n += "CODE : <strong>";
-        n += authNum + "</strong><div><br/> "; // 메일에 인증번호 넣기
-        n += "</div>";
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        message.setText(n, "utf-8", "html");
+        String emailTemplate = loadEmailTemplate("email_template.html");
+
+        emailTemplate = emailTemplate.replace("{{authCode}}", authCode);
+
+        helper.setSubject(title);
+        helper.setFrom(new InternetAddress(setFrom, "boocam", "UTF-8"));
+        helper.setTo(to);
+        helper.setText(emailTemplate, true);
+
         return message;
     }
 
-
-    // 메일 발송
-    public String sendSimpleMessage(String to) throws Exception {
-        createCode(); // 랜덤 인증코드 생성
-        MimeMessage message = createMessage(to); // 메일 발송
+    private String loadEmailTemplate(String templateName) {
         try {
-            emailsender.send((message));
-        } catch (MailException es) {
-            es.printStackTrace();
-            throw new IllegalArgumentException();
+            Resource resource = new ClassPathResource("templates/" + templateName);
+            InputStream inputStream = resource.getInputStream();
+            byte[] templateBytes = inputStream.readAllBytes();
+            return new String(templateBytes, "UTF-8");
+        } catch (IOException ex) {
+            throw new EmailTemplateLoadException();
         }
-        return authNum; // 메일로 보냈던 인증 코드를 서버로 반환
     }
-
-
 }

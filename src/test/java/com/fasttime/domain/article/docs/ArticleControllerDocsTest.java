@@ -33,6 +33,7 @@ import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.Article
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -46,10 +47,11 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     private final ArticleQueryUseCase articleQueryUseCase = mock(ArticleQueryUseCase.class);
     private final ArticleCommandUseCase articleCommandUseCase = mock(ArticleCommandUseCase.class);
+    private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new ArticleController(articleCommandUseCase, articleQueryUseCase);
+        return new ArticleController(articleCommandUseCase, articleQueryUseCase, securityUtil);
     }
 
     @DisplayName("게시글 작성 API 문서화")
