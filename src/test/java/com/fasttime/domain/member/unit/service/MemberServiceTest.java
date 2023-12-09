@@ -7,13 +7,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.LogInResponseDto;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.dto.request.RePasswordRequest;
-import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -59,10 +60,10 @@ public class MemberServiceTest {
             given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
             //when
-            MemberResponse memberResponse = memberService.loginMember(dto);
+            LogInResponseDto logInResponseDto = memberService.loginMember(dto);
 
             //then
-            assertThat(memberResponse).extracting("id",  "nickname")
+            assertThat(logInResponseDto).extracting("id",  "nickname")
                 .containsExactly(1L, member.getNickname());
 
         }

@@ -7,24 +7,18 @@ import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
+import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchServiceRequest;
 import com.fasttime.domain.member.dto.request.CreateMemberDTO;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
-import com.fasttime.domain.member.entity.Admin;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
-import com.fasttime.domain.member.exception.MemberNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
-import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,66 +29,39 @@ public class AdminService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private final AdminRepository adminRepository;
-    private final ArticleRepository postRepository;
+    private final ArticleQueryService articleQueryService;
+    private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
     private final AdminEmailRepository adminEmailRepository;
 
 
-    public void save(saveAdminDTO dto) {
+    public void save(CreateMemberDTO dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
-            throw new IllegalArgumentException("이미 생성된 이메일입니다.");
+            throw new MemberNotMatchInfoException();
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
-            throw new AdminNotFoundException("Admin not found");
+            throw new AdminNotFoundException();
         }
-        memberService.save(new CreateMemberDTO(dto.getEmail(), dto.getPassword(), dto.getEmail()));
-        adminRepository.save(Admin.builder().member(memberRepository.findByEmail
-            (dto.getEmail()).get()).build());
-    }
 
-    public Long loginAdmin(LoginRequestDTO dto) {
-
-        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new MemberNotFoundException("User not found with email: " + dto.getEmail()));
-
-        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new BadCredentialsException("Not match password!");
-        }
-        return adminRepository.findByMember(member)
-            .orElseThrow(() -> new AdminNotFoundException("Admin not found")).getId();
-
+        Member member = new Member();
+        member.setEmail(dto.getEmail());
+        member.setNickname(dto.getNickname());
+        member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        member.setRole(Role.ROLE_ADMIN);
+        memberRepository.save(member);
     }
 
     public List<ArticlesResponse> findReportedPost(int page) {
-        return postRepository.findAllByReportStatus(
-                createSortCondition(page, "createdAt"), ReportStatus.WAIT_FOR_REPORT_REVIEW)
-            .stream()
-            .map(post -> ArticlesResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .nickname(post.getMember().getNickname())
-                .anonymity(post.isAnonymity())
-                .likeCount(post.getLikeCount())
-                .hateCount(post.getHateCount())
-                .createdAt(post.getCreatedAt())
-                .lastModifiedAt(post.getUpdatedAt())
-                .build())
-            .collect(Collectors.toList());
+        return articleQueryService.findReportedArticles(
+            new ReportedArticlesSearchServiceRequest(page, DEFAULT_PAGE_SIZE,
+                ReportStatus.WAIT_FOR_REPORT_REVIEW));
     }
-
-    @NotNull
-    private static PageRequest createSortCondition(int searchPage, String propertyName) {
-        return PageRequest.of(searchPage, DEFAULT_PAGE_SIZE)
-            .withSort(Sort.by(propertyName).descending());
-    }
-
 
     public ArticleResponse findOneReportedPost(Long id) {
-        Article post = postRepository.findById(id)
+        Article post = articleRepository.findById(id)
             .orElseThrow(() -> new ArticleNotFoundException());
         if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new BadArticleReportStatusException();
@@ -113,15 +80,14 @@ public class AdminService {
     }
 
     public void deletePost(Long id) {
-        Article post = postRepository.findById(id)
-            .orElseThrow(() -> new ArticleNotFoundException());
-        postRepository.delete(post);
+        Article article = articleRepository.findById(id)
+            .orElseThrow(ArticleNotFoundException::new);
+        articleRepository.delete(article);
     }
 
     public void passPost(Long id) {
-        Article post = postRepository.findById(id).
-            orElseThrow(() -> new ArticleNotFoundException());
-        post.rejectReport();
+        Article article = articleRepository.findById(id).
+            orElseThrow(ArticleNotFoundException::new);
+        article.rejectReport();
     }
-
 }

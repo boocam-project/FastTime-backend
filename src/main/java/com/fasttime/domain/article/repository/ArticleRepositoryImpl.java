@@ -7,8 +7,8 @@ import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesS
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 
 public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 

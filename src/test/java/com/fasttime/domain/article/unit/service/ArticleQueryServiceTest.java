@@ -5,14 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-import com.fasttime.domain.article.service.ArticleSettingProvider;
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.ArticleSettingProvider;
+import com.fasttime.domain.member.entity.Member;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

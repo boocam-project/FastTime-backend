@@ -5,7 +5,7 @@ import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.service.RecordService;
 import com.fasttime.global.util.ResponseDTO;
-import jakarta.servlet.http.HttpSession;
+import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,20 +26,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class RecordRestController {
 
     private final RecordService recordService;
+    private final SecurityUtil securityUtil;
 
     @PostMapping
     public ResponseEntity<ResponseDTO<Object>> createLike(
-        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO, HttpSession session) {
+        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO) {
         log.info("CreateRecordRequest: " + createRecordRequestDTO);
-        recordService.createRecord(createRecordRequestDTO, (Long) session.getAttribute("MEMBER"));
+        recordService.createRecord(createRecordRequestDTO, securityUtil.getCurrentMemberId());
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요/싫어요를 성공적으로 등록했습니다."));
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ResponseDTO<RecordDTO>> getRecord(@PathVariable long postId,
-        HttpSession session) {
-        Long memberId = (Long) session.getAttribute("MEMBER");
+    public ResponseEntity<ResponseDTO<RecordDTO>> getRecord(@PathVariable long postId) {
+        Long memberId = securityUtil.getCurrentMemberId();
         log.info("getRecordRequest: postId(" + postId + "), memberId(" + memberId + ")");
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 조회했습니다.",
@@ -48,8 +48,8 @@ public class RecordRestController {
 
     @DeleteMapping
     public ResponseEntity<ResponseDTO<Object>> deleteRecord(
-        @Valid @RequestBody DeleteRecordRequestDTO deleteRecordRequestDTO, HttpSession session) {
-        Long memberId = (Long) session.getAttribute("MEMBER");
+        @Valid @RequestBody DeleteRecordRequestDTO deleteRecordRequestDTO) {
+        Long memberId = securityUtil.getCurrentMemberId();
         log.info(
             "DeleteRecordRequest: postId(" + deleteRecordRequestDTO.getPostId() + "), memberId("
                 + memberId + ")");

@@ -1,11 +1,8 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.global.util.ResponseDTO;
-import java.rmi.AccessException;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +30,7 @@ public class AdminController {
 
     @GetMapping("/{post_id}")
     public ResponseEntity<ResponseDTO> postDetail
-        (@PathVariable("post_id") Long post_id) throws AccessException {
+        (@PathVariable("post_id") Long post_id)  {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 보여줍니다.", adminService.findOneReportedPost(post_id)));
     }
@@ -55,18 +51,9 @@ public class AdminController {
             , "신고가 10번이상된 게시글을 복구합니다."));
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<ResponseDTO> login(@RequestBody @Valid LoginRequestDTO dto,
-        HttpSession session) {
-        if (session.getAttribute("MEMBER") != null) {
-            session.removeAttribute("MEMBER");
-        }
-        session.setAttribute("ADMIN",adminService.loginAdmin(dto));
-        return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "관리자 로그인 완료"));
-    }
+
     @PostMapping("/join")
-    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid saveAdminDTO dto) {
+    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid CreateMemberDTO dto) {
         adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "관리자 회원가입 완료"));

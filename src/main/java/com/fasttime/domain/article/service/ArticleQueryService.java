@@ -66,7 +66,7 @@ public class ArticleQueryService implements ArticleQueryUseCase {
     @Override
     public List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchServiceRequest request) {
         return articleRepository
-            .findAllByReportStatus(cretePageRequest(request), request.getReportStatus())
+            .findAllByReportStatus(cretePageRequest(request), request.reportStatus())
             .stream()
             .map(result -> ArticlesResponse.builder()
                 .id(result.getId())
@@ -80,7 +80,7 @@ public class ArticleQueryService implements ArticleQueryUseCase {
     }
 
     private PageRequest cretePageRequest(ReportedArticlesSearchServiceRequest request) {
-        return PageRequest.of(request.getPageNum(), request.getPageNum(),
+        return PageRequest.of(request.pageNum(), request.pageSize(),
             Sort.by(articleSettingProvider.getDefaultOrderField()).descending());
     }
 }

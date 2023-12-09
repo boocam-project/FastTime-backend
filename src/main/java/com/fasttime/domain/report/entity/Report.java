@@ -1,7 +1,7 @@
 package com.fasttime.domain.report.entity;
 
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

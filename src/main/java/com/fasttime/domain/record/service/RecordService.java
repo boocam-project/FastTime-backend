@@ -1,12 +1,12 @@
 package com.fasttime.domain.record.service;
 
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
 import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
@@ -15,11 +15,11 @@ import com.fasttime.domain.record.exception.AlreadyExistsRecordException;
 import com.fasttime.domain.record.exception.DuplicateRecordException;
 import com.fasttime.domain.record.exception.RecordNotFoundException;
 import com.fasttime.domain.record.repository.RecordRepository;
+import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,14 +39,14 @@ public class RecordService {
         ArticleResponse postResponse = postQueryService.queryById(
             createRecordRequestDTO.getPostId());
         Member member = memberService.getMember(memberId);
-        checkDuplicateRecords(member.getId(), postResponse.getId(),
+        checkDuplicateRecords(member.getId(), postResponse.id(),
             createRecordRequestDTO.getIsLike());
 
         recordRepository.save(
-            Record.builder().member(member).article(Article.builder().id(postResponse.getId()).build())
+            Record.builder().member(member).article(Article.builder().id(postResponse.id()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());
 
-        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.getId(),
+        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.id(),
             createRecordRequestDTO.getIsLike(), true));
     }
 

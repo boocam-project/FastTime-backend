@@ -13,7 +13,8 @@ public interface ArticleQueryUseCase {
 
     List<ArticlesResponse> search(ArticlesSearchServiceRequest request);
 
-    List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchServiceRequest searchCondition);
+    List<ArticlesResponse> findReportedArticles(
+        ReportedArticlesSearchServiceRequest searchCondition);
 
     @Getter
     class ArticlesSearchServiceRequest {
@@ -25,7 +26,8 @@ public interface ArticleQueryUseCase {
         private final int page;
 
         @Builder
-        private ArticlesSearchServiceRequest(String nickname, String title, int likeCount, int pageSize,
+        private ArticlesSearchServiceRequest(String nickname, String title, int likeCount,
+            int pageSize,
             int page) {
             this.nickname = nickname;
             this.title = title;
@@ -35,11 +37,9 @@ public interface ArticleQueryUseCase {
         }
     }
 
-    @Getter
-    class ReportedArticlesSearchServiceRequest {
+    record ReportedArticlesSearchServiceRequest(int pageNum,
+                                                int pageSize,
+                                                ReportStatus reportStatus) {
 
-        private int pageNum;
-        private int pageSize;
-        private ReportStatus reportStatus;
     }
 }

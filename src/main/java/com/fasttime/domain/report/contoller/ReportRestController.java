@@ -3,7 +3,7 @@ package com.fasttime.domain.report.contoller;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.service.ReportService;
 import com.fasttime.global.util.ResponseDTO;
-import jakarta.servlet.http.HttpSession;
+import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportRestController {
 
     private final ReportService reportService;
+    private final SecurityUtil securityUtil;
 
     @PostMapping
     public ResponseEntity<ResponseDTO<Object>> createReport(
-        @Valid @RequestBody CreateReportRequestDTO createReportRequestDTO, HttpSession session) {
+        @Valid @RequestBody CreateReportRequestDTO createReportRequestDTO) {
         log.info("CreateReportRequest: " + createReportRequestDTO);
-        reportService.createReport(createReportRequestDTO, (Long) session.getAttribute("MEMBER"));
+        reportService.createReport(createReportRequestDTO, securityUtil.getCurrentMemberId());
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, "신고를 성공적으로 접수했습니다."));
     }

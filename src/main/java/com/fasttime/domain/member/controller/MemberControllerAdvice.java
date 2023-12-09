@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice(basePackages = "com.fasttime.domain.member")
 public class MemberControllerAdvice {
 
-    @ExceptionHandler
+    @ExceptionHandler   // 비밀번호가 틀리거나 비밀번호 재확인이 일치하지않는 예외
     public ResponseEntity<ResponseDTO<Object>> badCredentialsException(BadCredentialsException e) {
         Map<String, Object> message = new HashMap<>();
         message.put("error", e.getMessage());
@@ -33,8 +34,7 @@ public class MemberControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ResponseDTO> memberNotFoundException(MemberNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-            ResponseDTO.res(HttpStatus.NOT_FOUND,
-                e.getMessage()));
+            ResponseDTO.res(HttpStatus.NOT_FOUND, e.getMessage()));
     }
 
     @ExceptionHandler
@@ -77,7 +77,10 @@ public class MemberControllerAdvice {
             .body(ResponseDTO.res(e.getErrorCode().getHttpStatus(), e.getErrorCode().getMessage()));
     }
 
-
+    @ExceptionHandler // email 로 접근할 때,
+    public ResponseEntity<ResponseDTO> userNameNotFoundException(UsernameNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage())
+        );
+    }
 }
-
-

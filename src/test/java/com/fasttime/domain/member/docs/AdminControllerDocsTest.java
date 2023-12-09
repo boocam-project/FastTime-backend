@@ -1,34 +1,27 @@
 package com.fasttime.domain.member.docs;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
-import com.fasttime.domain.member.controller.AdminController;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
-import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
+import com.fasttime.domain.member.controller.AdminController;
+import com.fasttime.domain.member.service.AdminService;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -201,43 +194,28 @@ class AdminControllerDocsTest extends RestDocsSupport {
                 pathParameters(
                     parameterWithName("id").description("게시글 식별자"))));
     }
-    @DisplayName("관리자 계정 로그인 API 문서화")
-    @Test
-    void login() throws Exception {
+
+//    @Disabled
+//    @Test
+//    void join() throws Exception {
         //given
-        LoginRequestDTO dto = new LoginRequestDTO("admin@gmail.com", "testPassword");
-        when(adminService.loginAdmin(any(LoginRequestDTO.class))).thenReturn(1L);
-        String data = new ObjectMapper().writeValueAsString(dto);
-
-        //when then
-        mockMvc.perform(post("/api/v1/admin/login")
-                .contentType(MediaType.APPLICATION_JSON).content(data))
-            .andExpect(status().isOk()).andDo(
-                document("admin-login", preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint()), requestFields(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
-                            .attributes(key("constraints").value("Not Blank")),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                            .attributes(key("constraints").value("Not Blank")))));
-    }
-    @DisplayName("관리자 계정 회원가입 API 문서화")
-    @Test
-    void join() throws Exception {
-        //given
-        saveAdminDTO dto = new saveAdminDTO("testAdmin@gmail.com", "1234");
-        doNothing().when(adminService).save(any(saveAdminDTO.class));
-        String data = new ObjectMapper().writeValueAsString(dto);
-
-        //when then
-        mockMvc.perform(post("/api/v1/admin/join")
-                .contentType(MediaType.APPLICATION_JSON).content(data))
-            .andExpect(status().isOk()).andDo(
-                document("admin-join", preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint()), requestFields(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
-                            .attributes(key("constraints").value("Not Blank")),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                            .attributes(key("constraints").value("Not Blank")))));
-    }
-
+//        MemberDto dto = MemberDto.builder()
+//            .email("test@gmail.com")
+//            .nickname("memberNickname")
+//            .password("1234")
+//            .build();
+//        doNothing().when(adminService).save(any(MemberDto.class));
+//        String data = new ObjectMapper().writeValueAsString(dto);
+//
+//        //when then
+//        mockMvc.perform(post("/api/v1/admin/join")
+//                .contentType(MediaType.APPLICATION_JSON).content(data))
+//            .andExpect(status().isOk()).andDo(
+//                document("admin-join", preprocessRequest(prettyPrint()),
+//                    preprocessResponse(prettyPrint()), requestFields(
+//                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+//                            .attributes(key("constraints").value("Not Blank")),
+//                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+//                            .attributes(key("constraints").value("Not Blank")))));
+//    }
 }

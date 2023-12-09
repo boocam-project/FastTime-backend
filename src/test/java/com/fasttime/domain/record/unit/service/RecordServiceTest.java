@@ -8,13 +8,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.service.ArticleCommandService;
-import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
 import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.record.dto.RecordDTO;
 import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
@@ -24,11 +24,11 @@ import com.fasttime.domain.record.exception.DuplicateRecordException;
 import com.fasttime.domain.record.exception.RecordNotFoundException;
 import com.fasttime.domain.record.repository.RecordRepository;
 import com.fasttime.domain.record.service.RecordService;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -115,7 +115,7 @@ public class RecordServiceTest {
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.getId()).build())
+                Record.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(true).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
@@ -139,7 +139,7 @@ public class RecordServiceTest {
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.getId()).build())
+                Record.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(false).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);

@@ -27,6 +27,7 @@ import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
 import com.fasttime.domain.comment.service.CommentService;
+import com.fasttime.global.util.SecurityUtil;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,10 +40,11 @@ import org.springframework.restdocs.payload.JsonFieldType;
 class CommentControllerDocsTest extends RestDocsSupport {
 
     private final CommentService commentService = mock(CommentService.class);
+    private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new CommentRestController(commentService);
+        return new CommentRestController(commentService, securityUtil);
     }
 
     ConstraintDescriptions createCommentRequestConstraints = new ConstraintDescriptions(
