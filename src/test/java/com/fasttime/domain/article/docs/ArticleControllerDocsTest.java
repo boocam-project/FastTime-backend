@@ -32,7 +32,7 @@ import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.Article
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
 import com.fasttime.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,9 +66,9 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .anonymity(requestDto.isAnonymity())
+                .title(requestDto.title())
+                .content(requestDto.content())
+                .anonymity(requestDto.anonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(null)
                 .build());
@@ -118,7 +118,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
     void searchArticles() throws Exception {
 
         // given
-        ArticlesSearchServiceRequest.builder()
+        ArticlesSearchRequest.builder()
             .title("패스")
             .nickname("패캠러")
             .likeCount(10)
@@ -126,7 +126,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .page(0)
             .build();
 
-        when(articleQueryUseCase.search(any(ArticlesSearchServiceRequest.class)))
+        when(articleQueryUseCase.search(any(ArticlesSearchRequest.class)))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
                     .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
@@ -195,9 +195,9 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .anonymity(requestDto.isAnonymity())
+                .title(requestDto.title())
+                .content(requestDto.content())
+                .anonymity(requestDto.anonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());
@@ -248,8 +248,8 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             .thenReturn(ArticleResponse.builder()
                 .id(1L)
                 .nickname("패캠러")
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
+                .title(requestDto.title())
+                .content(requestDto.content())
                 .anonymity(false)
                 .likeCount(5)
                 .hateCount(1)

@@ -10,7 +10,7 @@ import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.Article
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -81,7 +81,6 @@ public class ArticleController {
 
         Long memberId = securityUtil.getCurrentMemberId();
 
-
         articleCommandUseCase.delete(new ArticleDeleteServiceRequest(
             requestDto.articleId(),
             memberId,
@@ -108,7 +107,7 @@ public class ArticleController {
         @RequestParam(defaultValue = "0") int page) {
 
         List<ArticlesResponse> serviceResponse = articleQueryUseCase.search(
-            ArticlesSearchServiceRequest.builder()
+            ArticlesSearchRequest.builder()
                 .title(title)
                 .nickname(nickname)
                 .likeCount(likeCount)
