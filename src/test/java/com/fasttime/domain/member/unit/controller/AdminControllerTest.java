@@ -49,7 +49,7 @@ public class AdminControllerTest {
                 .id(1L)
                 .title("testTitle1")
                 .nickname("땅땅띠라랑")
-                .anonymity(true)
+                .isAnonymity(true)
                 .likeCount(0)
                 .hateCount(0)
                 .build();
@@ -57,7 +57,7 @@ public class AdminControllerTest {
                 .id(2L)
                 .nickname("땅땅띠라랑")
                 .title("testTitle2")
-                .anonymity(true)
+                .isAnonymity(true)
                 .likeCount(0)
                 .hateCount(0)
                 .build();
@@ -89,7 +89,7 @@ public class AdminControllerTest {
                 .id(1L)
                 .title("testTitle1")
                 .nickname("땅땅띠라랑")
-                .anonymity(true)
+                .isAnonymity(true)
                 .likeCount(0)
                 .hateCount(0)
                 .build();

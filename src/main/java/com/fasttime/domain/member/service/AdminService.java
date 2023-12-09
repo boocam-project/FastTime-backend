@@ -71,7 +71,7 @@ public class AdminService {
             .title(post.getTitle())
             .content(post.getContent())
             .nickname(post.getMember().getNickname())
-            .anonymity(post.isAnonymity())
+            .isAnonymity(post.isAnonymity())
             .likeCount(post.getLikeCount())
             .hateCount(post.getHateCount())
             .createdAt(post.getCreatedAt())

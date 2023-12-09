@@ -17,7 +17,7 @@ public interface ArticleCommandUseCase {
         Long memberId,
         String title,
         String content,
-        boolean anonymity) {
+        boolean isAnonymity) {
 
     }
 

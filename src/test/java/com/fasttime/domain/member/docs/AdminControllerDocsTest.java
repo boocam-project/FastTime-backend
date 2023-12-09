@@ -46,13 +46,13 @@ class AdminControllerDocsTest extends RestDocsSupport {
         when(adminService.findReportedPost(0))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
-                    .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패캠러").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
                 ArticlesResponse.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
-                    .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패캠러123").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
                 ArticlesResponse.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
-                    .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패컴러1").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build()
             ));
 
@@ -73,7 +73,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data[].title").type(JsonFieldType.STRING).description("게시글 제목"),
                     fieldWithPath("data[].nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
-                    fieldWithPath("data[].anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data[].isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data[].commentCounts").type(JsonFieldType.NUMBER)
                         .description("댓글 수"),
@@ -101,7 +101,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(requestDto.anonymity())
+                .isAnonymity(requestDto.isAnonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());
@@ -126,7 +126,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
-                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
@@ -148,7 +148,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(requestDto.anonymity())
+                .isAnonymity(requestDto.isAnonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());
@@ -178,7 +178,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(requestDto.anonymity())
+                .isAnonymity(requestDto.isAnonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());

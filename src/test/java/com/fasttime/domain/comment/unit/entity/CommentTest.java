@@ -21,7 +21,7 @@ public class CommentTest {
             .anonymity(anonymity).parentComment(null).build();
 
         // then
-        assertThat(comment).extracting("content", "anonymity", "parentComment")
+        assertThat(comment).extracting("content", "isAnonymity", "parentComment")
             .containsExactly(content, anonymity, null);
     }
 
@@ -37,7 +37,7 @@ public class CommentTest {
         comment.updateContent(content);
 
         // then
-        assertThat(comment).extracting("content", "anonymity", "parentComment")
+        assertThat(comment).extracting("content", "isAnonymity", "parentComment")
             .containsExactly(content, true, null);
     }
 

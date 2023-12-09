@@ -31,7 +31,7 @@ public class ArticleCommandService implements ArticleCommandUseCase {
 
         final Member writeMember = memberService.getMember(serviceDto.memberId());
         final Article createdArticle = Article.createNewArticle(writeMember, serviceDto.title(),
-            serviceDto.content(), serviceDto.anonymity());
+            serviceDto.content(), serviceDto.isAnonymity());
 
         Article savedArticle = postRepository.save(createdArticle);
 
@@ -41,7 +41,7 @@ public class ArticleCommandService implements ArticleCommandUseCase {
             .content(savedArticle.getContent())
             .nickname(savedArticle.isAnonymity() ? articleSettingProvider.getAnonymousNickname()
                 : savedArticle.getMember().getNickname())
-            .anonymity(savedArticle.isAnonymity())
+            .isAnonymity(savedArticle.isAnonymity())
             .likeCount(savedArticle.getLikeCount())
             .hateCount(savedArticle.getHateCount())
             .createdAt(savedArticle.getCreatedAt())
@@ -62,7 +62,7 @@ public class ArticleCommandService implements ArticleCommandUseCase {
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
-            .anonymity(post.isAnonymity())
+            .isAnonymity(post.isAnonymity())
             .likeCount(post.getLikeCount())
             .hateCount(post.getHateCount())
             .build();
