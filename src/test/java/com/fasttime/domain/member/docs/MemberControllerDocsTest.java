@@ -3,7 +3,10 @@ package com.fasttime.domain.member.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -28,8 +31,12 @@ import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.dto.request.EditRequest;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
 import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.request.RefreshRequestDto;
+import com.fasttime.domain.member.dto.response.LogInResponseDto;
 import com.fasttime.domain.member.dto.response.MemberResponse;
+import com.fasttime.domain.member.dto.response.MemberResponseDto;
 import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
+import com.fasttime.domain.member.dto.response.TokenResponseDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
@@ -56,48 +63,143 @@ class MemberControllerDocsTest extends RestDocsSupport {
         return new MemberController(memberService, memberRepository, securityUtil);
     }
 
-    @Disabled
+
+    @Test
     @DisplayName("회원 로그인 API 문서화")
-    @Test
     void login() throws Exception {
-        //given
-        LoginRequestDTO dto = new LoginRequestDTO("123@gmail.com", "testPassword");
-        MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
-//        when(memberService.loginMember(any(LoginRequestDTO.class))).thenReturn(memberResponse);
-        String data = new ObjectMapper().writeValueAsString(dto);
+        // given
+        LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
+            .email("test@mail.com")
+            .password("qwer1234$$")
+            .build();
+        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+            .memberId(1L)
+            .email("test@mail.com")
+            .nickname("test")
+            .image("")
+            .build();
+        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+            .grantType("Bearer")
+            .accessToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+            .accessTokenExpiresIn(1700586928520L)
+            .refreshToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+            .build();
+        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
+            .member(memberResponseDto)
+            .token(tokenResponseDto)
+            .build();
 
-        //when then
-        mockMvc.perform(post("/api/v1/login").contentType(MediaType.APPLICATION_JSON).content(data))
-            .andExpect(status().isOk()).andDo(
-                document("member-login", preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint()), requestFields(
-                        fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
-                            .attributes(key("constraints").value("Not Blank")),
-                        fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
-                            .attributes(key("constraints").value("Not Blank"))), responseFields(
-                        fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                        fieldWithPath("message").type(JsonFieldType.STRING).optional()
-                            .description("메시지"),
-                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
-                        fieldWithPath("data.nickname").type(JsonFieldType.STRING)
-                            .description("사용자 닉네임"))));
+        given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(logInResponseDto);
+
+
+        // when
+        mockMvc.perform(post("/api/v2/login")
+                .content(objectMapper.writeValueAsString(loginRequestDTO))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("member-login", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), requestFields(
+                    fieldWithPath("email").type(JsonFieldType.STRING).description("이메일")
+                        .attributes(key("constraints").value("Not Blank")),
+                    fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                        .attributes(key("constraints").value("Not Blank"))), responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
+                    fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
+                        .description("회원 식별자"),
+                    fieldWithPath("data.member.email").type(JsonFieldType.STRING)
+                        .description("이메일"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.image").type(JsonFieldType.STRING)
+                        .description("프로필 이미지"),
+                    fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
+                    fieldWithPath("data.token.grantType").type(JsonFieldType.STRING)
+                        .description("권한 부여 유형"),
+                    fieldWithPath("data.token.accessToken").type(JsonFieldType.STRING)
+                        .description("Access Token"),
+                    fieldWithPath("data.token.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                        .description("Access Token 만료 날짜"),
+                    fieldWithPath("data.token.refreshToken").type(JsonFieldType.STRING)
+                        .description("Refresh Token")
+                )
+            ));
+
     }
 
-    @DisplayName("회원 로그아웃 API 문서화")
     @Test
-    void logout() throws Exception {
-        //given
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
+    @DisplayName("토큰 재발급 API 문서화")
+    void refresh() throws Exception {
+        // given
+        RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+            .accessToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+            .refreshToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+            .build();
+        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+            .memberId(1L)
+            .email("test@mail.com")
+            .nickname("test")
+            .image("")
+            .build();
+        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+            .grantType("Bearer")
+            .accessToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+            .accessTokenExpiresIn(1700586928520L)
+            .refreshToken(
+                "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+            .build();
+        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
+            .member(memberResponseDto)
+            .token(tokenResponseDto)
+            .build();
 
-        //when then
-        mockMvc.perform(
-                get("/api/v1/logout").contentType(MediaType.APPLICATION_JSON).session(session))
-            .andExpect(status().isOk()).andDo(
-                document("member-logout", preprocessRequest(prettyPrint()),
-                    preprocessResponse(prettyPrint())));
+        given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(logInResponseDto);
+
+        // when
+        mockMvc.perform(post("/api/v2/refresh")
+                .content(objectMapper.writeValueAsString(refreshRequestDto))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("member-refresh", preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()), requestFields(
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                        .description("Access Token")
+                        .attributes(key("constraints").value("Not Blank")),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING)
+                        .description("Refresh Token")
+                        .attributes(key("constraints").value("Not Blank"))), responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
+                    fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
+                    fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
+                        .description("회원 식별자"),
+                    fieldWithPath("data.member.email").type(JsonFieldType.STRING)
+                        .description("이메일"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.image").type(JsonFieldType.STRING)
+                        .description("프로필 이미지"),
+                    fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
+                    fieldWithPath("data.token.grantType").type(JsonFieldType.STRING)
+                        .description("권한 부여 유형"),
+                    fieldWithPath("data.token.accessToken").type(JsonFieldType.STRING)
+                        .description("Access Token"),
+                    fieldWithPath("data.token.accessTokenExpiresIn").type(JsonFieldType.NUMBER)
+                        .description("Access Token 만료 날짜"),
+                    fieldWithPath("data.token.refreshToken").type(JsonFieldType.STRING)
+                        .description("Refresh Token")
+                )
+            ));
+
     }
+
+
 
     @DisplayName("회원 비밀번호 재설정 API 문서화")
     @Test
