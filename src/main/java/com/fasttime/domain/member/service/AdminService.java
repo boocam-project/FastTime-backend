@@ -8,25 +8,19 @@ import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
-import com.fasttime.domain.member.entity.Admin;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.UserNotMatchInfoException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
-import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import java.rmi.AccessException;
-import java.time.LocalDateTime;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +31,6 @@ public class AdminService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private final AdminRepository adminRepository;
     private final ArticleRepository postRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
@@ -45,31 +38,23 @@ public class AdminService {
     private final AdminEmailRepository adminEmailRepository;
 
 
-    public void save(saveAdminDTO dto) {
+    public void save(MemberDto dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
-            throw new IllegalArgumentException("이미 생성된 이메일입니다.");
+            throw new UserNotMatchInfoException();
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
-            throw new AdminNotFoundException("Admin not found");
+            throw new AdminNotFoundException();
         }
-        memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
-        adminRepository.save(Admin.builder().member(memberRepository.findByEmail
-            (dto.getEmail()).get()).build());
+
+        Member member = new Member();
+        member.setEmail(dto.getEmail());
+        member.setNickname(dto.getNickname());
+        member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        member.setRole(Role.ROLE_ADMIN);
+        memberRepository.save(member);
     }
 
-    public Long loginAdmin(LoginRequestDTO dto) {
-
-        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
-
-        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new BadCredentialsException("Not match password!");
-        }
-        return adminRepository.findByMember(member)
-            .orElseThrow(() -> new AdminNotFoundException("Admin not found")).getId();
-
-    }
 
     public List<ArticlesResponse> findReportedPost(int page) {
         return postRepository.findAllByReportStatus(
@@ -116,13 +101,13 @@ public class AdminService {
 
     public void deletePost(Long id) {
         Article post = postRepository.findById(id)
-            .orElseThrow(() -> new ArticleNotFoundException());
+            .orElseThrow(ArticleNotFoundException::new);
         postRepository.delete(post);
     }
 
     public void passPost(Long id) {
         Article post = postRepository.findById(id).
-            orElseThrow(() -> new ArticleNotFoundException());
+            orElseThrow(ArticleNotFoundException::new);
         post.rejectReport();
     }
 
