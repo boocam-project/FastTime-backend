@@ -62,7 +62,7 @@ public class AdminService {
 
     public ArticleResponse findOneReportedPost(Long id) {
         Article post = articleRepository.findById(id)
-            .orElseThrow(() -> new ArticleNotFoundException());
+            .orElseThrow(ArticleNotFoundException::new);
         if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new BadArticleReportStatusException();
         }

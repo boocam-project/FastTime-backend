@@ -19,6 +19,7 @@ import com.fasttime.domain.member.exception.LoggedOutException;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.exception.UnmatchedMemberException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
@@ -107,7 +108,7 @@ public class MemberService {
     public MyPageInfoDTO getMyPageInfoById(Long memberId) throws MemberNotFoundException {
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException());
+            .orElseThrow(MemberNotFoundException::new);
 
         return new MyPageInfoDTO(
             member.getNickname(),
@@ -130,7 +131,7 @@ public class MemberService {
 
     public Member getMember(Long id) throws MemberNotFoundException {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new MemberNotFoundException("User not found with id: " + id));
+            .orElseThrow(MemberNotFoundException::new);
     }
 
     public MemberResponse rePassword(RePasswordRequest request, Long id) {
@@ -145,9 +146,9 @@ public class MemberService {
 
     public LogInResponseDto loginMember(LoginRequestDTO dto) throws MemberNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new MemberNotFoundException("User not found with email: " + dto.getEmail()));
+            MemberNotMatchInfoException::new);
         if (member.getDeletedAt() != null) {
-            throw new MemberNotFoundException("이미 탈퇴한 계정입니다");
+            throw new MemberSoftDeletedException();
         }
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new MemberNotMatchInfoException();
