@@ -8,7 +8,7 @@ public record ArticlesResponse(
     Long id,
     String title,
     String nickname,
-    boolean anonymity,
+    boolean isAnonymity,
     int commentCounts,
     int likeCount,
     int hateCount,

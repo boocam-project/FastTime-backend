@@ -66,7 +66,7 @@ class ArticleCommandServiceTest {
             ArticleResponse response = postCommandService.write(dto);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
+            assertThat(response).extracting("id", "title", "content", "nickname", "isAnonymity", "likeCount", "hateCount")
                 .containsExactly(1L, "title", "content", articleSettingProvider.getAnonymousNickname(), true, 0, 0);
         }
 
@@ -107,7 +107,7 @@ class ArticleCommandServiceTest {
             ArticleResponse response = postCommandService.update(serviceDto);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
+            assertThat(response).extracting("id", "title", "content", "isAnonymity", "likeCount",
                     "hateCount")
                 .containsExactly(1L, "new title", "newContent", true, 0, 0);
         }

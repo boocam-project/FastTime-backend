@@ -69,7 +69,7 @@ public class ArticleQueryServiceTest {
 
             // then
             assertThat(response)
-                .extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
+                .extracting("id", "title", "content", "nickname", "isAnonymity", "likeCount", "hateCount")
                 .containsExactly(id, title, content, anonymity ? articleSettingProvider.getAnonymousNickname() : nickname, anonymity, likeCount, hateCount);
         }
 

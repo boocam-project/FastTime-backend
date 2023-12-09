@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.article.controller.ArticleController;
+import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
 import com.fasttime.domain.article.dto.controller.request.ArticleDeleteRequest;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
@@ -59,7 +60,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
     void createArticle() throws Exception {
 
         // given
-        ArticleCreateServiceRequest requestDto = new ArticleCreateServiceRequest(1L, "게시글 제목입니다.",
+        ArticleCreateRequest requestDto = new ArticleCreateRequest("게시글 제목입니다.",
             "게시글 본문입니다.", false);
 
         when(articleCommandUseCase.write(any(ArticleCreateServiceRequest.class)))
@@ -68,7 +69,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(requestDto.anonymity())
+                .isAnonymity(requestDto.isAnonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(null)
                 .build());
@@ -86,11 +87,10 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestFields(
-                    fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자"),
                     fieldWithPath("title").type(JsonFieldType.STRING).description("제목")
                         .attributes(key("constraints").value("50자 이하")),
                     fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
+                    fieldWithPath("isAnonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
@@ -102,7 +102,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
-                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
@@ -129,13 +129,13 @@ class ArticleControllerDocsTest extends RestDocsSupport {
         when(articleQueryUseCase.search(any(ArticlesSearchRequest.class)))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
-                    .nickname("패캠러").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패캠러").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
                 ArticlesResponse.builder().id(2L).title("패스트캠퍼스를 아시나요?").likeCount(20).hateCount(5)
-                    .nickname("패캠러123").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패캠러123").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build(),
                 ArticlesResponse.builder().id(3L).title("공무원합격 패스는 ㅇㅇㅇ").likeCount(20).hateCount(3)
-                    .nickname("패컴러1").anonymity(false).createdAt(LocalDateTime.now())
+                    .nickname("패컴러1").isAnonymity(false).createdAt(LocalDateTime.now())
                     .lastModifiedAt(LocalDateTime.now()).build()
             ));
 
@@ -167,7 +167,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data[].title").type(JsonFieldType.STRING).description("게시글 제목"),
                     fieldWithPath("data[].nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
-                    fieldWithPath("data[].anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data[].isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data[].commentCounts").type(JsonFieldType.NUMBER)
                         .description("댓글 수"),
@@ -197,7 +197,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(requestDto.anonymity())
+                .isAnonymity(requestDto.isAnonymity())
                 .createdAt(LocalDateTime.now())
                 .lastModifiedAt(LocalDateTime.now())
                 .build());
@@ -222,7 +222,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
-                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
@@ -250,7 +250,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .nickname("패캠러")
                 .title(requestDto.title())
                 .content(requestDto.content())
-                .anonymity(false)
+                .isAnonymity(false)
                 .likeCount(5)
                 .hateCount(1)
                 .createdAt(LocalDateTime.now())
@@ -273,7 +273,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("title").type(JsonFieldType.STRING).description("제목")
                         .attributes(new Attribute("constraints", "50자 이하")),
                     fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
+                    fieldWithPath("isAnonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
@@ -285,7 +285,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
-                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
