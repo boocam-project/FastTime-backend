@@ -96,7 +96,7 @@ public class AdminControllerTest {
 
             when(adminService.findOneReportedPost(anyLong())).thenReturn(article1);
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{article_id}", article1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{article_id}", article1.id()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.title").exists())

@@ -79,8 +79,8 @@ public class AdminServiceTest {
             List<ArticlesResponse> postList = adminService.findReportedPost(0);
 
             //then
-            Assertions.assertThat(postList.get(0).getTitle()).isEqualTo(article1.getTitle());
-            Assertions.assertThat(postList.get(1).getTitle()).isEqualTo(article2.getTitle());
+            Assertions.assertThat(postList.get(0).title()).isEqualTo(article1.getTitle());
+            Assertions.assertThat(postList.get(1).title()).isEqualTo(article2.getTitle());
         }
 
         @DisplayName("신고된 게시물들이 없어 조회 할 수 없다.")
@@ -118,7 +118,7 @@ public class AdminServiceTest {
             ArticleResponse oneReportedPost = adminService.findOneReportedPost(1L);
 
             //then
-            Assertions.assertThat(oneReportedPost.getTitle()).isEqualTo(article1.getTitle());
+            Assertions.assertThat(oneReportedPost.title()).isEqualTo(article1.getTitle());
         }
 
         @DisplayName("신고된 게시글이 존재하지 않아 조회 할 수 없다.")

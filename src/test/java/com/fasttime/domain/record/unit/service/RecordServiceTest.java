@@ -115,7 +115,7 @@ public class RecordServiceTest {
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.getId()).build())
+                Record.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(true).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
@@ -139,7 +139,7 @@ public class RecordServiceTest {
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.getId()).build())
+                Record.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(false).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
