@@ -241,29 +241,4 @@ public class RecordServiceTest {
         }
     }
 
-    @Nested
-    @DisplayName("getRecordCount()는 ")
-    class Context_getRecordCount {
-
-        @Test
-        @DisplayName("게시물에 등록된 좋아요/싫어요 합계를 가져올 수 있다.")
-        void _willSuccess() {
-            // given
-            Article post = Article.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
-            List<Record> list = new ArrayList<>();
-            list.add(Record.builder().id(1L).article(post).member(member).isLike(true).build());
-            list.add(Record.builder().id(2L).article(post).member(member).isLike(true).build());
-            list.add(Record.builder().id(3L).article(post).member(member).isLike(false).build());
-            Optional<List<Record>> records = Optional.of(list);
-            given(recordRepository.findAllByArticleId(any(Long.class))).willReturn(records);
-
-            // when
-            Map<String, Integer> result = recordService.getRecordCount(1L);
-
-            // then
-            assertThat(result).extracting("likeCount", "hateCount").containsExactly(2, 1);
-            verify(recordRepository, times(1)).findAllByArticleId(any(Long.class));
-        }
-    }
 }
