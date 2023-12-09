@@ -5,6 +5,7 @@ import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
 import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
 import com.fasttime.domain.record.service.RecordService;
 import com.fasttime.global.util.ResponseDTO;
+import com.fasttime.global.util.SecurityUtil;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/record")
 public class RecordRestController {
 
+    private final RecordService recordService;
+    private final SecurityUtil securityUtil;
   private final RecordService recordService;
 
+    @PostMapping
+    public ResponseEntity<ResponseDTO<Object>> createLike(
+        @Valid @RequestBody CreateRecordRequestDTO createRecordRequestDTO) {
+        log.info("CreateRecordRequest: " + createRecordRequestDTO);
+        recordService.createRecord(createRecordRequestDTO, securityUtil.getCurrentMemberId());
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요/싫어요를 성공적으로 등록했습니다."));
+    }
   /**
    * @apiNote 이 메서드는 사용자의 좋아요/싫어요 요청을 생성한다.
    * @param createRecordRequestDTO 좋아요/싫어요 생성 요청 데이터
