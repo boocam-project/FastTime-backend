@@ -26,12 +26,12 @@ public class ArticleReportService implements ArticleReportUseCase {
     @Override
     public void acceptReport(ArticleReportServiceRequest request) {
         Article targetArticle = getById(request);
-        targetArticle.approveReport(request.getRequestTimeStamp());
+        targetArticle.approveReport(request.requestTimeStamp());
     }
 
     private Article getById(ArticleReportServiceRequest request) {
-        return articleRepository.findById(request.getArticleId())
-            .orElseThrow(() -> new ArticleNotFoundException(request.getArticleId()));
+        return articleRepository.findById(request.articleId())
+            .orElseThrow(() -> new ArticleNotFoundException(request.articleId()));
     }
 
     @Override

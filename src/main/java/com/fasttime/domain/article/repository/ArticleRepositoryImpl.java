@@ -3,7 +3,7 @@ package com.fasttime.domain.article.repository;
 
 import static com.fasttime.domain.article.entity.QArticle.article;
 
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,7 +19,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleQueryResponse> search(ArticlesSearchServiceRequest searchCondition) {
+    public List<ArticleQueryResponse> search(ArticlesSearchRequest searchCondition) {
         return jpaQueryFactory
             .select(Projections.fields(ArticleQueryResponse.class,
                 article.id,
@@ -36,25 +36,25 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
             ))
             .from(article)
             .where(createSearchConditionBuilder(searchCondition))
-            .offset((long) searchCondition.getPage() * searchCondition.getPageSize())
-            .limit(searchCondition.getPageSize())
+            .offset((long) searchCondition.page() * searchCondition.pageSize())
+            .limit(searchCondition.pageSize())
             .orderBy(article.createdAt.desc())
             .fetch();
     }
 
-    private BooleanBuilder createSearchConditionBuilder(ArticlesSearchServiceRequest searchCondition) {
+    private BooleanBuilder createSearchConditionBuilder(ArticlesSearchRequest searchCondition) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        if (!isEmpty(searchCondition.getTitle())) {
-            booleanBuilder.and(article.title.contains(searchCondition.getTitle()));
+        if (!isEmpty(searchCondition.title())) {
+            booleanBuilder.and(article.title.contains(searchCondition.title()));
         }
 
-        if (!isEmpty(searchCondition.getNickname())) {
-            booleanBuilder.and(article.member.nickname.contains(searchCondition.getNickname()));
+        if (!isEmpty(searchCondition.nickname())) {
+            booleanBuilder.and(article.member.nickname.contains(searchCondition.nickname()));
         }
 
-        if (searchCondition.getLikeCount() > 0) {
-            booleanBuilder.and(article.likeCount.gt(searchCondition.getLikeCount()));
+        if (searchCondition.likeCount() > 0) {
+            booleanBuilder.and(article.likeCount.gt(searchCondition.likeCount()));
         }
 
         booleanBuilder.and(article.deletedAt.isNull());

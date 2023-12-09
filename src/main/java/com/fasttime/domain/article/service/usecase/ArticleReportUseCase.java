@@ -1,7 +1,6 @@
 package com.fasttime.domain.article.service.usecase;
 
 import java.time.LocalDateTime;
-import lombok.Getter;
 
 public interface ArticleReportUseCase {
 
@@ -11,15 +10,9 @@ public interface ArticleReportUseCase {
 
     void rejectReport(ArticleReportServiceRequest request);
 
-    @Getter
-    class ArticleReportServiceRequest {
+    record ArticleReportServiceRequest(
+        Long articleId,
+        LocalDateTime requestTimeStamp) {
 
-        private final Long articleId;
-        private final LocalDateTime requestTimeStamp;
-
-        public ArticleReportServiceRequest(Long articleId, LocalDateTime requestTimeStamp) {
-            this.articleId = articleId;
-            this.requestTimeStamp = requestTimeStamp;
-        }
     }
 }
