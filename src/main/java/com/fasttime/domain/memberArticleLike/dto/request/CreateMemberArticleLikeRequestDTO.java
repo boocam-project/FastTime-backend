@@ -1,4 +1,4 @@
-package com.fasttime.domain.record.dto.request;
+package com.fasttime.domain.memberArticleLike.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateRecordRequestDTO {
+public class CreateMemberArticleLikeRequestDTO {
 
     @NotNull(message = "게시글 ID를 입력하세요.")
     private Long postId;

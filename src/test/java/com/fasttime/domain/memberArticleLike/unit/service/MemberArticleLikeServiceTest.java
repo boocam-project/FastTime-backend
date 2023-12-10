@@ -1,4 +1,4 @@
-package com.fasttime.domain.record.unit.service;
+package com.fasttime.domain.memberArticleLike.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,19 +15,16 @@ import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleLikeOrHateServiceRequest;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.domain.record.dto.RecordDTO;
-import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
-import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
-import com.fasttime.domain.record.entity.Record;
-import com.fasttime.domain.record.exception.AlreadyExistsRecordException;
-import com.fasttime.domain.record.exception.DuplicateRecordException;
-import com.fasttime.domain.record.exception.RecordNotFoundException;
-import com.fasttime.domain.record.repository.RecordRepository;
-import com.fasttime.domain.record.service.RecordService;
+import com.fasttime.domain.memberArticleLike.dto.MemberArticleLikeDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.CreateMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.DeleteMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.entity.MemberArticleLike;
+import com.fasttime.domain.memberArticleLike.exception.AlreadyExistsMemberArticleLikeException;
+import com.fasttime.domain.memberArticleLike.exception.DuplicateMemberArticleLikeException;
+import com.fasttime.domain.memberArticleLike.exception.MemberArticleLikeNotFoundException;
+import com.fasttime.domain.memberArticleLike.repository.MemberArticleLikeRepository;
+import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,13 +36,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
-public class RecordServiceTest {
+public class MemberArticleLikeServiceTest {
 
     @InjectMocks
-    private RecordService recordService;
+    private MemberArticleLikeService memberArticleLikeService;
 
     @Mock
-    private RecordRepository recordRepository;
+    private MemberArticleLikeRepository memberArticleLikeRepository;
 
     @Mock
     private ArticleQueryService postQueryService;
@@ -58,28 +55,28 @@ public class RecordServiceTest {
 
     @Nested
     @DisplayName("createRecord()는 ")
-    class Context_createRecord {
+    class Context_createMemberArticleLike {
 
         @Test
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L)
                 .isLike(true).build();
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.empty();
+            Optional<MemberArticleLike> record = Optional.empty();
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when
-            recordService.createRecord(request, 1L);
+            memberArticleLikeService.createRecord(request, 1L);
 
             // then
-            verify(recordRepository, times(1)).save(any(Record.class));
+            verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
             verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
@@ -87,22 +84,22 @@ public class RecordServiceTest {
         @DisplayName("게시글을 싫어요 할 수 있다.")
         void hate_willSuccess() {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
                 .postId(1L).isLike(false).build();
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.empty();
+            Optional<MemberArticleLike> record = Optional.empty();
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when
-            recordService.createRecord(request, 1L);
+            memberArticleLikeService.createRecord(request, 1L);
 
             // then
-            verify(recordRepository, times(1)).save(any(Record.class));
+            verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
             verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
@@ -110,22 +107,22 @@ public class RecordServiceTest {
         @DisplayName("이미 좋아요(싫어요)를 한 게시글에 다시 좋아요(싫어요)를 등록할 수 없다.")
         void duplicateRecord1_willFail() {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
                 .postId(1L).isLike(true).build();
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.id()).build())
+            Optional<MemberArticleLike> record = Optional.of(
+                MemberArticleLike.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(true).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(DuplicateRecordException.class, () -> {
-                recordService.createRecord(request, 1L);
+            Throwable exception = assertThrows(DuplicateMemberArticleLikeException.class, () -> {
+                memberArticleLikeService.createRecord(request, 1L);
             });
             assertEquals("중복된 좋아요/싫어요 등록 요청입니다.", exception.getMessage());
         }
@@ -134,22 +131,22 @@ public class RecordServiceTest {
         @DisplayName("좋아요와 싫어요를 중복으로 등록할 수 없다.")
         void duplicateRecord2_willFail() {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
                 .postId(1L).isLike(true).build();
             ArticleResponse post = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.id()).build())
+            Optional<MemberArticleLike> record = Optional.of(
+                MemberArticleLike.builder().member(member).article(Article.builder().id(post.id()).build())
                     .isLike(false).build());
 
             given(postQueryService.queryById(any(Long.class))).willReturn(post);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(AlreadyExistsRecordException.class, () -> {
-                recordService.createRecord(request, 1L);
+            Throwable exception = assertThrows(AlreadyExistsMemberArticleLikeException.class, () -> {
+                memberArticleLikeService.createRecord(request, 1L);
             });
             assertEquals("한 게시글에 좋아요와 싫어요를 모두 등록할 수는 없습니다.", exception.getMessage());
         }
@@ -157,7 +154,7 @@ public class RecordServiceTest {
 
     @Nested
     @DisplayName("getRecord()는 ")
-    class Context_getRecord {
+    class Context_getMemberArticleLike {
 
         @Test
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 내역을 가져올 수 있다.")
@@ -165,18 +162,18 @@ public class RecordServiceTest {
             // given
             Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.of(
-                Record.builder().id(1L).article(post).member(member).isLike(true).build());
-            given(recordRepository.findByMemberIdAndArticleId(any(Long.class),
+            Optional<MemberArticleLike> record = Optional.of(
+                MemberArticleLike.builder().id(1L).article(post).member(member).isLike(true).build());
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class))).willReturn(record);
 
             // when
-            RecordDTO result = recordService.getRecord(1L, 1L);
+            MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
 
             // then
             assertThat(result).extracting("id", "postId", "memberId", "isLike")
                 .containsExactly(1L, 1L, 1L, true);
-            verify(recordRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
+            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class));
         }
 
@@ -184,58 +181,58 @@ public class RecordServiceTest {
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 데이터가 없다면 id값이 null인 ResponseDTO를 반환한다.")
         void noRecord_willSuccess() {
             // given
-            Optional<Record> record = Optional.empty();
-            given(recordRepository.findByMemberIdAndArticleId(any(Long.class),
+            Optional<MemberArticleLike> record = Optional.empty();
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class))).willReturn(record);
 
             // when
-            RecordDTO result = recordService.getRecord(1L, 1L);
+            MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
 
             // then
             assertThat(result).extracting("id", "postId", "memberId", "isLike")
                 .containsExactly(null, null, null, null);
-            verify(recordRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
+            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class));
         }
     }
 
     @Nested
     @DisplayName("deleteRecord()는 ")
-    class Context_deleteRecord {
+    class Context_deleteMemberArticleLike {
 
         @Test
         @DisplayName("게시글 좋아요/싫어요를 취소할 수 있다.")
         void _willSuccess() {
             // given
-            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder()
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder()
                 .postId(1L).build();
             Article post = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
-            Optional<Record> record = Optional.of(
-                Record.builder().id(1L).member(member).article(post).isLike(true).build());
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            Optional<MemberArticleLike> record = Optional.of(
+                MemberArticleLike.builder().id(1L).member(member).article(post).isLike(true).build());
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when
-            recordService.deleteRecord(request, 1L);
+            memberArticleLikeService.deleteRecord(request, 1L);
 
             // then
-            verify(recordRepository, times(1)).delete(any(Record.class));
+            verify(memberArticleLikeRepository, times(1)).delete(any(MemberArticleLike.class));
         }
 
         @Test
         @DisplayName("게시글 좋아요/싫어요 한 적이 없다면 좋아요/싫어요를 취소할 수 없다.")
         void recordNotFound_willSuccess() {
             // given
-            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder()
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder()
                 .postId(1L).build();
-            Optional<Record> record = Optional.empty();
-            given(recordRepository.findByMemberIdAndArticleId(any(long.class),
+            Optional<MemberArticleLike> record = Optional.empty();
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(RecordNotFoundException.class, () -> {
-                recordService.deleteRecord(request, 1L);
+            Throwable exception = assertThrows(MemberArticleLikeNotFoundException.class, () -> {
+                memberArticleLikeService.deleteRecord(request, 1L);
             });
             assertEquals("존재하지 않는 좋아요/싫어요 입니다.", exception.getMessage());
         }
