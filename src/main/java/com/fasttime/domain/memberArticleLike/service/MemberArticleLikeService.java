@@ -27,48 +27,65 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberArticleLikeService {
 
-    private final MemberArticleLikeRepository memberArticleLikeRepository;
-    private final ArticleQueryService postQueryService;
-    private final ArticleCommandService postCommandService;
-    private final MemberService memberService;
+  private final MemberArticleLikeRepository memberArticleLikeRepository;
+  private final ArticleQueryService articleQueryService;
+  private final ArticleCommandService articleCommandService;
+  private final MemberService memberService;
 
-    public void createRecord(CreateMemberArticleLikeRequestDTO createMemberArticleLikeRequestDTO, Long memberId) {
-        ArticleResponse postResponse = postQueryService.queryById(
-            createMemberArticleLikeRequestDTO.getPostId());
-        Member member = memberService.getMember(memberId);
-        checkDuplicateRecords(member.getId(), postResponse.id(),
-            createMemberArticleLikeRequestDTO.getIsLike());
+  public void createMemberArticleLike(
+      CreateMemberArticleLikeRequestDTO createMemberArticleLikeRequestDTO, Long memberId) {
+    ArticleResponse postResponse =
+        articleQueryService.queryById(createMemberArticleLikeRequestDTO.getPostId());
+    Member member = memberService.getMember(memberId);
+    checkDuplicateMemberArticleLikes(
+        member.getId(), postResponse.id(), createMemberArticleLikeRequestDTO.getIsLike());
 
-        memberArticleLikeRepository.save(
-            MemberArticleLike.builder().member(member).article(Article.builder().id(postResponse.id()).build())
-                .isLike(createMemberArticleLikeRequestDTO.getIsLike()).build());
+    memberArticleLikeRepository.save(
+        MemberArticleLike.builder()
+            .member(member)
+            .article(Article.builder().id(postResponse.id()).build())
+            .isLike(createMemberArticleLikeRequestDTO.getIsLike())
+            .build());
 
-        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.id(),
-            createMemberArticleLikeRequestDTO.getIsLike(), true));
-    }
+    articleCommandService.likeOrHate(
+        new ArticleLikeOrHateServiceRequest(
+            postResponse.id(), createMemberArticleLikeRequestDTO.getIsLike(), true));
+  }
 
-    public MemberArticleLikeDTO getRecord(long memberId, long postId) {
-        Optional<MemberArticleLike> record = memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, postId);
-        return record.map(MemberArticleLike::toDTO)
-            .orElse(
-                MemberArticleLikeDTO.builder().id(null).memberId(null).postId(null).isLike(null).build());
-    }
+  public MemberArticleLikeDTO getMemberArticleLike(long memberId, long postId) {
+    Optional<MemberArticleLike> memberArticleLike =
+        memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, postId);
+    return memberArticleLike
+        .map(MemberArticleLike::toDTO)
+        .orElseGet(this::getFallbackMemberArticleLikeDTO);
+  }
 
-    public void deleteRecord(DeleteMemberArticleLikeRequestDTO req, Long memberId) {
-        MemberArticleLike memberArticleLike = memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, req.getPostId())
+  public void deleteMemberArticleLike(DeleteMemberArticleLikeRequestDTO req, Long memberId) {
+    MemberArticleLike memberArticleLike =
+        memberArticleLikeRepository
+            .findByMemberIdAndArticleId(memberId, req.getPostId())
             .orElseThrow(MemberArticleLikeNotFoundException::new);
-        memberArticleLikeRepository.delete(memberArticleLike);
-    }
+    memberArticleLikeRepository.delete(memberArticleLike);
+  }
 
-    private void checkDuplicateRecords(long memberId, long postId, boolean isLike) {
-        Optional<MemberArticleLike> record = memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, postId);
-        if (record.isPresent()) {
-            if (record.get().isLike() == isLike) {
+  private void checkDuplicateMemberArticleLikes(long memberId, long postId, boolean isLike) {
+    memberArticleLikeRepository
+        .findByMemberIdAndArticleId(memberId, postId)
+        .ifPresent(
+            memberArticleLike -> {
+              if (memberArticleLike.isLike() == isLike) {
                 throw new DuplicateMemberArticleLikeException();
-            } else {
-                throw new AlreadyExistsMemberArticleLikeException();
-            }
-        }
-    }
+              }
+              throw new AlreadyExistsMemberArticleLikeException();
+            });
+  }
+  private MemberArticleLikeDTO getFallbackMemberArticleLikeDTO() {
+    return MemberArticleLikeDTO.builder()
+        .id(null)
+        .memberId(null)
+        .postId(null)
+        .isLike(null)
+        .build();
+  }
 
 }

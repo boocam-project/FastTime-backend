@@ -75,7 +75,7 @@ public class MemberArticleLikeServiceTest {
 
 
     @Nested
-    @DisplayName("createRecord()는 ")
+    @DisplayName("createMemberArticleLike()는 ")
     class Context_createMemberArticleLike {
 
         @Test
@@ -86,7 +86,7 @@ public class MemberArticleLikeServiceTest {
             mockForSuccess();
 
             // when
-            memberArticleLikeService.createRecord(createLikeRequest, 1L);
+            memberArticleLikeService.createMemberArticleLike(createLikeRequest, 1L);
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
@@ -100,7 +100,7 @@ public class MemberArticleLikeServiceTest {
             mockForSuccess();
 
             // when
-            memberArticleLikeService.createRecord(createHateRequest, 1L);
+            memberArticleLikeService.createMemberArticleLike(createHateRequest, 1L);
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
@@ -120,7 +120,7 @@ public class MemberArticleLikeServiceTest {
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(DuplicateMemberArticleLikeException.class, () -> memberArticleLikeService.createRecord(createLikeRequest, 1L));
+            Throwable exception = assertThrows(DuplicateMemberArticleLikeException.class, () -> memberArticleLikeService.createMemberArticleLike(createLikeRequest, 1L));
             assertEquals("중복된 좋아요/싫어요 등록 요청입니다.", exception.getMessage());
         }
 
@@ -137,13 +137,13 @@ public class MemberArticleLikeServiceTest {
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(AlreadyExistsMemberArticleLikeException.class, () -> memberArticleLikeService.createRecord(createLikeRequest, 1L));
+            Throwable exception = assertThrows(AlreadyExistsMemberArticleLikeException.class, () -> memberArticleLikeService.createMemberArticleLike(createLikeRequest, 1L));
             assertEquals("한 게시글에 좋아요와 싫어요를 모두 등록할 수는 없습니다.", exception.getMessage());
         }
     }
 
     @Nested
-    @DisplayName("getRecord()는 ")
+    @DisplayName("getMemberArticleLike()는 ")
     class Context_getMemberArticleLike {
 
         private Member member;
@@ -173,7 +173,7 @@ public class MemberArticleLikeServiceTest {
             mockRepositoryResponse(record);
 
             // when
-            MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
+            MemberArticleLikeDTO result = memberArticleLikeService.getMemberArticleLike(1L, 1L);
 
             // then
             assertMemberArticleLikeDTO(result, 1L, 1L, 1L, true);
@@ -187,7 +187,7 @@ public class MemberArticleLikeServiceTest {
             mockRepositoryResponse(Optional.empty());
 
             // when
-            MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
+            MemberArticleLikeDTO result = memberArticleLikeService.getMemberArticleLike(1L, 1L);
 
             // then
             assertMemberArticleLikeDTO(result, null, null, null, null);
@@ -197,7 +197,7 @@ public class MemberArticleLikeServiceTest {
 
 
     @Nested
-    @DisplayName("deleteRecord()는 ")
+    @DisplayName("deleteMemberArticleLike()는 ")
     class Context_deleteMemberArticleLike {
 
         private Member member;
@@ -222,7 +222,7 @@ public class MemberArticleLikeServiceTest {
             mockRepositoryResponse(record);
 
             // when
-            memberArticleLikeService.deleteRecord(request, 1L);
+            memberArticleLikeService.deleteMemberArticleLike(request, 1L);
 
             // then
             verify(memberArticleLikeRepository, times(1)).delete(any(MemberArticleLike.class));
@@ -236,7 +236,7 @@ public class MemberArticleLikeServiceTest {
             mockRepositoryResponse(Optional.empty());
 
             // when, then
-            assertThrows(MemberArticleLikeNotFoundException.class, () -> memberArticleLikeService.deleteRecord(request, 1L));
+            assertThrows(MemberArticleLikeNotFoundException.class, () -> memberArticleLikeService.deleteMemberArticleLike(request, 1L));
         }
     }
 

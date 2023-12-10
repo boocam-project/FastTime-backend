@@ -55,7 +55,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(true)
             .build();
         doNothing().when(memberArticleLikeService)
-            .createRecord(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
+            .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
@@ -84,7 +84,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         // given
         MemberArticleLikeDTO memberArticleLikeDTO = MemberArticleLikeDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
             .build();
-        given(memberArticleLikeService.getRecord(any(Long.class), any(Long.class))).willReturn(
+        given(memberArticleLikeService.getMemberArticleLike(any(Long.class), any(Long.class))).willReturn(
             memberArticleLikeDTO);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
@@ -115,7 +115,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         // given
         DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
         doNothing().when(memberArticleLikeService)
-            .deleteRecord(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
+            .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
 
         // when, then

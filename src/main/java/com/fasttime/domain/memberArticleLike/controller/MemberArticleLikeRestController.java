@@ -44,7 +44,7 @@ public class MemberArticleLikeRestController {
       @Valid @RequestBody CreateMemberArticleLikeRequestDTO createMemberArticleLikeRequestDTO) {
     log.info("CreateRecordRequest: " + createMemberArticleLikeRequestDTO);
     Long memberId = this.securityUtil.getCurrentMemberId();
-    memberArticleLikeService.createRecord(createMemberArticleLikeRequestDTO, memberId);
+    memberArticleLikeService.createMemberArticleLike(createMemberArticleLikeRequestDTO, memberId);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요/싫어요를 성공적으로 등록했습니다."));
   }
@@ -63,7 +63,7 @@ public class MemberArticleLikeRestController {
             ResponseDTO.res(
                 HttpStatus.OK,
                 "좋아요/싫어요를 성공적으로 조회했습니다.",
-                memberArticleLikeService.getRecord(memberId, postId)));
+                memberArticleLikeService.getMemberArticleLike(memberId, postId)));
   }
 
   /**
@@ -81,7 +81,7 @@ public class MemberArticleLikeRestController {
             + "), memberId("
             + memberId
             + ")");
-    memberArticleLikeService.deleteRecord(deleteMemberArticleLikeRequestDTO, memberId);
+    memberArticleLikeService.deleteMemberArticleLike(deleteMemberArticleLikeRequestDTO, memberId);
     return ResponseEntity.status(HttpStatus.OK)
         .body(ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 취소했습니다."));
   }

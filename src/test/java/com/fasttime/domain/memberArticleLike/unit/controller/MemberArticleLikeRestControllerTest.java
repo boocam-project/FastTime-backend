@@ -36,7 +36,7 @@ public class MemberArticleLikeRestControllerTest {
     MemberArticleLikeService memberArticleLikeService;
 
     @Nested
-    @DisplayName("createRecord()는")
+    @DisplayName("createMemberArticleLike()는")
     class Context_createMemberArticleLike {
 
         @Test
@@ -46,7 +46,7 @@ public class MemberArticleLikeRestControllerTest {
             CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L)
                 .isLike(true).build();
             doNothing().when(memberArticleLikeService)
-                .createRecord(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
+                .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -66,7 +66,7 @@ public class MemberArticleLikeRestControllerTest {
             CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L)
                 .isLike(false).build();
             doNothing().when(memberArticleLikeService)
-                .createRecord(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
+                .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -90,7 +90,7 @@ public class MemberArticleLikeRestControllerTest {
                 CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(null)
                     .isLike(true).build();
                 doNothing().when(memberArticleLikeService)
-                    .createRecord(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
+                    .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
@@ -116,7 +116,7 @@ public class MemberArticleLikeRestControllerTest {
                 CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L)
                     .isLike(null).build();
                 doNothing().when(memberArticleLikeService)
-                    .createRecord(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
+                    .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
@@ -133,7 +133,7 @@ public class MemberArticleLikeRestControllerTest {
     }
 
     @Nested
-    @DisplayName("getRecord()는")
+    @DisplayName("getMemberArticleLike()는")
     class Context_getMemberArticleLike {
 
         @Test
@@ -142,7 +142,7 @@ public class MemberArticleLikeRestControllerTest {
             // given
             MemberArticleLikeDTO memberArticleLikeDTO = MemberArticleLikeDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
                 .build();
-            given(memberArticleLikeService.getRecord(any(Long.class), any(Long.class))).willReturn(
+            given(memberArticleLikeService.getMemberArticleLike(any(Long.class), any(Long.class))).willReturn(
                 memberArticleLikeDTO);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -159,7 +159,7 @@ public class MemberArticleLikeRestControllerTest {
     }
 
     @Nested
-    @DisplayName("deleteRecord()는")
+    @DisplayName("deleteMemberArticleLike()는")
     class Context_deleteMemberArticleLike {
 
         @Test
@@ -168,7 +168,7 @@ public class MemberArticleLikeRestControllerTest {
             // given
             DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
             doNothing().when(memberArticleLikeService)
-                .deleteRecord(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
+                .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -192,7 +192,7 @@ public class MemberArticleLikeRestControllerTest {
                 DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(null)
                     .build();
                 doNothing().when(memberArticleLikeService)
-                    .deleteRecord(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
+                    .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
