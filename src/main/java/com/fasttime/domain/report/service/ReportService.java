@@ -1,19 +1,19 @@
 package com.fasttime.domain.report.service;
 
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.exception.ArticleDeletedException;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.repository.ArticleRepository;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.entity.Report;
 import com.fasttime.domain.report.exception.DuplicateReportException;
 import com.fasttime.domain.report.repository.ReportRepository;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -19,6 +19,7 @@ import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.report.contoller.ReportRestController;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.service.ReportService;
+import com.fasttime.global.util.SecurityUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -26,13 +27,14 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class ReportControllerDocsTest extends RestDocsSupport {
+class ReportControllerDocsTest extends RestDocsSupport {
 
     private final ReportService reportService = mock(ReportService.class);
+    private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new ReportRestController(reportService);
+        return new ReportRestController(reportService, securityUtil);
     }
 
     ConstraintDescriptions createReportRequestConstraints = new ConstraintDescriptions(

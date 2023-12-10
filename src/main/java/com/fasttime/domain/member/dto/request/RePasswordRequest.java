@@ -1,4 +1,4 @@
-package com.fasttime.domain.member.request;
+package com.fasttime.domain.member.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

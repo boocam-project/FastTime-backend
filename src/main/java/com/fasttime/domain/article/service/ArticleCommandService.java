@@ -29,9 +29,9 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     @Override
     public ArticleResponse write(ArticleCreateServiceRequest serviceDto) {
 
-        final Member writeMember = memberService.getMember(serviceDto.getMemberId());
-        final Article createdArticle = Article.createNewArticle(writeMember, serviceDto.getTitle(),
-            serviceDto.getContent(), serviceDto.isAnonymity());
+        final Member writeMember = memberService.getMember(serviceDto.memberId());
+        final Article createdArticle = Article.createNewArticle(writeMember, serviceDto.title(),
+            serviceDto.content(), serviceDto.isAnonymity());
 
         Article savedArticle = postRepository.save(createdArticle);
 
@@ -41,7 +41,7 @@ public class ArticleCommandService implements ArticleCommandUseCase {
             .content(savedArticle.getContent())
             .nickname(savedArticle.isAnonymity() ? articleSettingProvider.getAnonymousNickname()
                 : savedArticle.getMember().getNickname())
-            .anonymity(savedArticle.isAnonymity())
+            .isAnonymity(savedArticle.isAnonymity())
             .likeCount(savedArticle.getLikeCount())
             .hateCount(savedArticle.getHateCount())
             .createdAt(savedArticle.getCreatedAt())
@@ -52,17 +52,17 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     @Override
     public ArticleResponse update(ArticleUpdateServiceRequest serviceDto) {
 
-        final Member updateRequestMember = memberService.getMember(serviceDto.getMemberId());
-        Article post = findArticleById(serviceDto.getArticleId());
+        final Member updateRequestMember = memberService.getMember(serviceDto.memberId());
+        Article post = findArticleById(serviceDto.articleId());
 
         isWriter(updateRequestMember, post);
-        post.update(serviceDto.getTitle(), serviceDto.getContent());
+        post.update(serviceDto.title(), serviceDto.content());
 
         return ArticleResponse.builder()
             .id(post.getId())
             .title(post.getTitle())
             .content(post.getContent())
-            .anonymity(post.isAnonymity())
+            .isAnonymity(post.isAnonymity())
             .likeCount(post.getLikeCount())
             .hateCount(post.getHateCount())
             .build();
@@ -71,17 +71,17 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     @Override
     public void delete(ArticleDeleteServiceRequest serviceDto) {
 
-        final Member deleteRequestMember = memberService.getMember(serviceDto.getMemberId());
-        final Article post = findArticleById(serviceDto.getArticleId());
+        final Member deleteRequestMember = memberService.getMember(serviceDto.memberId());
+        final Article post = findArticleById(serviceDto.articleId());
 
         validateAuthority(deleteRequestMember, post);
 
-        post.delete(serviceDto.getDeletedAt());
+        post.delete(serviceDto.deletedAt());
     }
 
     @Override
     public void likeOrHate(ArticleLikeOrHateServiceRequest serviceDto) {
-        Article post = findArticleById(serviceDto.getArticleId());
+        Article post = findArticleById(serviceDto.articleId());
         post.likeOrHate(serviceDto.isLike(), serviceDto.isIncrease());
     }
 

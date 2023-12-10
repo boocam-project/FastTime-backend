@@ -1,7 +1,6 @@
 package com.fasttime.global.exception;
 
 import com.fasttime.global.util.ResponseDTO;
-import java.nio.file.AccessDeniedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;

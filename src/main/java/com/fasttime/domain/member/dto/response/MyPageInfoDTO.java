@@ -1,19 +1,17 @@
-package com.fasttime.domain.member.response;
+package com.fasttime.domain.member.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class EditResponse {
-
-    private String email;
+public class MyPageInfoDTO {
     private String nickname;
     private String image;
-
+    private String email;
 
 }
