@@ -27,9 +27,7 @@ public class ThreadConfigTest {
     assertNotNull(taskExecutor, "AsyncTaskExecutor should not be null");
     Future<Boolean> future =
         taskExecutor.submit(
-            () -> {
-              return Thread.currentThread().isVirtual();
-            });
+            () -> Thread.currentThread().isVirtual());
 
     boolean isVirtualThread = future.get();
     assertThat(isVirtualThread).isTrue();
