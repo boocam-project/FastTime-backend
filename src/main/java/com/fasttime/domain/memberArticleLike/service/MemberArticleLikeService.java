@@ -16,9 +16,6 @@ import com.fasttime.domain.memberArticleLike.exception.DuplicateMemberArticleLik
 import com.fasttime.domain.memberArticleLike.exception.MemberArticleLikeNotFoundException;
 import com.fasttime.domain.memberArticleLike.repository.MemberArticleLikeRepository;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,21 +71,4 @@ public class MemberArticleLikeService {
         }
     }
 
-    public Map<String, Integer> getRecordCount(long postId) {
-        Optional<List<MemberArticleLike>> records = memberArticleLikeRepository.findAllByArticleId(postId);
-        Map<String, Integer> recordCount = new HashMap<>();
-        if (records.isPresent()) {
-            for (MemberArticleLike memberArticleLike : records.get()) {
-                if (memberArticleLike.isLike()) {
-                    recordCount.put("likeCount", recordCount.getOrDefault("likeCount", 0) + 1);
-                } else {
-                    recordCount.put("hateCount", recordCount.getOrDefault("hateCount", 0) + 1);
-                }
-            }
-        } else {
-            recordCount.put("likeCount", 0);
-            recordCount.put("hateCount", 0);
-        }
-        return recordCount;
-    }
 }

@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/record")
+@RequestMapping("/api/v1/article-like")
 public class MemberArticleLikeRestController {
 
   private final MemberArticleLikeService memberArticleLikeService;

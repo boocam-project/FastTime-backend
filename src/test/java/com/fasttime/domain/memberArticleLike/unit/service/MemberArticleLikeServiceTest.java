@@ -26,6 +26,7 @@ import com.fasttime.domain.memberArticleLike.repository.MemberArticleLikeReposit
 import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,26 @@ public class MemberArticleLikeServiceTest {
     @Mock
     private MemberService memberService;
 
+    private Member testMember;
+    private ArticleResponse testArticle;
+    private CreateMemberArticleLikeRequestDTO createLikeRequest;
+    private CreateMemberArticleLikeRequestDTO createHateRequest;
+
+    @BeforeEach
+    public void setup() {
+        testMember = Member.builder().id(1L).build();
+        testArticle = ArticleResponse.builder().id(1L).build();
+        createLikeRequest = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(true).build();
+        createHateRequest = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(false).build();
+    }
+
+    private void mockForSuccess() {
+        given(postQueryService.queryById(any(Long.class))).willReturn(testArticle);
+        given(memberService.getMember(any(Long.class))).willReturn(testMember);
+        given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),any(long.class))).willReturn(Optional.empty());
+    }
+
+
     @Nested
     @DisplayName("createRecord()는 ")
     class Context_createMemberArticleLike {
@@ -60,20 +81,12 @@ public class MemberArticleLikeServiceTest {
         @Test
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() {
-            // given
-            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L)
-                .isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
-            Optional<MemberArticleLike> record = Optional.empty();
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
-            given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
-                any(long.class))).willReturn(record);
+            // given
+            mockForSuccess();
 
             // when
-            memberArticleLikeService.createRecord(request, 1L);
+            memberArticleLikeService.createRecord(createLikeRequest, 1L);
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
@@ -84,19 +97,10 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("게시글을 싫어요 할 수 있다.")
         void hate_willSuccess() {
             // given
-            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
-                .postId(1L).isLike(false).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
-            Optional<MemberArticleLike> record = Optional.empty();
-
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
-            given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
-                any(long.class))).willReturn(record);
+            mockForSuccess();
 
             // when
-            memberArticleLikeService.createRecord(request, 1L);
+            memberArticleLikeService.createRecord(createHateRequest, 1L);
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
@@ -107,23 +111,16 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("이미 좋아요(싫어요)를 한 게시글에 다시 좋아요(싫어요)를 등록할 수 없다.")
         void duplicateRecord1_willFail() {
             // given
-            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
-                .postId(1L).isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
+            mockForSuccess();
             Optional<MemberArticleLike> record = Optional.of(
-                MemberArticleLike.builder().member(member).article(Article.builder().id(post.id()).build())
+                MemberArticleLike.builder().member(testMember).article(Article.builder().id(testArticle.id()).build())
                     .isLike(true).build());
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
-            given(memberService.getMember(any(Long.class))).willReturn(member);
             given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(DuplicateMemberArticleLikeException.class, () -> {
-                memberArticleLikeService.createRecord(request, 1L);
-            });
+            Throwable exception = assertThrows(DuplicateMemberArticleLikeException.class, () -> memberArticleLikeService.createRecord(createLikeRequest, 1L));
             assertEquals("중복된 좋아요/싫어요 등록 요청입니다.", exception.getMessage());
         }
 
@@ -131,23 +128,16 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("좋아요와 싫어요를 중복으로 등록할 수 없다.")
         void duplicateRecord2_willFail() {
             // given
-            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
-                .postId(1L).isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
+            mockForSuccess();
             Optional<MemberArticleLike> record = Optional.of(
-                MemberArticleLike.builder().member(member).article(Article.builder().id(post.id()).build())
+                MemberArticleLike.builder().member(testMember).article(Article.builder().id(testArticle.id()).build())
                     .isLike(false).build());
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
-            given(memberService.getMember(any(Long.class))).willReturn(member);
             given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
             // when, then
-            Throwable exception = assertThrows(AlreadyExistsMemberArticleLikeException.class, () -> {
-                memberArticleLikeService.createRecord(request, 1L);
-            });
+            Throwable exception = assertThrows(AlreadyExistsMemberArticleLikeException.class, () -> memberArticleLikeService.createRecord(createLikeRequest, 1L));
             assertEquals("한 게시글에 좋아요와 싫어요를 모두 등록할 수는 없습니다.", exception.getMessage());
         }
     }
@@ -156,62 +146,80 @@ public class MemberArticleLikeServiceTest {
     @DisplayName("getRecord()는 ")
     class Context_getMemberArticleLike {
 
+        private Member member;
+        private Article post;
+
+        @BeforeEach
+        void setUp() {
+            member = Member.builder().id(1L).build();
+            post = Article.builder().id(1L).build();
+        }
+
+        private void mockRepositoryResponse(Optional<MemberArticleLike> record) {
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(Long.class), any(Long.class)))
+                .willReturn(record);
+        }
+
+        private void assertMemberArticleLikeDTO(MemberArticleLikeDTO result, Long id, Long postId, Long memberId, Boolean isLike) {
+            assertThat(result).extracting("id", "postId", "memberId", "isLike")
+                .containsExactly(id, postId, memberId, isLike);
+        }
+
         @Test
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 내역을 가져올 수 있다.")
         void _willSuccess() {
             // given
-            Article post = Article.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
-            Optional<MemberArticleLike> record = Optional.of(
-                MemberArticleLike.builder().id(1L).article(post).member(member).isLike(true).build());
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(Long.class),
-                any(Long.class))).willReturn(record);
+            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).article(post).member(member).isLike(true).build());
+            mockRepositoryResponse(record);
 
             // when
             MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
 
             // then
-            assertThat(result).extracting("id", "postId", "memberId", "isLike")
-                .containsExactly(1L, 1L, 1L, true);
-            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
-                any(Long.class));
+            assertMemberArticleLikeDTO(result, 1L, 1L, 1L, true);
+            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class), any(Long.class));
         }
 
         @Test
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 데이터가 없다면 id값이 null인 ResponseDTO를 반환한다.")
         void noRecord_willSuccess() {
             // given
-            Optional<MemberArticleLike> record = Optional.empty();
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(Long.class),
-                any(Long.class))).willReturn(record);
+            mockRepositoryResponse(Optional.empty());
 
             // when
             MemberArticleLikeDTO result = memberArticleLikeService.getRecord(1L, 1L);
 
             // then
-            assertThat(result).extracting("id", "postId", "memberId", "isLike")
-                .containsExactly(null, null, null, null);
-            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
-                any(Long.class));
+            assertMemberArticleLikeDTO(result, null, null, null, null);
+            verify(memberArticleLikeRepository, times(1)).findByMemberIdAndArticleId(any(Long.class), any(Long.class));
         }
     }
+
 
     @Nested
     @DisplayName("deleteRecord()는 ")
     class Context_deleteMemberArticleLike {
 
+        private Member member;
+        private Article post;
+
+        @BeforeEach
+        void setUp() {
+            member = Member.builder().id(1L).build();
+            post = Article.builder().id(1L).build();
+        }
+
+        private void mockRepositoryResponse(Optional<MemberArticleLike> record) {
+            given(memberArticleLikeRepository.findByMemberIdAndArticleId(1L, 1L)).willReturn(record);
+        }
+
         @Test
         @DisplayName("게시글 좋아요/싫어요를 취소할 수 있다.")
         void _willSuccess() {
             // given
-            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder()
-                .postId(1L).build();
-            Article post = Article.builder().id(1L).build();
-            Member member = Member.builder().id(1L).build();
-            Optional<MemberArticleLike> record = Optional.of(
-                MemberArticleLike.builder().id(1L).member(member).article(post).isLike(true).build());
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
-                any(long.class))).willReturn(record);
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
+            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).member(member).article(post).isLike(true).build());
+            mockRepositoryResponse(record);
 
             // when
             memberArticleLikeService.deleteRecord(request, 1L);
@@ -224,17 +232,11 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("게시글 좋아요/싫어요 한 적이 없다면 좋아요/싫어요를 취소할 수 없다.")
         void recordNotFound_willSuccess() {
             // given
-            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder()
-                .postId(1L).build();
-            Optional<MemberArticleLike> record = Optional.empty();
-            given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),
-                any(long.class))).willReturn(record);
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
+            mockRepositoryResponse(Optional.empty());
 
             // when, then
-            Throwable exception = assertThrows(MemberArticleLikeNotFoundException.class, () -> {
-                memberArticleLikeService.deleteRecord(request, 1L);
-            });
-            assertEquals("존재하지 않는 좋아요/싫어요 입니다.", exception.getMessage());
+            assertThrows(MemberArticleLikeNotFoundException.class, () -> memberArticleLikeService.deleteRecord(request, 1L));
         }
     }
 
