@@ -35,7 +35,7 @@ public class MemberArticleLikeService {
   public void createMemberArticleLike(
       CreateMemberArticleLikeRequestDTO createMemberArticleLikeRequestDTO, Long memberId) {
     ArticleResponse postResponse =
-        articleQueryService.queryById(createMemberArticleLikeRequestDTO.getPostId());
+        articleQueryService.queryById(createMemberArticleLikeRequestDTO.getArticleId());
     Member member = memberService.getMember(memberId);
     checkDuplicateMemberArticleLikes(
         member.getId(), postResponse.id(), createMemberArticleLikeRequestDTO.getIsLike());
@@ -52,9 +52,9 @@ public class MemberArticleLikeService {
             postResponse.id(), createMemberArticleLikeRequestDTO.getIsLike(), true));
   }
 
-  public MemberArticleLikeDTO getMemberArticleLike(long memberId, long postId) {
+  public MemberArticleLikeDTO getMemberArticleLike(long memberId, long articleId) {
     Optional<MemberArticleLike> memberArticleLike =
-        memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, postId);
+        memberArticleLikeRepository.findByMemberIdAndArticleId(memberId, articleId);
     return memberArticleLike
         .map(MemberArticleLike::toDTO)
         .orElseGet(this::getFallbackMemberArticleLikeDTO);
@@ -63,14 +63,14 @@ public class MemberArticleLikeService {
   public void deleteMemberArticleLike(DeleteMemberArticleLikeRequestDTO req, Long memberId) {
     MemberArticleLike memberArticleLike =
         memberArticleLikeRepository
-            .findByMemberIdAndArticleId(memberId, req.getPostId())
+            .findByMemberIdAndArticleId(memberId, req.getArticleId())
             .orElseThrow(MemberArticleLikeNotFoundException::new);
     memberArticleLikeRepository.delete(memberArticleLike);
   }
 
-  private void checkDuplicateMemberArticleLikes(long memberId, long postId, boolean isLike) {
+  private void checkDuplicateMemberArticleLikes(long memberId, long articleId, boolean isLike) {
     memberArticleLikeRepository
-        .findByMemberIdAndArticleId(memberId, postId)
+        .findByMemberIdAndArticleId(memberId, articleId)
         .ifPresent(
             memberArticleLike -> {
               if (memberArticleLike.isLike() == isLike) {
@@ -83,7 +83,7 @@ public class MemberArticleLikeService {
     return MemberArticleLikeDTO.builder()
         .id(null)
         .memberId(null)
-        .postId(null)
+        .articleId(null)
         .isLike(null)
         .build();
   }

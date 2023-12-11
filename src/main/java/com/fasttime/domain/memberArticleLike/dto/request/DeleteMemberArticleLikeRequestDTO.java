@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class DeleteMemberArticleLikeRequestDTO {
 
     @NotNull(message = "게시글 ID를 입력하세요.")
-    private Long postId;
+    private Long articleId;
 }

@@ -61,21 +61,21 @@ public class AdminService {
     }
 
     public ArticleResponse findOneReportedPost(Long id) {
-        Article post = articleRepository.findById(id)
+        Article article = articleRepository.findById(id)
             .orElseThrow(() -> new ArticleNotFoundException());
-        if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
+        if (!article.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new BadArticleReportStatusException();
         }
         return ArticleResponse.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .nickname(post.getMember().getNickname())
-            .isAnonymity(post.isAnonymity())
-            .likeCount(post.getLikeCount())
-            .hateCount(post.getHateCount())
-            .createdAt(post.getCreatedAt())
-            .lastModifiedAt(post.getUpdatedAt())
+            .id(article.getId())
+            .title(article.getTitle())
+            .content(article.getContent())
+            .nickname(article.getMember().getNickname())
+            .isAnonymity(article.isAnonymity())
+            .likeCount(article.getLikeCount())
+            .hateCount(article.getHateCount())
+            .createdAt(article.getCreatedAt())
+            .lastModifiedAt(article.getUpdatedAt())
             .build();
     }
 

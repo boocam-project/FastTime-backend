@@ -30,10 +30,10 @@ public abstract class ControllerUnitTestSupporter {
     protected ObjectMapper objectMapper;
 
     @MockBean
-    protected ArticleCommandService postCommandService;
+    protected ArticleCommandService articleCommandService;
 
     @MockBean
-    protected ArticleQueryService postQueryService;
+    protected ArticleQueryService articleQueryService;
 
     @MockBean
     protected MemberService memberService;

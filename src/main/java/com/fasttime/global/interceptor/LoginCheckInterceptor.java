@@ -34,7 +34,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     }
 
     private  boolean isGetPost(HttpServletRequest request) {
-        boolean contains = request.getRequestURI().contains("/api/v1/post");
+        boolean contains = request.getRequestURI().contains("/api/v1/article");
         boolean get = request.getMethod().equals("GET");
         if (contains && get){
                 return true;

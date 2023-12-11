@@ -9,6 +9,6 @@ public class MemberArticleLikeDTO {
 
     private Long id;
     private Long memberId;
-    private Long postId;
+    private Long articleId;
     private Boolean isLike;
 }

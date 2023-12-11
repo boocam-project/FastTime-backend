@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberArticleLikeRepository extends JpaRepository<MemberArticleLike, Long> {
 
-    Optional<MemberArticleLike> findByMemberIdAndArticleId(Long articleId, Long postId);
+    Optional<MemberArticleLike> findByMemberIdAndArticleId(Long memberId, Long articleId);
 }
