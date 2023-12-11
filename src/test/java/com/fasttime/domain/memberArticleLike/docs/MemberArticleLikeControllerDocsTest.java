@@ -1,4 +1,4 @@
-package com.fasttime.domain.record.docs;
+package com.fasttime.domain.memberArticleLike.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -18,11 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
-import com.fasttime.domain.record.controller.RecordRestController;
-import com.fasttime.domain.record.dto.RecordDTO;
-import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
-import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
-import com.fasttime.domain.record.service.RecordService;
+import com.fasttime.domain.memberArticleLike.controller.MemberArticleLikeRestController;
+import com.fasttime.domain.memberArticleLike.dto.MemberArticleLikeDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.CreateMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.DeleteMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
 import com.fasttime.global.util.SecurityUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,29 +33,29 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-class RecordControllerDocsTest extends RestDocsSupport {
+class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
 
-    private final RecordService recordService = mock(RecordService.class);
+    private final MemberArticleLikeService memberArticleLikeService = mock(MemberArticleLikeService.class);
     private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new RecordRestController(recordService, securityUtil);
+        return new MemberArticleLikeRestController(memberArticleLikeService, securityUtil);
     }
 
     ConstraintDescriptions createRecordRequestConstraints = new ConstraintDescriptions(
-        CreateRecordRequestDTO.class);
+        CreateMemberArticleLikeRequestDTO.class);
     ConstraintDescriptions deleteRecordRequestConstraints = new ConstraintDescriptions(
-        DeleteRecordRequestDTO.class);
+        DeleteMemberArticleLikeRequestDTO.class);
 
     @DisplayName("좋아요/싫어요 등록 API 문서화")
     @Test
     void createLike() throws Exception {
         // given
-        CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L).isLike(true)
+        CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(true)
             .build();
-        doNothing().when(recordService)
-            .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
+        doNothing().when(memberArticleLikeService)
+            .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
@@ -82,9 +82,10 @@ class RecordControllerDocsTest extends RestDocsSupport {
     @Test
     void getRecord() throws Exception {
         // given
-        RecordDTO recordDTO = RecordDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
+        MemberArticleLikeDTO memberArticleLikeDTO = MemberArticleLikeDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
             .build();
-        given(recordService.getRecord(any(Long.class), any(Long.class))).willReturn(recordDTO);
+        given(memberArticleLikeService.getMemberArticleLike(any(Long.class), any(Long.class))).willReturn(
+            memberArticleLikeDTO);
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
 
@@ -112,9 +113,9 @@ class RecordControllerDocsTest extends RestDocsSupport {
     @Test
     void deleteRecord() throws Exception {
         // given
-        DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().postId(1L).build();
-        doNothing().when(recordService)
-            .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
+        DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
+        doNothing().when(memberArticleLikeService)
+            .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
 
         // when, then
