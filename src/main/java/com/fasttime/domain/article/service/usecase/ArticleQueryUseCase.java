@@ -10,12 +10,12 @@ public interface ArticleQueryUseCase {
 
     ArticleResponse queryById(Long id);
 
-    List<ArticlesResponse> search(ArticlesSearchRequest request);
+    List<ArticlesResponse> search(ArticlesSearchRequestServiceDto request);
 
-    List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchRequest request);
+    List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchRequestServiceDto request);
 
     @Builder
-    record ArticlesSearchRequest(
+    record ArticlesSearchRequestServiceDto(
         String nickname,
         String title,
         int likeCount,
@@ -25,7 +25,7 @@ public interface ArticleQueryUseCase {
 
     }
 
-    record ReportedArticlesSearchRequest(
+    record ReportedArticlesSearchRequestServiceDto(
         int pageNum,
         int pageSize,
         ReportStatus reportStatus) {

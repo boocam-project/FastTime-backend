@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.repository.ArticleRepositoryCustom.ArticleQueryResponse;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import java.util.List;
@@ -49,7 +49,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = postRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .title(searchTarget)
                     .pageSize(10)
                     .build());
@@ -75,7 +75,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = postRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .nickname(searchTarget)
                     .pageSize(10)
                     .build());
@@ -101,7 +101,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = postRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .likeCount(searchTarget)
                     .pageSize(10)
                     .build());
