@@ -2,6 +2,7 @@ package com.fasttime.domain.article.unit.service;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
@@ -18,20 +19,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
 class ArticleReportServiceTest {
 
-    @InjectMocks
-    private ArticleReportService articleReportService;
+    private final ArticleRepository articleRepository = mock(ArticleRepository.class);
 
-    @Mock
-    private ArticleRepository articleRepository;
+    private final ArticleReportService articleReportService = new ArticleReportService(
+        articleRepository);
 
     @DisplayName("reportArticle 은")
     @Nested
@@ -55,7 +49,8 @@ class ArticleReportServiceTest {
             given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
 
             // when
-            articleReportService.reportArticle(new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
+            articleReportService.reportArticle(
+                new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
 
             // then
             Assertions.assertThat(article.getReportStatus())
@@ -63,7 +58,8 @@ class ArticleReportServiceTest {
         }
 
         @DisplayName("만약 이미 NORMAL 상태가 아니라면 실패한다.")
-        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT", "WAIT_FOR_REPORT_REVIEW"})
+        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT",
+            "WAIT_FOR_REPORT_REVIEW"})
         @ParameterizedTest
         void reportStatus_alreadyAccept_willFail(ReportStatus reportStatus) {
 
@@ -109,7 +105,8 @@ class ArticleReportServiceTest {
             given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
 
             // when
-            articleReportService.acceptReport(new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
+            articleReportService.acceptReport(
+                new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
 
             // then
             Assertions.assertThat(article.getReportStatus())
@@ -117,7 +114,8 @@ class ArticleReportServiceTest {
         }
 
         @DisplayName("만약 이미 WAIT_FOR_REPORT_REVIEW 상태가 아니라면 실패한다.")
-        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT", "NORMAL"})
+        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT",
+            "NORMAL"})
         @ParameterizedTest
         void reportStatus_notWaitForReportReview_willFail(ReportStatus reportStatus) {
 
@@ -163,7 +161,8 @@ class ArticleReportServiceTest {
             given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
 
             // when
-            articleReportService.rejectReport(new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
+            articleReportService.rejectReport(
+                new ArticleReportServiceRequest(article.getId(), reportTimeStamp));
 
             // then
             Assertions.assertThat(article.getReportStatus())
@@ -171,7 +170,8 @@ class ArticleReportServiceTest {
         }
 
         @DisplayName("만약 이미 WAIT_FOR_REPORT_REVIEW 상태가 아니라면 실패한다.")
-        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT", "NORMAL"})
+        @EnumSource(value = ReportStatus.class, names = {"REPORT_ACCEPT", "REPORT_REJECT",
+            "NORMAL"})
         @ParameterizedTest
         void reportStatus_notWaitForReportReview_willFail(ReportStatus reportStatus) {
 

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
 import com.fasttime.util.ControllerUnitTestSupporter;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,9 @@ import org.springframework.mock.web.MockHttpSession;
 
 class ArticleControllerTest extends ControllerUnitTestSupporter {
 
-    @DisplayName("writePost(PostCreateRequestDto)는")
+    @DisplayName("writeArticle(ArticleCreateRequestDto)는")
     @Nested
-    class Context_WritePost {
+    class Context_WriteArticle {
 
         @DisplayName("게시글을 저장할 수 있다.")
         @Test

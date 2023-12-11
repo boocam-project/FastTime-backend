@@ -20,10 +20,10 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     private final ArticleRepository postRepository;
 
     public ArticleCommandService(ArticleSettingProvider articleSettingProvider,
-        MemberService memberService, ArticleRepository postRepository) {
+        MemberService memberService, ArticleRepository articleRepository) {
         this.articleSettingProvider = articleSettingProvider;
         this.memberService = memberService;
-        this.postRepository = postRepository;
+        this.postRepository = articleRepository;
     }
 
     @Override
