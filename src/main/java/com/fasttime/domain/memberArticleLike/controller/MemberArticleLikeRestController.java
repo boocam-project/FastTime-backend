@@ -51,19 +51,19 @@ public class MemberArticleLikeRestController {
 
   /**
    * @apiNote 이 메서드는 사용자의 좋아요/싫어요 데이터를 조회한다.
-   * @param postId 조회할 게시글의 ID
+   * @param articleId 조회할 게시글의 ID
    * @return 조회된 좋아요/싫어요 상태에 대한 응답
    */
-  @GetMapping("/{postId}")
-  public ResponseEntity<ResponseDTO<MemberArticleLikeDTO>> getRecord(@PathVariable long postId) {
+  @GetMapping("/{articleId}")
+  public ResponseEntity<ResponseDTO<MemberArticleLikeDTO>> getRecord(@PathVariable long articleId) {
     Long memberId = this.securityUtil.getCurrentMemberId();
-    log.info("getRecordRequest: postId(" + postId + "), memberId(" + memberId + ")");
+    log.info("getRecordRequest: articleId(" + articleId + "), memberId(" + memberId + ")");
     return ResponseEntity.status(HttpStatus.OK)
         .body(
             ResponseDTO.res(
                 HttpStatus.OK,
                 "좋아요/싫어요를 성공적으로 조회했습니다.",
-                memberArticleLikeService.getMemberArticleLike(memberId, postId)));
+                memberArticleLikeService.getMemberArticleLike(memberId, articleId)));
   }
 
   /**
@@ -76,8 +76,8 @@ public class MemberArticleLikeRestController {
       @Valid @RequestBody DeleteMemberArticleLikeRequestDTO deleteMemberArticleLikeRequestDTO) {
     Long memberId = this.securityUtil.getCurrentMemberId();
     log.info(
-        "DeleteRecordRequest: postId("
-            + deleteMemberArticleLikeRequestDTO.getPostId()
+        "DeleteRecordRequest: articleId("
+            + deleteMemberArticleLikeRequestDTO.getArticleId()
             + "), memberId("
             + memberId
             + ")");
