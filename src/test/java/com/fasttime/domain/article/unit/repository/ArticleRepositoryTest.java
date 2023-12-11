@@ -27,6 +27,7 @@ class ArticleRepositoryTest {
     @Autowired
     private ArticleRepository postRepository;
 
+    @DisplayName("게시글 목록 검색은")
     @Nested
     class Context_queryArticles {
 
