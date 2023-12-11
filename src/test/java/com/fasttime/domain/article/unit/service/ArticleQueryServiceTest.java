@@ -27,7 +27,7 @@ public class ArticleQueryServiceTest {
 
     private final ArticleSettingProvider articleSettingProvider = mock(ArticleSettingProvider.class);
 
-    private final ArticleQueryService postQueryService = new ArticleQueryService(articleSettingProvider, articleRepository);
+    private final ArticleQueryService articleQueryService = new ArticleQueryService(articleSettingProvider, articleRepository);
 
     @DisplayName("searchById()는")
     @Nested
@@ -40,7 +40,7 @@ public class ArticleQueryServiceTest {
             "3, 제목3, 내용3, 패캠러3, true, 23, 35"
         })
         @ParameterizedTest
-        void inputKey_postResponse_willReturn(long id, String title, String content,
+        void inputKey_articleResponse_willReturn(long id, String title, String content,
             String nickname, boolean anonymity, int likeCount, int hateCount) {
 
             // given
@@ -57,7 +57,7 @@ public class ArticleQueryServiceTest {
                     .build()));
 
             // when
-            ArticleResponse response = postQueryService.queryById(id);
+            ArticleResponse response = articleQueryService.queryById(id);
 
             // then
             assertThat(response)
@@ -70,13 +70,13 @@ public class ArticleQueryServiceTest {
 
         @DisplayName("DB에 해당 id 를 가지는 게시글이 없다면 ArticleNotFoundException을 던진다.")
         @Test
-        void postDoesntExist_inDB_willThrowIllArgumentException() {
+        void articleDoesntExist_inDB_willThrowIllArgumentException() {
 
             // given
             given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
 
             // when then
-            assertThatThrownBy(() -> postQueryService.queryById(1L))
+            assertThatThrownBy(() -> articleQueryService.queryById(1L))
                 .isInstanceOf(ArticleNotFoundException.class);
         }
     }

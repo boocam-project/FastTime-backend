@@ -37,13 +37,13 @@ public class RecordRestController {
             .body(ResponseDTO.res(HttpStatus.CREATED, "좋아요/싫어요를 성공적으로 등록했습니다."));
     }
 
-    @GetMapping("/{postId}")
-    public ResponseEntity<ResponseDTO<RecordDTO>> getRecord(@PathVariable long postId) {
+    @GetMapping("/{articleId}")
+    public ResponseEntity<ResponseDTO<RecordDTO>> getRecord(@PathVariable long articleId) {
         Long memberId = securityUtil.getCurrentMemberId();
-        log.info("getRecordRequest: postId(" + postId + "), memberId(" + memberId + ")");
+        log.info("getRecordRequest: articleId(" + articleId + "), memberId(" + memberId + ")");
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "좋아요/싫어요를 성공적으로 조회했습니다.",
-                recordService.getRecord(memberId, postId)));
+                recordService.getRecord(memberId, articleId)));
     }
 
     @DeleteMapping
@@ -51,7 +51,7 @@ public class RecordRestController {
         @Valid @RequestBody DeleteRecordRequestDTO deleteRecordRequestDTO) {
         Long memberId = securityUtil.getCurrentMemberId();
         log.info(
-            "DeleteRecordRequest: postId(" + deleteRecordRequestDTO.getPostId() + "), memberId("
+            "DeleteRecordRequest: articleId(" + deleteRecordRequestDTO.getArticleId() + "), memberId("
                 + memberId + ")");
         recordService.deleteRecord(deleteRecordRequestDTO, memberId);
         return ResponseEntity.status(HttpStatus.OK)

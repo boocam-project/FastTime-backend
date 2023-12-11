@@ -31,39 +31,39 @@ import org.springframework.stereotype.Service;
 public class RecordService {
 
     private final RecordRepository recordRepository;
-    private final ArticleQueryService postQueryService;
-    private final ArticleCommandService postCommandService;
+    private final ArticleQueryService articleQueryService;
+    private final ArticleCommandService articleCommandService;
     private final MemberService memberService;
 
     public void createRecord(CreateRecordRequestDTO createRecordRequestDTO, Long memberId) {
-        ArticleResponse postResponse = postQueryService.queryById(
-            createRecordRequestDTO.getPostId());
+        ArticleResponse articleResponse = articleQueryService.queryById(
+            createRecordRequestDTO.getArticleId());
         Member member = memberService.getMember(memberId);
-        checkDuplicateRecords(member.getId(), postResponse.id(),
+        checkDuplicateRecords(member.getId(), articleResponse.id(),
             createRecordRequestDTO.getIsLike());
 
         recordRepository.save(
-            Record.builder().member(member).article(Article.builder().id(postResponse.id()).build())
+            Record.builder().member(member).article(Article.builder().id(articleResponse.id()).build())
                 .isLike(createRecordRequestDTO.getIsLike()).build());
 
-        postCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(postResponse.id(),
+        articleCommandService.likeOrHate(new ArticleLikeOrHateServiceRequest(articleResponse.id(),
             createRecordRequestDTO.getIsLike(), true));
     }
 
-    public RecordDTO getRecord(long memberId, long postId) {
-        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, postId);
+    public RecordDTO getRecord(long memberId, long articleId) {
+        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, articleId);
         return record.map(Record::toDTO)
-            .orElse(RecordDTO.builder().id(null).memberId(null).postId(null).isLike(null).build());
+            .orElse(RecordDTO.builder().id(null).memberId(null).articleId(null).isLike(null).build());
     }
 
     public void deleteRecord(DeleteRecordRequestDTO req, Long memberId) {
-        Record record = recordRepository.findByMemberIdAndArticleId(memberId, req.getPostId())
+        Record record = recordRepository.findByMemberIdAndArticleId(memberId, req.getArticleId())
             .orElseThrow(RecordNotFoundException::new);
         recordRepository.delete(record);
     }
 
-    private void checkDuplicateRecords(long memberId, long postId, boolean isLike) {
-        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, postId);
+    private void checkDuplicateRecords(long memberId, long articleId, boolean isLike) {
+        Optional<Record> record = recordRepository.findByMemberIdAndArticleId(memberId, articleId);
         if (record.isPresent()) {
             if (record.get().isLike() == isLike) {
                 throw new DuplicateRecordException();
@@ -73,8 +73,8 @@ public class RecordService {
         }
     }
 
-    public Map<String, Integer> getRecordCount(long postId) {
-        Optional<List<Record>> records = recordRepository.findAllByArticleId(postId);
+    public Map<String, Integer> getRecordCount(long articleId) {
+        Optional<List<Record>> records = recordRepository.findAllByArticleId(articleId);
         Map<String, Integer> recordCount = new HashMap<>();
         if (records.isPresent()) {
             for (Record record : records.get()) {

@@ -43,7 +43,7 @@ public class RecordRestControllerTest {
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
                 .isLike(true).build();
             doNothing().when(recordService)
                 .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
@@ -63,7 +63,7 @@ public class RecordRestControllerTest {
         @DisplayName("게시글을 싫어요 할 수 있다.")
         void hate_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
                 .isLike(false).build();
             doNothing().when(recordService)
                 .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
@@ -80,14 +80,14 @@ public class RecordRestControllerTest {
         }
 
         @Nested
-        @DisplayName("postId가 ")
-        class Element_postId {
+        @DisplayName("articleId가 ")
+        class Element_articleId {
 
             @Test
             @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(null)
+                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(null)
                     .isLike(true).build();
                 doNothing().when(recordService)
                     .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
@@ -113,7 +113,7 @@ public class RecordRestControllerTest {
             @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
                     .isLike(null).build();
                 doNothing().when(recordService)
                     .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
@@ -140,19 +140,19 @@ public class RecordRestControllerTest {
         @DisplayName("좋아요/싫어요 데이터를 불러올 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            RecordDTO recordDTO = RecordDTO.builder().id(1L).memberId(1L).postId(1L).isLike(true)
+            RecordDTO recordDTO = RecordDTO.builder().id(1L).memberId(1L).articleId(1L).isLike(true)
                 .build();
             given(recordService.getRecord(any(Long.class), any(Long.class))).willReturn(recordDTO);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
 
             // when, then
-            mockMvc.perform(get("/api/v1/record/{postId}", 1L).session(session)
+            mockMvc.perform(get("/api/v1/record/{articleId}", 1L).session(session)
                     .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isMap()).andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.memberId").exists())
-                .andExpect(jsonPath("$.data.postId").exists())
+                .andExpect(jsonPath("$.data.articleId").exists())
                 .andExpect(jsonPath("$.data.isLike").exists()).andDo(print());
         }
     }
@@ -165,7 +165,7 @@ public class RecordRestControllerTest {
         @DisplayName("게시글 좋아요(싫어요)를 취소할 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().postId(1L).build();
+            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().articleId(1L).build();
             doNothing().when(recordService)
                 .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
@@ -181,14 +181,14 @@ public class RecordRestControllerTest {
         }
 
         @Nested
-        @DisplayName("postId가 ")
-        class Element_postId {
+        @DisplayName("articleId가 ")
+        class Element_articleId {
 
             @Test
             @DisplayName("null일 경우 취소할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().postId(null)
+                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().articleId(null)
                     .build();
                 doNothing().when(recordService)
                     .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));

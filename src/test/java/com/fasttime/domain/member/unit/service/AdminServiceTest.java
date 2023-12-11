@@ -35,7 +35,7 @@ public class AdminServiceTest {
     private AdminService adminService;
 
     @Mock
-    private ArticleRepository postRepository;
+    private ArticleRepository articleRepository;
 
 
     @DisplayName("findReportedPost()는 ")
@@ -72,24 +72,24 @@ public class AdminServiceTest {
             articles.add(article2);
 
             given(
-                postRepository.findAllByReportStatus(any(Pageable.class), any(ReportStatus.class)))
+                articleRepository.findAllByReportStatus(any(Pageable.class), any(ReportStatus.class)))
                 .willReturn(articles);
 
             // when
-            List<ArticlesResponse> postList = adminService.findReportedPost(0);
+            List<ArticlesResponse> articleList = adminService.findReportedPost(0);
 
             //then
-            Assertions.assertThat(postList.get(0).title()).isEqualTo(article1.getTitle());
-            Assertions.assertThat(postList.get(1).title()).isEqualTo(article2.getTitle());
+            Assertions.assertThat(articleList.get(0).title()).isEqualTo(article1.getTitle());
+            Assertions.assertThat(articleList.get(1).title()).isEqualTo(article2.getTitle());
         }
 
         @DisplayName("신고된 게시물들이 없어 조회 할 수 없다.")
         @Test
         void _willFail() {
             // when
-            List<ArticlesResponse> postList = adminService.findReportedPost(0);
+            List<ArticlesResponse> articleList = adminService.findReportedPost(0);
             //then
-            Assertions.assertThat(postList.isEmpty()).isTrue();
+            Assertions.assertThat(articleList.isEmpty()).isTrue();
         }
     }
 
@@ -113,7 +113,7 @@ public class AdminServiceTest {
                 .likeCount(0)
                 .hateCount(0)
                 .build();
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when
             ArticleResponse oneReportedPost = adminService.findOneReportedPost(1L);
 
@@ -125,7 +125,7 @@ public class AdminServiceTest {
         @Test
         void NotFound_willFail() {
             //given
-            given(postRepository.findById(anyLong())).willThrow(new ArticleNotFoundException());
+            given(articleRepository.findById(anyLong())).willThrow(new ArticleNotFoundException());
 
             //when, then
             Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
@@ -148,7 +148,7 @@ public class AdminServiceTest {
                 .likeCount(0)
                 .hateCount(0)
                 .build();
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
                 BadArticleReportStatusException.class).hasMessage("신고 후처리를 할 수 없습니다.");

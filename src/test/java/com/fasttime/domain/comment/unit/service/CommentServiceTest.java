@@ -126,7 +126,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content", false, -1L, 0);
             verify(commentRepository, never()).findById(any(Long.class));
             verify(articleQueryService, times(1)).queryById(any(Long.class));
@@ -161,7 +161,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content", true, -1L, 0);
             verify(commentRepository, never()).findById(any(Long.class));
             verify(articleQueryService, times(1)).queryById(any(Long.class));
@@ -207,7 +207,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", false, 1L, 0);
             verify(commentRepository, times(1)).findById(any(Long.class));
             verify(articleQueryService, times(1)).queryById(any(Long.class));
@@ -253,7 +253,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", true, 1L, 0);
             verify(commentRepository, times(1)).findById(any(Long.class));
             verify(articleQueryService, times(1)).queryById(any(Long.class));
@@ -263,7 +263,7 @@ public class CommentServiceTest {
 
         @Test
         @DisplayName("게시물을 찾을 수 없으면 댓글을 등록할 수 없다.")
-        void postNotFound_willFail() {
+        void articleNotFound_willFail() {
             // given
             CreateCommentRequestDTO createCommentRequestDTO = CreateCommentRequestDTO.builder()
                 .content("content")
@@ -382,10 +382,10 @@ public class CommentServiceTest {
 
             // then
             assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content1", false, -1L, 1);
             assertThat(result.getComments().get(1)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(3L, 1L, 1L, "nickname", "content3", false, -1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
                 any(GetCommentsRequestDTO.class), any(Pageable.class));
@@ -436,13 +436,13 @@ public class CommentServiceTest {
 
             // then
             assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content1", false, -1L, 1);
             assertThat(result.getComments().get(1)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", false, 1L, 0);
             assertThat(result.getComments().get(2)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(3L, 1L, 1L, "nickname", "content3", false, -1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
                 any(GetCommentsRequestDTO.class), any(Pageable.class));
@@ -486,7 +486,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(result.getComments().get(0)).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(2L, 1L, 1L, "nickname", "content2", false, 1L, 0);
             verify(commentRepository, times(1)).findAllBySearchCondition(
                 any(GetCommentsRequestDTO.class), any(Pageable.class));
@@ -542,7 +542,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content2", false, -1L, 0);
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
@@ -613,7 +613,7 @@ public class CommentServiceTest {
 
             // then
             assertThat(commentResponseDTO).extracting("commentId", "articleId", "memberId",
-                    "nickname", "content", "isAnonymity", "parentCommentId", "childCommentCount")
+                    "nickname", "content", "anonymity", "parentCommentId", "childCommentCount")
                 .containsExactly(1L, 1L, 1L, "nickname", "content", false, -1L, 0);
             verify(commentRepository, times(1)).findById(any(Long.class));
         }
@@ -673,7 +673,7 @@ public class CommentServiceTest {
             Comment result = commentService.getComment(1L);
 
             // then
-            assertThat(result).extracting("id", "article", "member", "content", "isAnonymity",
+            assertThat(result).extracting("id", "article", "member", "content", "anonymity",
                     "parentComment", "childComments")
                 .containsExactly(1L, article, member, "test", false, null,
                     new ArrayList<>());

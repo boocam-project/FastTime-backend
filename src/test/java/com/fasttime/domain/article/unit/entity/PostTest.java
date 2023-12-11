@@ -29,7 +29,7 @@ class ArticleTest {
         Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
 
         // then
-        assertThat(createdArticle).extracting("title", "content", "isAnonymity")
+        assertThat(createdArticle).extracting("title", "content", "anonymity")
             .containsExactly(title, content, anounumity);
     }
 
@@ -51,7 +51,7 @@ class ArticleTest {
             createdArticle.update(updateTitle, updateContent);
 
             // then
-            assertThat(createdArticle).extracting("title", "content", "isAnonymity")
+            assertThat(createdArticle).extracting("title", "content", "anonymity")
                 .containsExactly(updateTitle, updateContent, anounumity);
         }
 

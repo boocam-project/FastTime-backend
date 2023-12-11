@@ -48,10 +48,10 @@ public class RecordServiceTest {
     private RecordRepository recordRepository;
 
     @Mock
-    private ArticleQueryService postQueryService;
+    private ArticleQueryService articleQueryService;
 
     @Mock
-    private ArticleCommandService postCommandService;
+    private ArticleCommandService articleCommandService;
 
     @Mock
     private MemberService memberService;
@@ -64,13 +64,13 @@ public class RecordServiceTest {
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().postId(1L)
+            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
                 .isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
+            ArticleResponse article = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
+            given(articleQueryService.queryById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -80,7 +80,7 @@ public class RecordServiceTest {
 
             // then
             verify(recordRepository, times(1)).save(any(Record.class));
-            verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
+            verify(articleCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
         @Test
@@ -88,12 +88,12 @@ public class RecordServiceTest {
         void hate_willSuccess() {
             // given
             CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
-                .postId(1L).isLike(false).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
+                .articleId(1L).isLike(false).build();
+            ArticleResponse article = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.empty();
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
+            given(articleQueryService.queryById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -103,7 +103,7 @@ public class RecordServiceTest {
 
             // then
             verify(recordRepository, times(1)).save(any(Record.class));
-            verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
+            verify(articleCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
         @Test
@@ -111,14 +111,14 @@ public class RecordServiceTest {
         void duplicateRecord1_willFail() {
             // given
             CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
-                .postId(1L).isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
+                .articleId(1L).isLike(true).build();
+            ArticleResponse article = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.id()).build())
+                Record.builder().member(member).article(Article.builder().id(article.id()).build())
                     .isLike(true).build());
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
+            given(articleQueryService.queryById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -135,14 +135,14 @@ public class RecordServiceTest {
         void duplicateRecord2_willFail() {
             // given
             CreateRecordRequestDTO request = CreateRecordRequestDTO.builder()
-                .postId(1L).isLike(true).build();
-            ArticleResponse post = ArticleResponse.builder().id(1L).build();
+                .articleId(1L).isLike(true).build();
+            ArticleResponse article = ArticleResponse.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().member(member).article(Article.builder().id(post.id()).build())
+                Record.builder().member(member).article(Article.builder().id(article.id()).build())
                     .isLike(false).build());
 
-            given(postQueryService.queryById(any(Long.class))).willReturn(post);
+            given(articleQueryService.queryById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -163,10 +163,10 @@ public class RecordServiceTest {
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 내역을 가져올 수 있다.")
         void _willSuccess() {
             // given
-            Article post = Article.builder().id(1L).build();
+            Article article = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().id(1L).article(post).member(member).isLike(true).build());
+                Record.builder().id(1L).article(article).member(member).isLike(true).build());
             given(recordRepository.findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class))).willReturn(record);
 
@@ -174,7 +174,7 @@ public class RecordServiceTest {
             RecordDTO result = recordService.getRecord(1L, 1L);
 
             // then
-            assertThat(result).extracting("id", "postId", "memberId", "isLike")
+            assertThat(result).extracting("id", "articleId", "memberId", "isLike")
                 .containsExactly(1L, 1L, 1L, true);
             verify(recordRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class));
@@ -192,7 +192,7 @@ public class RecordServiceTest {
             RecordDTO result = recordService.getRecord(1L, 1L);
 
             // then
-            assertThat(result).extracting("id", "postId", "memberId", "isLike")
+            assertThat(result).extracting("id", "articleId", "memberId", "isLike")
                 .containsExactly(null, null, null, null);
             verify(recordRepository, times(1)).findByMemberIdAndArticleId(any(Long.class),
                 any(Long.class));
@@ -208,11 +208,11 @@ public class RecordServiceTest {
         void _willSuccess() {
             // given
             DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder()
-                .postId(1L).build();
-            Article post = Article.builder().id(1L).build();
+                .articleId(1L).build();
+            Article article = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             Optional<Record> record = Optional.of(
-                Record.builder().id(1L).member(member).article(post).isLike(true).build());
+                Record.builder().id(1L).member(member).article(article).isLike(true).build());
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
 
@@ -228,7 +228,7 @@ public class RecordServiceTest {
         void recordNotFound_willSuccess() {
             // given
             DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder()
-                .postId(1L).build();
+                .articleId(1L).build();
             Optional<Record> record = Optional.empty();
             given(recordRepository.findByMemberIdAndArticleId(any(long.class),
                 any(long.class))).willReturn(record);
@@ -249,12 +249,12 @@ public class RecordServiceTest {
         @DisplayName("게시물에 등록된 좋아요/싫어요 합계를 가져올 수 있다.")
         void _willSuccess() {
             // given
-            Article post = Article.builder().id(1L).build();
+            Article article = Article.builder().id(1L).build();
             Member member = Member.builder().id(1L).build();
             List<Record> list = new ArrayList<>();
-            list.add(Record.builder().id(1L).article(post).member(member).isLike(true).build());
-            list.add(Record.builder().id(2L).article(post).member(member).isLike(true).build());
-            list.add(Record.builder().id(3L).article(post).member(member).isLike(false).build());
+            list.add(Record.builder().id(1L).article(article).member(member).isLike(true).build());
+            list.add(Record.builder().id(2L).article(article).member(member).isLike(true).build());
+            list.add(Record.builder().id(3L).article(article).member(member).isLike(false).build());
             Optional<List<Record>> records = Optional.of(list);
             given(recordRepository.findAllByArticleId(any(Long.class))).willReturn(records);
 

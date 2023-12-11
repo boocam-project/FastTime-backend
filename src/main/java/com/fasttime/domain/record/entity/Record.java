@@ -47,7 +47,7 @@ public class Record extends BaseTimeEntity {
     }
 
     public RecordDTO toDTO() {
-        return RecordDTO.builder().id(this.id).postId(this.article.getId())
+        return RecordDTO.builder().id(this.id).articleId(this.article.getId())
             .memberId(this.member.getId()).isLike(this.isLike).build();
     }
 }

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final ArticleQueryService postQueryService;
+    private final ArticleQueryService articleQueryService;
     private final MemberService memberService;
 
     public CommentResponseDTO createComment(long articleId, long memberId,
@@ -38,7 +38,7 @@ public class CommentService {
             isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
         return commentRepository.save(Comment.builder()
                 .article(Article.builder()
-                    .id(postQueryService.queryById(articleId).id())
+                    .id(articleQueryService.queryById(articleId).id())
                     .build())
                 .member(memberService.getMember(memberId))
                 .content(createCommentRequestDTO.getContent())

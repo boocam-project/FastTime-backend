@@ -14,14 +14,14 @@ public class RecordTest {
     @Test
     void create_record_willSuccess() {
         // given
-        Article post = Article.builder().id(0L).build();
+        Article article = Article.builder().id(0L).build();
         Member member = Member.builder().id(0L).build();
 
         // when
-        Record record = Record.builder().id(0L).article(post).member(member).isLike(true).build();
+        Record record = Record.builder().id(0L).article(article).member(member).isLike(true).build();
 
         // then
         assertThat(record).extracting("id", "member", "article", "isLike")
-            .containsExactly(0L, member, post, true);
+            .containsExactly(0L, member, article, true);
     }
 }

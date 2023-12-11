@@ -25,7 +25,7 @@ class ArticleRepositoryTest {
     private MemberRepository memberRepository;
 
     @Autowired
-    private ArticleRepository postRepository;
+    private ArticleRepository articleRepository;
 
     @DisplayName("게시글 목록 검색은")
     @Nested
@@ -33,23 +33,23 @@ class ArticleRepositoryTest {
 
         @BeforeEach
         public void tearDown() {
-            postRepository.deleteAll();
+            articleRepository.deleteAll();
         }
 
         @DisplayName("검색 제목을 포함하는 게시글들을 찾아낼 수 있다.")
         @ValueSource(strings = {"제목", "목입", "제목입니다.", "니다."})
         @ParameterizedTest
-        void postsContainsTitle_willReturn(String searchTarget) {
+        void articlesContainsTitle_willReturn(String searchTarget) {
 
             // given
             Member savedMember = memberRepository.save(
                 Member.builder().id(1L).nickname("nickname1").build());
 
-            postRepository.save(
+            articleRepository.save(
                 Article.createNewArticle(savedMember, "제목입니다.", "content1", false));
 
             // when
-            List<ArticleQueryResponse> result = postRepository
+            List<ArticleQueryResponse> result = articleRepository
                 .search(ArticlesSearchRequest.builder()
                     .title(searchTarget)
                     .pageSize(10)
@@ -65,17 +65,17 @@ class ArticleRepositoryTest {
         @DisplayName("검색 닉네임을 포함하는 게시글들을 찾아낼 수 있다.")
         @ValueSource(strings = {"nickname", "nickname1", "nick", "ckname"})
         @ParameterizedTest
-        void postsContainsNickname_willReturn(String searchTarget) {
+        void articlesContainsNickname_willReturn(String searchTarget) {
 
             // given
             Member savedMember = memberRepository.save(
                 Member.builder().id(1L).nickname("nickname1").build());
 
-            postRepository.save(
+            articleRepository.save(
                 Article.createNewArticle(savedMember, "title1", "content1", false));
 
             // when
-            List<ArticleQueryResponse> result = postRepository
+            List<ArticleQueryResponse> result = articleRepository
                 .search(ArticlesSearchRequest.builder()
                     .nickname(searchTarget)
                     .pageSize(10)
@@ -91,17 +91,17 @@ class ArticleRepositoryTest {
         @DisplayName("좋아요 수보다 큰 게시물들을 찾을 수 있다.")
         @ValueSource(ints = {1, 2, 100})
         @ParameterizedTest
-        void postsContainsGreaterThanLike_willReturn(int searchTarget) {
+        void articlesContainsGreaterThanLike_willReturn(int searchTarget) {
 
             // given
             Member savedMember = memberRepository.save(
                 Member.builder().id(1L).nickname("nickname1").build());
 
-            postRepository.save(
+            articleRepository.save(
                 Article.createNewArticle(savedMember, "title1", "content1", false));
 
             // when
-            List<ArticleQueryResponse> result = postRepository
+            List<ArticleQueryResponse> result = articleRepository
                 .search(ArticlesSearchRequest.builder()
                     .likeCount(searchTarget)
                     .pageSize(10)

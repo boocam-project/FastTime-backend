@@ -44,7 +44,7 @@ class ReportControllerDocsTest extends RestDocsSupport {
     @Test
     void createReport() throws Exception {
         // given
-        CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L).build();
+        CreateReportRequestDTO request = CreateReportRequestDTO.builder().articleId(1L).build();
         doNothing().when(reportService)
             .createReport(any(CreateReportRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
@@ -57,9 +57,9 @@ class ReportControllerDocsTest extends RestDocsSupport {
                 .session(session)).andExpect(status().isCreated()).andDo(
             document("report-create", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
-                    fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글 식별자")
+                    fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자")
                         .attributes(key("constraints").value(
-                            createReportRequestConstraints.descriptionsForProperty("postId")))),
+                            createReportRequestConstraints.descriptionsForProperty("articleId")))),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
