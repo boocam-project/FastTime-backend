@@ -50,7 +50,7 @@ public class SpringSecurityConfig implements WebMvcConfigurer {
                 configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers(PERMIT_URL_ARRAY).permitAll()
-                .requestMatchers(HttpMethod.GET,"api/v1/article").permitAll()
+                .requestMatchers(HttpMethod.GET,"api/v1/article", "api/v2/articles").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .formLogin(AbstractHttpConfigurer::disable)

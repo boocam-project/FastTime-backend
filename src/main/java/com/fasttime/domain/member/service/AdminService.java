@@ -8,7 +8,7 @@ import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleQueryService;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchRequestServiceDto;
 import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.entity.Role;
@@ -56,7 +56,7 @@ public class AdminService {
 
     public List<ArticlesResponse> findReportedPost(int page) {
         return articleQueryService.findReportedArticles(
-            new ReportedArticlesSearchRequest(page, DEFAULT_PAGE_SIZE,
+            new ReportedArticlesSearchRequestServiceDto(page, DEFAULT_PAGE_SIZE,
                 ReportStatus.WAIT_FOR_REPORT_REVIEW));
     }
 

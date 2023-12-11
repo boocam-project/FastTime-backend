@@ -3,7 +3,7 @@ package com.fasttime.domain.article.repository;
 
 import static com.fasttime.domain.article.entity.QArticle.article;
 
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,7 +19,7 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleQueryResponse> search(ArticlesSearchRequest searchCondition) {
+    public List<ArticleQueryResponse> search(ArticlesSearchRequestServiceDto searchCondition) {
         return jpaQueryFactory
             .select(Projections.fields(ArticleQueryResponse.class,
                 article.id,
@@ -42,7 +42,8 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
             .fetch();
     }
 
-    private BooleanBuilder createSearchConditionBuilder(ArticlesSearchRequest searchCondition) {
+    private BooleanBuilder createSearchConditionBuilder(
+        ArticlesSearchRequestServiceDto searchCondition) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (!isEmpty(searchCondition.title())) {
