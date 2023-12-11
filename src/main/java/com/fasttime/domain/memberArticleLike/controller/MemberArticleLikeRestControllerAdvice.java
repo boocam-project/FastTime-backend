@@ -1,7 +1,7 @@
-package com.fasttime.domain.record.controller;
+package com.fasttime.domain.memberArticleLike.controller;
 
-import com.fasttime.domain.record.exception.AlreadyExistsRecordException;
-import com.fasttime.domain.record.exception.DuplicateRecordException;
+import com.fasttime.domain.memberArticleLike.exception.AlreadyExistsMemberArticleLikeException;
+import com.fasttime.domain.memberArticleLike.exception.DuplicateMemberArticleLikeException;
 import com.fasttime.global.util.ResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -11,19 +11,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-class RecordRestControllerAdvice {
+class MemberArticleLikeRestControllerAdvice {
 
     @ExceptionHandler
-    ResponseEntity<ResponseDTO<Object>> duplicateRecordException(DuplicateRecordException e) {
-        log.error("DuplicateRecordException: " + e.getMessage());
+    ResponseEntity<ResponseDTO<Object>> duplicateRecordException(
+        DuplicateMemberArticleLikeException e) {
+        log.error("DuplicateMemberArticleLikeException: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 
     @ExceptionHandler
     ResponseEntity<ResponseDTO<Object>> alreadyExistsRecordException(
-        AlreadyExistsRecordException e) {
-        log.error("AlreadyExistsRecordException: " + e.getMessage());
+        AlreadyExistsMemberArticleLikeException e) {
+        log.error("AlreadyExistsMemberArticleLikeException: " + e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ResponseDTO.res(HttpStatus.BAD_REQUEST, e.getMessage()));
     }

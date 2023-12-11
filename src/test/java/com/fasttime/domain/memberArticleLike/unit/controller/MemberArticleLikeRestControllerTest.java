@@ -1,4 +1,4 @@
-package com.fasttime.domain.record.unit.controller;
+package com.fasttime.domain.memberArticleLike.unit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -11,11 +11,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.record.controller.RecordRestController;
-import com.fasttime.domain.record.dto.RecordDTO;
-import com.fasttime.domain.record.dto.request.CreateRecordRequestDTO;
-import com.fasttime.domain.record.dto.request.DeleteRecordRequestDTO;
-import com.fasttime.domain.record.service.RecordService;
+import com.fasttime.domain.memberArticleLike.controller.MemberArticleLikeRestController;
+import com.fasttime.domain.memberArticleLike.dto.MemberArticleLikeDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.CreateMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.dto.request.DeleteMemberArticleLikeRequestDTO;
+import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,27 +26,29 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(RecordRestController.class)
-public class RecordRestControllerTest {
+@WebMvcTest(MemberArticleLikeRestController.class)
+public class MemberArticleLikeRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    RecordService recordService;
+    MemberArticleLikeService memberArticleLikeService;
 
     @Nested
-    @DisplayName("createRecord()는")
-    class Context_createRecord {
+    @DisplayName("createMemberArticleLike()는")
+    class Context_createMemberArticleLike {
 
         @Test
         @DisplayName("게시글을 좋아요 할 수 있다.")
         void like_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
+                .articleId(1L)
                 .isLike(true).build();
-            doNothing().when(recordService)
-                .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
+            doNothing().when(memberArticleLikeService)
+                .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class),
+                    any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -63,10 +65,12 @@ public class RecordRestControllerTest {
         @DisplayName("게시글을 싫어요 할 수 있다.")
         void hate_willSuccess() throws Exception {
             // given
-            CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
+            CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
+                .articleId(1L)
                 .isLike(false).build();
-            doNothing().when(recordService)
-                .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
+            doNothing().when(memberArticleLikeService)
+                .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class),
+                    any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -87,10 +91,12 @@ public class RecordRestControllerTest {
             @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(null)
+                CreateMemberArticleLikeRequestDTO request = CreateMemberArticleLikeRequestDTO.builder()
+                    .articleId(null)
                     .isLike(true).build();
-                doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
+                doNothing().when(memberArticleLikeService)
+                    .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class),
+                        any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
@@ -113,10 +119,12 @@ public class RecordRestControllerTest {
             @DisplayName("null일 경우 좋아요/싫어요를 등록할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                CreateRecordRequestDTO request = CreateRecordRequestDTO.builder().articleId(1L)
+                CreateMemberArticleLikeRequestDTO request =
+                    CreateMemberArticleLikeRequestDTO.builder().articleId(1L)
                     .isLike(null).build();
-                doNothing().when(recordService)
-                    .createRecord(any(CreateRecordRequestDTO.class), any(Long.class));
+                doNothing().when(memberArticleLikeService)
+                    .createMemberArticleLike(any(CreateMemberArticleLikeRequestDTO.class),
+                        any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
@@ -133,16 +141,19 @@ public class RecordRestControllerTest {
     }
 
     @Nested
-    @DisplayName("getRecord()는")
-    class Context_getRecord {
+    @DisplayName("getMemberArticleLike()는")
+    class Context_getMemberArticleLike {
 
         @Test
         @DisplayName("좋아요/싫어요 데이터를 불러올 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            RecordDTO recordDTO = RecordDTO.builder().id(1L).memberId(1L).articleId(1L).isLike(true)
+            MemberArticleLikeDTO memberArticleLikeDTO =
+                MemberArticleLikeDTO.builder().id(1L).memberId(1L).articleId(1L).isLike(true)
                 .build();
-            given(recordService.getRecord(any(Long.class), any(Long.class))).willReturn(recordDTO);
+            given(memberArticleLikeService.getMemberArticleLike(any(Long.class),
+                any(Long.class))).willReturn(
+                memberArticleLikeDTO);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
 
@@ -158,16 +169,18 @@ public class RecordRestControllerTest {
     }
 
     @Nested
-    @DisplayName("deleteRecord()는")
-    class Context_deleteRecord {
+    @DisplayName("deleteMemberArticleLike()는")
+    class Context_deleteMemberArticleLike {
 
         @Test
         @DisplayName("게시글 좋아요(싫어요)를 취소할 수 있다.")
         void _willSuccess() throws Exception {
             // given
-            DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().articleId(1L).build();
-            doNothing().when(recordService)
-                .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder()
+                .articleId(1L).build();
+            doNothing().when(memberArticleLikeService)
+                .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class),
+                    any(Long.class));
             String json = new ObjectMapper().writeValueAsString(request);
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", 1L);
@@ -188,10 +201,12 @@ public class RecordRestControllerTest {
             @DisplayName("null일 경우 취소할 수 없다.")
             void null_willFail() throws Exception {
                 // given
-                DeleteRecordRequestDTO request = DeleteRecordRequestDTO.builder().articleId(null)
+                DeleteMemberArticleLikeRequestDTO request =
+                    DeleteMemberArticleLikeRequestDTO.builder().articleId(null)
                     .build();
-                doNothing().when(recordService)
-                    .deleteRecord(any(DeleteRecordRequestDTO.class), any(Long.class));
+                doNothing().when(memberArticleLikeService)
+                    .deleteMemberArticleLike(any(DeleteMemberArticleLikeRequestDTO.class),
+                        any(Long.class));
                 String json = new ObjectMapper().writeValueAsString(request);
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);

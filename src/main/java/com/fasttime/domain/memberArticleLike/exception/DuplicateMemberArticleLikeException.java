@@ -1,17 +1,17 @@
-package com.fasttime.domain.record.exception;
+package com.fasttime.domain.memberArticleLike.exception;
 
 import com.fasttime.global.exception.ApplicationException;
 import com.fasttime.global.exception.ErrorCode;
 
-public class DuplicateRecordException extends ApplicationException {
+public class DuplicateMemberArticleLikeException extends ApplicationException {
 
     private static final ErrorCode ERROR_CODE = ErrorCode.DUPLICATED_REQUEST_FOR_RECORD;
 
-    public DuplicateRecordException() {
+    public DuplicateMemberArticleLikeException() {
         super(ERROR_CODE);
     }
 
-    public DuplicateRecordException(String message) {
+    public DuplicateMemberArticleLikeException(String message) {
         super(ERROR_CODE, message);
     }
 }

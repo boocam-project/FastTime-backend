@@ -16,7 +16,7 @@ endif::[]
 === link:comment/comment-api.html[댓글 API, window=blank]
 === link:admin/admin-api.html[어드민 API, window=blank]
 === link:report/report-api.html[신고 API, window=blank]
-=== link:record/record-api.html[좋아요/싫어요 API, window=blank]
+=== link:memberArticleLike/memberArticleLike-api.html[좋아요/싫어요 API, window=blank]
 
 == API Common Response
 [[overview-http-status-code]]

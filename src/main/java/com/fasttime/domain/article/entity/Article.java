@@ -117,17 +117,9 @@ public class Article extends BaseTimeEntity {
 
     public void likeOrHate(boolean isLike, boolean increase) {
         if (isLike) {
-            if (increase) {
-                this.likeCount++;
-            } else {
-                this.likeCount--;
-            }
+            this.likeCount += increase ? 1 : -1;
         } else {
-            if (increase) {
-                this.hateCount++;
-            } else {
-                this.hateCount--;
-            }
+            this.hateCount += increase ? 1 : -1;
         }
     }
 

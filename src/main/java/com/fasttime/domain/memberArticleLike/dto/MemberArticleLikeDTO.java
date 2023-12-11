@@ -1,11 +1,11 @@
-package com.fasttime.domain.record.dto;
+package com.fasttime.domain.memberArticleLike.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 @Getter
-public class RecordDTO {
+public class MemberArticleLikeDTO {
 
     private Long id;
     private Long memberId;
