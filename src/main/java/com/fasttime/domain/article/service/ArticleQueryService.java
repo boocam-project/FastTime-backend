@@ -7,7 +7,6 @@ import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,8 @@ public class ArticleQueryService implements ArticleQueryUseCase {
     private final ArticleSettingProvider articleSettingProvider;
     private final ArticleRepository articleRepository;
 
-    public ArticleQueryService(ArticleSettingProvider articleSettingProvider, ArticleRepository articleRepository) {
+    public ArticleQueryService(ArticleSettingProvider articleSettingProvider,
+        ArticleRepository articleRepository) {
         this.articleSettingProvider = articleSettingProvider;
         this.articleRepository = articleRepository;
     }
@@ -35,8 +35,9 @@ public class ArticleQueryService implements ArticleQueryUseCase {
             .title(targetArticle.getTitle())
             .content(targetArticle.getContent())
             .nickname(targetArticle.isAnonymity() ?
-                articleSettingProvider.getAnonymousNickname() : targetArticle.getMember().getNickname())
-            .anonymity(targetArticle.isAnonymity())
+                articleSettingProvider.getAnonymousNickname()
+                : targetArticle.getMember().getNickname())
+            .isAnonymity(targetArticle.isAnonymity())
             .likeCount(targetArticle.getLikeCount())
             .hateCount(targetArticle.getHateCount())
             .createdAt(targetArticle.getCreatedAt())
@@ -45,28 +46,30 @@ public class ArticleQueryService implements ArticleQueryUseCase {
     }
 
     @Override
-    public List<ArticlesResponse> search(ArticlesSearchServiceRequest request) {
+    public List<ArticlesResponse> search(ArticlesSearchRequestServiceDto request) {
         return articleRepository.search(request)
             .stream()
             .map(repositoryDto -> ArticlesResponse.builder()
-                .id(repositoryDto.getId())
-                .title(repositoryDto.getTitle())
-                .nickname(repositoryDto.isAnonymity() ? articleSettingProvider.getAnonymousNickname()
-                    : repositoryDto.getNickname())
-                .anonymity(repositoryDto.isAnonymity())
-                .likeCount(repositoryDto.getLikeCount())
-                .hateCount(repositoryDto.getHateCount())
-                .commentCounts(repositoryDto.getCommentCount())
-                .createdAt(repositoryDto.getCreatedAt())
-                .lastModifiedAt(repositoryDto.getLastModifiedAt())
+                .id(repositoryDto.id())
+                .title(repositoryDto.title())
+                .nickname(
+                    repositoryDto.isAnonymity() ? articleSettingProvider.getAnonymousNickname()
+                        : repositoryDto.nickname())
+                .isAnonymity(repositoryDto.isAnonymity())
+                .likeCount(repositoryDto.likeCount())
+                .hateCount(repositoryDto.hateCount())
+                .commentCounts(repositoryDto.commentCount())
+                .createdAt(repositoryDto.createdAt())
+                .lastModifiedAt(repositoryDto.lastModifiedAt())
                 .build())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Override
-    public List<ArticlesResponse> findReportedArticles(ReportedArticlesSearchServiceRequest request) {
+    public List<ArticlesResponse> findReportedArticles(
+        ReportedArticlesSearchRequestServiceDto request) {
         return articleRepository
-            .findAllByReportStatus(cretePageRequest(request), request.getReportStatus())
+            .findAllByReportStatus(cretePageRequest(request), request.reportStatus())
             .stream()
             .map(result -> ArticlesResponse.builder()
                 .id(result.getId())
@@ -76,11 +79,11 @@ public class ArticleQueryService implements ArticleQueryUseCase {
                 .createdAt(result.getCreatedAt())
                 .lastModifiedAt(result.getCreatedAt())
                 .build())
-            .collect(Collectors.toList());
+            .toList();
     }
 
-    private PageRequest cretePageRequest(ReportedArticlesSearchServiceRequest request) {
-        return PageRequest.of(request.getPageNum(), request.getPageNum(),
+    private PageRequest cretePageRequest(ReportedArticlesSearchRequestServiceDto request) {
+        return PageRequest.of(request.pageNum(), request.pageSize(),
             Sort.by(articleSettingProvider.getDefaultOrderField()).descending());
     }
 }

@@ -5,8 +5,10 @@ import com.fasttime.global.exception.ErrorCode;
 
 public class EmailAlreadyExistsException extends ApplicationException {
 
-    public EmailAlreadyExistsException(ErrorCode errorCode) {
+    private static final ErrorCode ERROR_CODE = ErrorCode.MEMBER_ALREADY_REGISTERED;
 
-        super(errorCode);
+    public EmailAlreadyExistsException() {
+
+        super(ERROR_CODE);
     }
 }

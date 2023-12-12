@@ -1,18 +1,20 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.dto.MemberDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
+import com.fasttime.domain.member.dto.request.EditRequest;
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.MyPageInfoDTO;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.request.RefreshRequestDto;
+import com.fasttime.domain.member.dto.response.EditResponse;
+import com.fasttime.domain.member.dto.response.LogInResponseDto;
+import com.fasttime.domain.member.dto.response.MemberResponse;
+import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.EditRequest;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.EditResponse;
-import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.exception.ErrorCode;
 import com.fasttime.global.util.ResponseDTO;
-import jakarta.servlet.http.HttpSession;
+import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,24 +33,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+
     private final MemberRepository memberRepository;
 
+    private final SecurityUtil securityUtil;
 
     @PostMapping("/api/v1/join")
-    public ResponseEntity<ResponseDTO<?>> join(@Valid @RequestBody MemberDto memberDto) {
-        ResponseDTO<Object> response = memberService.registerOrRecoverMember(memberDto);
+    public ResponseEntity<ResponseDTO<?>> join(
+        @Valid @RequestBody CreateMemberDTO createMemberDTO) {
+        ResponseDTO<Object> response = memberService.registerOrRecoverMember(createMemberDTO);
         return ResponseEntity.status(HttpStatus.valueOf(response.getCode())).body(response);
     }
 
     @PutMapping("/api/v1/retouch-member")
     public ResponseEntity<ResponseDTO<EditResponse>> updateMember(
-        @Valid @RequestBody EditRequest editRequest,
-        HttpSession session) {
+        @Valid @RequestBody EditRequest editRequest) {
 
-        return memberService.updateMemberInfo(editRequest, session)
+        return memberService.updateMemberInfo(editRequest, securityUtil.getCurrentMemberId())
             .map(updatedMember -> ResponseEntity.ok(
-                ResponseDTO.<EditResponse>res(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus(),
-                    ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage(),
+                ResponseDTO.<EditResponse>res(HttpStatus.OK, "회원 정보가 업데이트되었습니다.",
                     new EditResponse(updatedMember.getEmail(),
                         updatedMember.getNickname(),
                         updatedMember.getImage()))
@@ -63,79 +66,55 @@ public class MemberController {
 
 
     @DeleteMapping("/api/v1/delete")
-    public ResponseEntity<ResponseDTO<Object>> deleteMember(HttpSession httpSession) {
-        Long memberId = (Long) httpSession.getAttribute("MEMBER");
-        if (memberId != null) {
-            try {
-                Member member = memberService.getMember(memberId);
-                memberService.softDeleteMember(member);
-                httpSession.invalidate();
+    public ResponseEntity<ResponseDTO<Object>> deleteMember() {
 
-                return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
-            } catch (Exception e) {
-
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR,
-                        "회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage()));
-            }
-        } else {
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ResponseDTO.res(HttpStatus.UNAUTHORIZED,
-                    "세션에 유효한 회원 ID가 없습니다. 로그인 상태를 확인하세요."));
+        try {
+            Member member = memberService.getMember(securityUtil.getCurrentMemberId());
+            memberService.softDeleteMember(member);
+            return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "탈퇴가 완료되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage()));
         }
+
     }
 
-
     @GetMapping("/api/v1/mypage")
-    public ResponseEntity<ResponseDTO> getMyPageInfo(HttpSession session) {
+    public ResponseEntity<ResponseDTO> getMyPageInfo() {
 
-        Long memberId = (Long) session.getAttribute("MEMBER");
-        // 프론트 측에서 요청한 예외 처리 ->403
-        if (memberId == null) {
-
-            return ResponseEntity
-                .status(HttpStatus.FORBIDDEN)
-                .body(ResponseDTO.res(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."));
-        }
-
-        MyPageInfoDTO myPageInfoDto = memberService.getMyPageInfoById(memberId);
+        MyPageInfoDTO myPageInfoDto = memberService
+            .getMyPageInfoById(securityUtil.getCurrentMemberId());
         return ResponseEntity.ok(
-            ResponseDTO.res(HttpStatus.OK, ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage(),
+            ResponseDTO.res(HttpStatus.OK, "사용자 정보를 성공적으로 조회하였습니다.",
                 myPageInfoDto));
     }
 
 
-    @PostMapping("/api/v1/login")
-    public ResponseEntity<ResponseDTO> logIn(@Validated @RequestBody LoginRequestDTO dto
-        , HttpSession session) {
-
-        MemberResponse response = memberService.loginMember(dto);
-        session.setAttribute("MEMBER", response.getId());
+    @PostMapping("/api/v2/login")
+    public ResponseEntity<ResponseDTO<LogInResponseDto>> logIn
+        (@Validated @RequestBody LoginRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "로그인이 완료되었습니다.", response));
+            (HttpStatus.OK, "로그인이 완료되었습니다.", memberService.loginMember(dto)));
     }
 
-    @GetMapping("/api/v1/logout")
-    public ResponseEntity<ResponseDTO> logOut(HttpSession session) {
-        if (session.getAttribute("ADMIN") != null) {
-            session.removeAttribute("ADMIN");
-        }
-        if (session.getAttribute("MEMBER") != null) {
-            session.removeAttribute("MEMBER");
-        }
+    @PostMapping("/api/v2/refresh")
+    public ResponseEntity<ResponseDTO<LogInResponseDto>> refresh(
+        @Validated @RequestBody RefreshRequestDto dto) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
-            (HttpStatus.OK, "로그아웃이 완료되었습니다."));
+            (HttpStatus.OK, "성공적으로 토큰을 재발급 했습니다.", memberService.refresh(dto)));
+
     }
 
     @PostMapping("/api/v1/RePassword")
-    public ResponseEntity<ResponseDTO> rePassword
-        (@Validated @RequestBody RePasswordRequest request, HttpSession session) {
+    public ResponseEntity<ResponseDTO<MemberResponse>> rePassword
+        (@Validated @RequestBody RePasswordRequest request) {
 
         MemberResponse response =
-            memberService.rePassword(request, (Long) session.getAttribute("MEMBER"));
+            memberService.rePassword(request, securityUtil.getCurrentMemberId());
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "패스워드 재설정이 완료되었습니다", response));
     }
+
 }
 

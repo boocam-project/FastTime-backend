@@ -13,10 +13,10 @@ import com.fasttime.domain.comment.exception.MultipleSearchConditionException;
 import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.service.MemberService;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final ArticleQueryService postQueryService;
+    private final ArticleQueryService articleQueryService;
     private final MemberService memberService;
 
     public CommentResponseDTO createComment(long articleId, long memberId,
@@ -38,7 +38,7 @@ public class CommentService {
             isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
         return commentRepository.save(Comment.builder()
                 .article(Article.builder()
-                    .id(postQueryService.queryById(articleId).getId())
+                    .id(articleQueryService.queryById(articleId).id())
                     .build())
                 .member(memberService.getMember(memberId))
                 .content(createCommentRequestDTO.getContent())

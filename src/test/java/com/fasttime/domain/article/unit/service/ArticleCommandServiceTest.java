@@ -5,46 +5,40 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
-import com.fasttime.domain.article.service.ArticleSettingProvider;
-import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
-import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
-import com.fasttime.domain.article.exception.NotArticleWriterException;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
+import com.fasttime.domain.article.exception.NotArticleWriterException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleCommandService;
+import com.fasttime.domain.article.service.ArticleSettingProvider;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
+import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
+import com.fasttime.domain.member.service.MemberService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
-@SpringBootTest
 class ArticleCommandServiceTest {
 
-    @InjectMocks
-    private ArticleCommandService postCommandService;
+    private final MemberService memberService = mock(MemberService.class);
 
-    @Mock
-    private MemberService memberService;
+    private final ArticleSettingProvider articleSettingProvider = mock(
+        ArticleSettingProvider.class);
 
-    @Mock
-    private ArticleSettingProvider articleSettingProvider;
+    private final ArticleRepository articleRepository = mock(ArticleRepository.class);
 
-    @Mock
-    private ArticleRepository postRepository;
+    private final ArticleCommandService articleCommandService = new ArticleCommandService(
+        articleSettingProvider, memberService, articleRepository);
+
 
     @DisplayName("createArticle()는")
     @Nested
@@ -60,14 +54,16 @@ class ArticleCommandServiceTest {
                 "content", true);
 
             given(memberService.getMember(1L)).willReturn(member);
-            given(postRepository.save(any(Article.class))).willReturn(mockArticle);
+            given(articleRepository.save(any(Article.class))).willReturn(mockArticle);
 
             // when
-            ArticleResponse response = postCommandService.write(dto);
+            ArticleResponse response = articleCommandService.write(dto);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "nickname", "anonymity", "likeCount", "hateCount")
-                .containsExactly(1L, "title", "content", articleSettingProvider.getAnonymousNickname(), true, 0, 0);
+            assertThat(response).extracting("id", "title", "content", "nickname", "isAnonymity",
+                    "likeCount", "hateCount")
+                .containsExactly(1L, "title", "content",
+                    articleSettingProvider.getAnonymousNickname(), true, 0, 0);
         }
 
         @DisplayName("회원 정보가 DB에 없는 경우 UserNotFoundException을 던진다.")
@@ -78,12 +74,12 @@ class ArticleCommandServiceTest {
             ArticleCreateServiceRequest dto = new ArticleCreateServiceRequest(1L, "title",
                 "content", true);
 
-            given(memberService.getMember(1L)).willThrow(UserNotFoundException.class);
-            given(postRepository.save(any(Article.class))).willReturn(mockArticle);
+            given(memberService.getMember(1L)).willThrow(MemberNotFoundException.class);
+            given(articleRepository.save(any(Article.class))).willReturn(mockArticle);
 
             // when then
-            assertThatThrownBy(() -> postCommandService.write(dto))
-                .isInstanceOf(UserNotFoundException.class);
+            assertThatThrownBy(() -> articleCommandService.write(dto))
+                .isInstanceOf(MemberNotFoundException.class);
         }
     }
 
@@ -101,28 +97,28 @@ class ArticleCommandServiceTest {
                 "new title", true, "newContent");
 
             given(memberService.getMember(1L)).willReturn(member);
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
 
             // when
-            ArticleResponse response = postCommandService.update(serviceDto);
+            ArticleResponse response = articleCommandService.update(serviceDto);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "anonymity", "likeCount",
+            assertThat(response).extracting("id", "title", "content", "isAnonymity", "likeCount",
                     "hateCount")
                 .containsExactly(1L, "new title", "newContent", true, 0, 0);
         }
 
         @DisplayName("수정할 게시글 정보가 DB에 없는 경우 ArticleNotFoundException을 던진다.")
         @Test
-        void post_notExist_throwIllArgumentException() {
+        void article_notExist_throwIllArgumentException() {
             // given
             ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L, 1L,
                 "newTitle", true, "newContent");
 
-            given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+            given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
 
             // when then
-            assertThatThrownBy(() -> postCommandService.update(serviceDto))
+            assertThatThrownBy(() -> articleCommandService.update(serviceDto))
                 .isInstanceOf(ArticleNotFoundException.class);
         }
 
@@ -133,14 +129,15 @@ class ArticleCommandServiceTest {
             Member writer = Member.builder().id(1L).build();
             Member notAuthorizedMember = Member.builder().id(100L).build();
             Article mockArticle = createMockArticle(writer, "title", "content");
-            ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L, notAuthorizedMember.getId(),
+            ArticleUpdateServiceRequest serviceDto = new ArticleUpdateServiceRequest(1L,
+                notAuthorizedMember.getId(),
                 "newTitle", true, "newContent");
 
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
-            assertThatThrownBy(() -> postCommandService.update(serviceDto))
+            assertThatThrownBy(() -> articleCommandService.update(serviceDto))
                 .isInstanceOf(NotArticleWriterException.class);
         }
     }
@@ -151,15 +148,16 @@ class ArticleCommandServiceTest {
 
         @DisplayName("수정할 게시글 정보가 DB에 없는 경우 ArticleNotFoundException을 던진다.")
         @Test
-        void post_notExist_throwIllArgumentException() {
+        void article_notExist_throwIllArgumentException() {
             // given
             LocalDateTime deletedAt = LocalDateTime.now();
-            ArticleDeleteServiceRequest serviceDto = new ArticleDeleteServiceRequest(1L, 1L, deletedAt);
+            ArticleDeleteServiceRequest serviceDto = new ArticleDeleteServiceRequest(1L, 1L,
+                deletedAt);
 
-            given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+            given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
 
             // when then
-            assertThatThrownBy(() -> postCommandService.delete(serviceDto))
+            assertThatThrownBy(() -> articleCommandService.delete(serviceDto))
                 .isInstanceOf(ArticleNotFoundException.class);
         }
 
@@ -171,13 +169,14 @@ class ArticleCommandServiceTest {
             Member writer = Member.builder().id(1L).build();
             Member notAuthorizedMember = Member.builder().id(100L).build();
 
-            ArticleDeleteServiceRequest serviceDto = new ArticleDeleteServiceRequest(1L, notAuthorizedMember.getId(), deletedAt);
+            ArticleDeleteServiceRequest serviceDto = new ArticleDeleteServiceRequest(1L,
+                notAuthorizedMember.getId(), deletedAt);
             Article mockArticle = createMockArticle(writer, "title", "content");
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(mockArticle));
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
 
             // when then
-            assertThatThrownBy(() -> postCommandService.delete(serviceDto))
+            assertThatThrownBy(() -> articleCommandService.delete(serviceDto))
                 .isInstanceOf(NotArticleWriterException.class);
         }
     }

@@ -19,6 +19,7 @@ import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.report.contoller.ReportRestController;
 import com.fasttime.domain.report.dto.request.CreateReportRequestDTO;
 import com.fasttime.domain.report.service.ReportService;
+import com.fasttime.global.util.SecurityUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -26,13 +27,14 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-public class ReportControllerDocsTest extends RestDocsSupport {
+class ReportControllerDocsTest extends RestDocsSupport {
 
     private final ReportService reportService = mock(ReportService.class);
+    private final SecurityUtil securityUtil = mock(SecurityUtil.class);
 
     @Override
     public Object initController() {
-        return new ReportRestController(reportService);
+        return new ReportRestController(reportService, securityUtil);
     }
 
     ConstraintDescriptions createReportRequestConstraints = new ConstraintDescriptions(
@@ -42,7 +44,7 @@ public class ReportControllerDocsTest extends RestDocsSupport {
     @Test
     void createReport() throws Exception {
         // given
-        CreateReportRequestDTO request = CreateReportRequestDTO.builder().postId(1L).build();
+        CreateReportRequestDTO request = CreateReportRequestDTO.builder().articleId(1L).build();
         doNothing().when(reportService)
             .createReport(any(CreateReportRequestDTO.class), any(Long.class));
         String json = new ObjectMapper().writeValueAsString(request);
@@ -55,9 +57,9 @@ public class ReportControllerDocsTest extends RestDocsSupport {
                 .session(session)).andExpect(status().isCreated()).andDo(
             document("report-create", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
-                    fieldWithPath("postId").type(JsonFieldType.NUMBER).description("게시글 식별자")
+                    fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자")
                         .attributes(key("constraints").value(
-                            createReportRequestConstraints.descriptionsForProperty("postId")))),
+                            createReportRequestConstraints.descriptionsForProperty("articleId")))),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),

@@ -1,24 +1,14 @@
 package com.fasttime.domain.article.dto.controller.request;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
 
-@Getter
-public class ArticleDeleteRequest {
-
-    @NotNull
-    private final Long articleId;
-
-    @NotNull
-    private final Long memberId;
-
-    @JsonCreator
-    public ArticleDeleteRequest(
-        @JsonProperty("articleId") Long articleId,
-        @JsonProperty("memberId") Long memberId) {
-        this.articleId = articleId;
-        this.memberId = memberId;
-    }
+/**
+ * articleId는 PathVariable으로, MemberId 는 Spring Security 으로부터 인자로 전달받기 때문에 더 이상 필요하지 않습니다.
+ * @param articleId
+ * @param memberId
+ */
+@Deprecated(since = "2023.12.11")
+public record ArticleDeleteRequest(
+    @NotNull Long articleId,
+    @NotNull Long memberId) {
 }

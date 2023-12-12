@@ -26,13 +26,13 @@ import com.fasttime.domain.comment.exception.NotCommentAuthorException;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.comment.service.CommentService;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.service.MemberService;
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ public class CommentServiceTest {
             .title("title")
             .content("content")
             .nickname("nickname1")
-            .anonymity(true)
+            .isAnonymity(true)
             .likeCount(0)
             .hateCount(0)
             .createdAt(LocalDateTime.of(2024, 1, 1, 12, 0, 0))
@@ -263,7 +263,7 @@ public class CommentServiceTest {
 
         @Test
         @DisplayName("게시물을 찾을 수 없으면 댓글을 등록할 수 없다.")
-        void postNotFound_willFail() {
+        void articleNotFound_willFail() {
             // given
             CreateCommentRequestDTO createCommentRequestDTO = CreateCommentRequestDTO.builder()
                 .content("content")
@@ -296,10 +296,10 @@ public class CommentServiceTest {
             given(articleQueryService.queryById(any(Long.class))).willReturn(
                 newArticleResponse());
             given(memberService.getMember(any(Long.class))).willThrow(
-                new UserNotFoundException("User not found with id: 1L"));
+                new MemberNotFoundException("User not found with id: 1L"));
 
             // when, then
-            Throwable exception = assertThrows(UserNotFoundException.class, () -> {
+            Throwable exception = assertThrows(MemberNotFoundException.class, () -> {
                 commentService.createComment(1L, 1L, createCommentRequestDTO);
             });
             assertEquals("User not found with id: 1L", exception.getMessage());

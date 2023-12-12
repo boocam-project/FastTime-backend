@@ -45,4 +45,5 @@ public class GlobalExceptionRestAdvice {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(ResponseDTO.res(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러!"));
     }
+
 }

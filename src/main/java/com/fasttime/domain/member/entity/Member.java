@@ -1,13 +1,15 @@
 package com.fasttime.domain.member.entity;
 
 import com.fasttime.global.common.BaseTimeEntity;
-import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +24,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @Table(name = "Member")
-public class Member extends BaseTimeEntity {
+public class Member extends BaseTimeEntity  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,11 +36,19 @@ public class Member extends BaseTimeEntity {
 
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @Override
     public void delete(LocalDateTime currentTime) {
         super.delete(currentTime);
     }
 
+    public void update(String nickname, String image) {
+        this.nickname = nickname;
+        this.image = image;
+
+    }
     @Override
     public void restore() {
         super.restore();
@@ -46,12 +56,6 @@ public class Member extends BaseTimeEntity {
 
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
-
-    public void update(String nickname, String image) {
-        this.nickname = nickname;
-        this.image = image;
-
-    }
 
 
 }

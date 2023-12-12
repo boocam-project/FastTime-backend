@@ -7,26 +7,18 @@ import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
-import com.fasttime.domain.member.dto.MemberDto;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
-import com.fasttime.domain.member.dto.request.saveAdminDTO;
-import com.fasttime.domain.member.entity.Admin;
+import com.fasttime.domain.article.service.ArticleQueryService;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchRequestServiceDto;
+import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.entity.Member;
+import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
-import com.fasttime.domain.member.exception.UserNotFoundException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.repository.AdminEmailRepository;
-import com.fasttime.domain.member.repository.AdminRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
-import java.rmi.AccessException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,93 +29,65 @@ public class AdminService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    private final AdminRepository adminRepository;
-    private final ArticleRepository postRepository;
+    private final ArticleQueryService articleQueryService;
+    private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final MemberService memberService;
     private final AdminEmailRepository adminEmailRepository;
 
 
-    public void save(saveAdminDTO dto) {
+    public void save(CreateMemberDTO dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
-            throw new IllegalArgumentException("이미 생성된 이메일입니다.");
+            throw new MemberNotMatchInfoException();
         }
         if (!adminEmailRepository.existsAdminEmailByEmail(dto.getEmail())) {
-            throw new AdminNotFoundException("Admin not found");
+            throw new AdminNotFoundException();
         }
-        memberService.save(new MemberDto(dto.getEmail(), dto.getPassword(), dto.getEmail()));
-        adminRepository.save(Admin.builder().member(memberRepository.findByEmail
-            (dto.getEmail()).get()).build());
-    }
 
-    public Long loginAdmin(LoginRequestDTO dto) {
-
-        Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new UserNotFoundException("User not found with email: " + dto.getEmail()));
-
-        if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
-            throw new BadCredentialsException("Not match password!");
-        }
-        return adminRepository.findByMember(member)
-            .orElseThrow(() -> new AdminNotFoundException("Admin not found")).getId();
-
+        Member member = new Member();
+        member.setEmail(dto.getEmail());
+        member.setNickname(dto.getNickname());
+        member.setPassword(passwordEncoder.encode(dto.getPassword()));
+        member.setRole(Role.ROLE_ADMIN);
+        memberRepository.save(member);
     }
 
     public List<ArticlesResponse> findReportedPost(int page) {
-        return postRepository.findAllByReportStatus(
-                createSortCondition(page, "createdAt"), ReportStatus.WAIT_FOR_REPORT_REVIEW)
-            .stream()
-            .map(post -> ArticlesResponse.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .nickname(post.getMember().getNickname())
-                .anonymity(post.isAnonymity())
-                .likeCount(post.getLikeCount())
-                .hateCount(post.getHateCount())
-                .createdAt(post.getCreatedAt())
-                .lastModifiedAt(post.getUpdatedAt())
-                .build())
-            .collect(Collectors.toList());
+        return articleQueryService.findReportedArticles(
+            new ReportedArticlesSearchRequestServiceDto(page, DEFAULT_PAGE_SIZE,
+                ReportStatus.WAIT_FOR_REPORT_REVIEW));
     }
-
-    @NotNull
-    private static PageRequest createSortCondition(int searchPage, String propertyName) {
-        return PageRequest.of(searchPage, DEFAULT_PAGE_SIZE)
-            .withSort(Sort.by(propertyName).descending());
-    }
-
 
     public ArticleResponse findOneReportedPost(Long id) {
-        Article post = postRepository.findById(id)
+        Article article = articleRepository.findById(id)
             .orElseThrow(() -> new ArticleNotFoundException());
-        if (!post.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
+        if (!article.getReportStatus().equals(ReportStatus.WAIT_FOR_REPORT_REVIEW)) {
             throw new BadArticleReportStatusException();
         }
         return ArticleResponse.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .nickname(post.getMember().getNickname())
-            .anonymity(post.isAnonymity())
-            .likeCount(post.getLikeCount())
-            .hateCount(post.getHateCount())
-            .createdAt(post.getCreatedAt())
-            .lastModifiedAt(post.getUpdatedAt())
+            .id(article.getId())
+            .title(article.getTitle())
+            .content(article.getContent())
+            .nickname(article.getMember().getNickname())
+            .isAnonymity(article.isAnonymity())
+            .likeCount(article.getLikeCount())
+            .hateCount(article.getHateCount())
+            .createdAt(article.getCreatedAt())
+            .lastModifiedAt(article.getUpdatedAt())
             .build();
     }
 
     public void deletePost(Long id) {
-        Article post = postRepository.findById(id)
-            .orElseThrow(() -> new ArticleNotFoundException());
-        postRepository.delete(post);
+        Article article = articleRepository.findById(id)
+            .orElseThrow(ArticleNotFoundException::new);
+        articleRepository.delete(article);
     }
 
     public void passPost(Long id) {
-        Article post = postRepository.findById(id).
-            orElseThrow(() -> new ArticleNotFoundException());
-        post.rejectReport();
+        Article article = articleRepository.findById(id).
+            orElseThrow(ArticleNotFoundException::new);
+        article.rejectReport();
     }
-
 }

@@ -7,13 +7,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.RePasswordRequest;
+import com.fasttime.domain.member.dto.response.LogInResponseDto;
+import com.fasttime.domain.member.dto.response.MemberResponse;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.exception.UserNotMatchInfoException;
-import com.fasttime.domain.member.exception.UserNotMatchRePasswordException;
-import com.fasttime.domain.member.exception.UserSoftDeletedException;
+import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
+import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.domain.member.request.RePasswordRequest;
-import com.fasttime.domain.member.response.MemberResponse;
 import com.fasttime.domain.member.service.MemberService;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -59,10 +60,10 @@ public class MemberServiceTest {
             given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(true);
 
             //when
-            MemberResponse memberResponse = memberService.loginMember(dto);
+            LogInResponseDto logInResponseDto = memberService.loginMember(dto);
 
             //then
-            assertThat(memberResponse).extracting("id",  "nickname")
+            assertThat(logInResponseDto).extracting("id",  "nickname")
                 .containsExactly(1L, member.getNickname());
 
         }
@@ -78,7 +79,7 @@ public class MemberServiceTest {
 
             //when,then
             assertThatThrownBy(() -> memberService.loginMember(dto))
-                .isInstanceOf(UserNotMatchInfoException.class)
+                .isInstanceOf(MemberNotMatchInfoException.class)
                .hasMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
 
 
@@ -101,7 +102,7 @@ public class MemberServiceTest {
 
             //when,then
             assertThatThrownBy(() -> memberService.loginMember(dto))
-                .isInstanceOf(UserNotMatchInfoException.class)
+                .isInstanceOf(MemberNotMatchInfoException.class)
                 .hasMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
 
         }
@@ -122,7 +123,7 @@ public class MemberServiceTest {
 
             //when,then
             assertThatThrownBy(() -> memberService.loginMember(dto))
-                .isInstanceOf(UserSoftDeletedException.class)
+                .isInstanceOf(MemberSoftDeletedException.class)
                 .hasMessage("이미 탈퇴한 회원입니다.");
 
         }
@@ -169,7 +170,7 @@ public class MemberServiceTest {
 
             //when, then
             assertThatThrownBy(() -> memberService.rePassword(request,1L))
-                .isInstanceOf(UserNotMatchRePasswordException.class)
+                .isInstanceOf(MemberNotMatchRePasswordException.class)
                 .hasMessage("비밀번호 재확인이 일치하지 않습니다.");
 
         }

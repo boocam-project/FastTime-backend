@@ -1,7 +1,7 @@
 package com.fasttime.domain.report.entity;
 
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,14 +27,14 @@ public class Report extends BaseTimeEntity {
     @ManyToOne
     private Member member;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "article_id")
     @ManyToOne
-    private Article post;
+    private Article article;
 
     @Builder
-    public Report(Long id, Member member, Article post) {
+    public Report(Long id, Member member, Article article) {
         this.id = id;
         this.member = member;
-        this.post = post;
+        this.article = article;
     }
 }

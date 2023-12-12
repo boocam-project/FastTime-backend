@@ -2,8 +2,8 @@ package com.fasttime.domain.report.unit.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.article.entity.Article;
+import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.report.entity.Report;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ public class ReportTest {
     @Test
     void create_report_willSuccess() {
         // given
-        Article post = Article.builder().id(0L).build();
+        Article article = Article.builder().id(0L).build();
         Member member = Member.builder().id(0L).build();
 
         // when
-        Report report = Report.builder().id(0L).post(post).member(member).build();
+        Report report = Report.builder().id(0L).article(article).member(member).build();
 
         // then
-        assertThat(report).extracting("id", "member", "post").containsExactly(0L, member, post);
+        assertThat(report).extracting("id", "member", "article").containsExactly(0L, member, article);
     }
 }

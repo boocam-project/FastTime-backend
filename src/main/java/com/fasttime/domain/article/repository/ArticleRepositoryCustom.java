@@ -1,27 +1,25 @@
 package com.fasttime.domain.article.repository;
 
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.Getter;
 
 public interface ArticleRepositoryCustom {
 
-    List<ArticleQueryResponse> search(ArticlesSearchServiceRequest searchCondition);
+    List<ArticleQueryResponse> search(ArticlesSearchRequestServiceDto searchCondition);
 
-    @Getter
-    class ArticleQueryResponse {
-
-        private Long id;
-        private Long memberId;
-        private String nickname;
-        private String title;
-        private boolean anonymity;
-        private int commentCount;
-        private int likeCount;
-        private int hateCount;
-        private LocalDateTime createdAt;
-        private LocalDateTime lastModifiedAt;
-        private LocalDateTime deletedAt;
+    record ArticleQueryResponse(
+        Long id,
+        Long memberId,
+        String nickname,
+        String title,
+        boolean isAnonymity,
+        int commentCount,
+        int likeCount,
+        int hateCount,
+        LocalDateTime createdAt,
+        LocalDateTime lastModifiedAt,
+        LocalDateTime deletedAt
+    ) {
     }
 }

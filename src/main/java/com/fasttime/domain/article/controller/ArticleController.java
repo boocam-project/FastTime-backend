@@ -10,12 +10,12 @@ import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.Article
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchServiceRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import com.fasttime.global.util.ResponseDTO;
+import com.fasttime.global.util.SecurityUtil;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,73 +29,61 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @deprecated 2023.12.05
+ * spring security를 사용하면서 더 이상 memberId 값을 받아올 필요가 없어졌습니다.
+ * 해당 이유로 다음 api를 deprecated 하고 v2로 제공합니다.
+ */
 @Slf4j
+@Deprecated(since = "2023.12.05")
 @RequestMapping("/api/v1/article")
 @RestController
 public class ArticleController {
 
-    private static final String SESSION_MEMBER_KEY = "MEMBER";
-
     private final ArticleCommandUseCase articleCommandUseCase;
     private final ArticleQueryUseCase articleQueryUseCase;
+    private final SecurityUtil securityUtil;
 
     public ArticleController(ArticleCommandUseCase articleCommandUseCase,
-        ArticleQueryUseCase articleQueryUseCase) {
+        ArticleQueryUseCase articleQueryUseCase, SecurityUtil securityUtil) {
         this.articleCommandUseCase = articleCommandUseCase;
         this.articleQueryUseCase = articleQueryUseCase;
+        this.securityUtil = securityUtil;
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<ArticleResponse>> createArticle(HttpSession session,
+    public ResponseEntity<ResponseDTO<ArticleResponse>> createArticle(
         @RequestBody @Valid ArticleCreateRequest requestDto) {
-
-        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
-
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseDTO.res(HttpStatus.CREATED, articleCommandUseCase.write(
-                new ArticleCreateServiceRequest(memberId,
-                    requestDto.getTitle(),
-                    requestDto.getContent(),
+                new ArticleCreateServiceRequest(securityUtil.getCurrentMemberId(),
+                    requestDto.title(),
+                    requestDto.content(),
                     requestDto.isAnonymity()))));
     }
 
     @PutMapping
-    public ResponseEntity<ResponseDTO<ArticleResponse>> updateArticle(HttpSession session,
+    public ResponseEntity<ResponseDTO<ArticleResponse>> updateArticle(
         @RequestBody @Valid ArticleUpdateRequest requestDto) {
-
-        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
-
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK, articleCommandUseCase.update(
                 new ArticleUpdateServiceRequest(
-                    memberId,
-                    requestDto.getMemberId(),
-                    requestDto.getTitle(),
-                    requestDto.isAnonymity(), requestDto.getContent()
+                    requestDto.articleId(),
+                    requestDto.memberId(),
+                    requestDto.title(),
+                    requestDto.isAnonymity(), requestDto.content()
                 ))));
     }
 
     @DeleteMapping
-    public ResponseEntity<ResponseDTO<Void>> deleteArticle(HttpSession session,
+    public ResponseEntity<ResponseDTO<Void>> deleteArticle(
         @RequestBody @Valid ArticleDeleteRequest requestDto) {
 
-        Long memberId = (Long) session.getAttribute(SESSION_MEMBER_KEY);
-
-        if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         articleCommandUseCase.delete(new ArticleDeleteServiceRequest(
-            requestDto.getArticleId(),
-            memberId,
+            requestDto.articleId(),
+            securityUtil.getCurrentMemberId(),
             LocalDateTime.now()
         ));
         return ResponseEntity.status(HttpStatus.OK)
@@ -119,7 +107,7 @@ public class ArticleController {
         @RequestParam(defaultValue = "0") int page) {
 
         List<ArticlesResponse> serviceResponse = articleQueryUseCase.search(
-            ArticlesSearchServiceRequest.builder()
+            ArticlesSearchRequestServiceDto.builder()
                 .title(title)
                 .nickname(nickname)
                 .likeCount(likeCount)
