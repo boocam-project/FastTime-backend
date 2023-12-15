@@ -63,7 +63,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
-                    MockMvcRequestBuilders.post("/api/v1/join")
+                    post("/api/v1/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")
@@ -86,7 +86,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
-                    MockMvcRequestBuilders.post("/api/v1/join")
+                    post("/api/v1/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")
@@ -113,7 +113,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
                     .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
                 ResultActions resultActions = mockMvc.perform(
-                    MockMvcRequestBuilders.post("/api/v1/join")
+                    post("/api/v1/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")

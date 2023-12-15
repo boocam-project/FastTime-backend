@@ -12,11 +12,11 @@ endif::[]
 
 == API
 === link:member/member-api.html[회원 API, window=blank]
-=== link:post/post-api.html[게시글 API, window=blank]
+=== link:article/article-api.html[게시글 API, window=blank]
 === link:comment/comment-api.html[댓글 API, window=blank]
 === link:admin/admin-api.html[어드민 API, window=blank]
 === link:report/report-api.html[신고 API, window=blank]
-=== link:record/record-api.html[좋아요/싫어요 API, window=blank]
+=== link:memberArticleLike/memberArticleLike-api.html[좋아요/싫어요 API, window=blank]
 
 == API Common Response
 [[overview-http-status-code]]

@@ -168,7 +168,7 @@ public class AdminControllerTest {
             doNothing().when(adminService).deletePost(anyLong());
 
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}/delete", article1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{article_id}/delete", article1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 삭제합니다."))
@@ -199,7 +199,7 @@ public class AdminControllerTest {
 
             doNothing().when(adminService).passPost(anyLong());
             //when, then
-            mockMvc.perform(get("/api/v1/admin/{post_id}/pass", article1.getId()))
+            mockMvc.perform(get("/api/v1/admin/{article_id}/pass", article1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message")
                     .value("신고가 10번이상된 게시글을 복구합니다."))
