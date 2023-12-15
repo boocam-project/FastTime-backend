@@ -17,7 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.filter.CorsFilter;
 
 
 /**
@@ -26,9 +26,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SpringSecurityConfig  {
+public class SpringSecurityConfig {
+
     private final JwtProvider jwtProvider;
-    private final CorsConfig corsConfig;
+    private final CorsFilter corsFilter;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private static final String[] PERMIT_URL_ARRAY = {
@@ -50,21 +51,22 @@ public class SpringSecurityConfig  {
                 configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers(PERMIT_URL_ARRAY).permitAll()
-                .requestMatchers(HttpMethod.GET,"api/v1/article", "api/v2/articles").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/article", "api/v2/articles").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
             .formLogin(AbstractHttpConfigurer::disable)
-            .addFilter(corsConfig.corsFilter())
+            .addFilter(corsFilter)
             .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
                 UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(AuthenticationManager -> AuthenticationManager
+            .exceptionHandling(authenticationManager -> authenticationManager
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler));
+
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
