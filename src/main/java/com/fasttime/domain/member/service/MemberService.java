@@ -107,7 +107,7 @@ public class MemberService {
     public MyPageInfoDTO getMyPageInfoById(Long memberId) throws MemberNotFoundException {
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException());
+            .orElseThrow(MemberNotFoundException::new);
 
         return new MyPageInfoDTO(
             member.getNickname(),
@@ -179,7 +179,7 @@ public class MemberService {
             throw new UnmatchedMemberException();
         }
         TokenResponseDto tokenResponseDto = provider.createToken(authentication);
-        refreshToken.updateValue(tokenResponseDto.getRefreshToken());
+        refreshToken.updateToken(tokenResponseDto.getRefreshToken());
         return LogInResponseDto.builder()
             .member(MemberResponseDto.of(getMember(refreshToken.getId())))
             .token(tokenResponseDto)

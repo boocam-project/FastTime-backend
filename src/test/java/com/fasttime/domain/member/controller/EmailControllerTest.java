@@ -1,30 +1,14 @@
 package com.fasttime.domain.member.controller;
 
-import com.fasttime.domain.member.service.EmailService;
-import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.util.ControllerUnitTestSupporter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTest(EmailController.class)
-public class EmailControllerTest {
-
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private EmailService emailService;
-
-    @MockBean
-    private MemberService memberService;
+class EmailControllerTest extends ControllerUnitTestSupporter {
 
     @Nested
     @DisplayName("이메일 확인 API 테스트")
@@ -46,7 +30,7 @@ public class EmailControllerTest {
 //
 //            verify(emailService).sendSimpleMessage(email);
 //        }
-
+//
 //        @Test
 //        @DisplayName("실패한다. : 등록되지 않은 이메일")
 //        public void testMailConfirm_UnregisteredEmail() throws Exception {
@@ -68,7 +52,7 @@ public class EmailControllerTest {
 
     @Test
     @DisplayName("이메일 인증 코드를 확인한다.")
-    public void Element_Email() throws Exception {
+    void Element_Email() throws Exception {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("emailCode", "123456");
 

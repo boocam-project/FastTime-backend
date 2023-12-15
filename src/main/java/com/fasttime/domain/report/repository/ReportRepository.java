@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    Optional<List<Report>> findAllByPost(Article article);
+    Optional<List<Report>> findAllByArticle(Article article);
 }

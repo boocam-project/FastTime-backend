@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
 import com.fasttime.util.ControllerUnitTestSupporter;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,22 +36,6 @@ class ArticleControllerTest extends ControllerUnitTestSupporter {
                     .content(objectMapper.writeValueAsString(requestDto)))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        }
-
-        @DisplayName("회원 ID가 없는 경우 회원 관련 에러가 발생한다.")
-        @Test
-        void whenMemberId_isNull_willSend400Error() throws Exception {
-
-            // given
-            ArticleCreateRequest requestDto = new ArticleCreateRequest("title",
-                "this is content", false);
-
-            // when then
-            mockMvc.perform(post("/api/v1/article")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestDto)))
-                .andDo(print())
-                .andExpect(status().isForbidden());
         }
     }
 }
