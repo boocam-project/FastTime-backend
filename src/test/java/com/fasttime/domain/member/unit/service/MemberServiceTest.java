@@ -28,6 +28,7 @@ import com.fasttime.domain.member.exception.UnmatchedMemberException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.repository.RefreshTokenRepository;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.global.jwt.JwtPayload;
 import com.fasttime.global.jwt.JwtProvider;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -117,15 +118,14 @@ public class MemberServiceTest {
                 .token(
                     "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
                 .build();
-            given(passwordEncoder.matches(any(),any())).willReturn(true);
+            given(passwordEncoder.matches(any(), any())).willReturn(true);
             given(memberRepository.findByEmail(any())).willReturn(Optional.of(member));
             given(authenticationManagerBuilder.getObject()).willReturn(authenticationManager);
             given(authenticationManager.authenticate(any(Authentication.class))).willReturn(
                 authentication);
-            given(jwtTokenProvider.createToken(any(Authentication.class))).willReturn(
+            given(jwtTokenProvider.createToken(any(JwtPayload.class))).willReturn(
                 tokenResponseDto);
             given(refreshTokenRepository.save(any(RefreshToken.class))).willReturn(refreshToken);
-
 
             // when
             LogInResponseDto result = memberService.loginMember(signInRequestDto);
@@ -144,7 +144,7 @@ public class MemberServiceTest {
 
             verify(authenticationManagerBuilder, times(1)).getObject();
             verify(authenticationManager, times(1)).authenticate(any(Authentication.class));
-            verify(jwtTokenProvider, times(1)).createToken(any(Authentication.class));
+            verify(jwtTokenProvider, times(1)).createToken(any(JwtPayload.class));
             verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
         }
 
@@ -160,14 +160,14 @@ public class MemberServiceTest {
             //when,then
             assertThatThrownBy(() -> memberService.loginMember(dto))
                 .isInstanceOf(MemberNotMatchInfoException.class)
-               .hasMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
+                .hasMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
 
 
         }
 
         @DisplayName("로그인을 비밀번호가 달라 실패한다.")
         @Test
-        void password_willFail() throws Exception {
+        void password_willFail() {
             //given
             Member member = Member.builder()
                 .id(1L)
@@ -178,7 +178,7 @@ public class MemberServiceTest {
             LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
 
             given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.of(member));
-            given(passwordEncoder.matches(any(String.class),any(String.class))).willReturn(false);
+            given(passwordEncoder.matches(any(String.class), any(String.class))).willReturn(false);
 
             //when,then
             assertThatThrownBy(() -> memberService.loginMember(dto))
@@ -189,7 +189,7 @@ public class MemberServiceTest {
 
         @DisplayName("로그인을 이미 탈퇴한 회원이라서 실패한다.")
         @Test
-        void softDeleted_willFail() throws Exception {
+        void softDeleted_willFail() {
             //given
             Member member = Member.builder()
                 .id(1L)
@@ -211,14 +211,13 @@ public class MemberServiceTest {
     }
 
 
-
     @DisplayName("rePassword()는")
     @Nested
     class RePassword {
 
         @DisplayName("비밀번호 재설정을 성공한다.")
         @Test
-        void _willSuccess() throws Exception {
+        void _willSuccess() {
             //given
             Member member = Member.builder()
                 .id(1L)
@@ -240,16 +239,15 @@ public class MemberServiceTest {
         }
 
 
-
         @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
         @Test
-        void Re_willFail() throws Exception {
+        void Re_willFail() {
             //given
             RePasswordRequest request = new RePasswordRequest
                 ("newPassword", "new");
 
             //when, then
-            assertThatThrownBy(() -> memberService.rePassword(request,1L))
+            assertThatThrownBy(() -> memberService.rePassword(request, 1L))
                 .isInstanceOf(MemberNotMatchRePasswordException.class)
                 .hasMessage("비밀번호 재확인이 일치하지 않습니다.");
 
@@ -279,14 +277,8 @@ public class MemberServiceTest {
                     "https://fastly.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI")
                 .role(Role.ROLE_USER)
                 .build();
-            UserDetails principal = new User(String.valueOf(member.getId()), "",
-                Arrays.stream(new String[]{member.getRole().name()})
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
-            Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "",
-                Arrays.stream(new String[]{member.getRole().name()})
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
+            JwtPayload jwtPayload = new JwtPayload(String.valueOf(member.getId()),
+                member.getRole().name());
             TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
                 .grantType("Bearer")
                 .accessToken(
@@ -302,13 +294,12 @@ public class MemberServiceTest {
                 .build();
 
             given(jwtTokenProvider.validateToken(any(String.class))).willReturn(true);
-            given(jwtTokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
+            given(jwtTokenProvider.resolveToken(any(String.class))).willReturn(jwtPayload);
             given(refreshTokenRepository.findById(any(Long.class))).willReturn(
                 Optional.of(refreshToken));
-            given(jwtTokenProvider.createToken(any(Authentication.class))).willReturn(
+            given(jwtTokenProvider.createToken(any(JwtPayload.class))).willReturn(
                 tokenResponseDto);
             given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
-
 
             // when
             LogInResponseDto result = memberService.refresh(refreshRequestDto);
@@ -326,9 +317,9 @@ public class MemberServiceTest {
                     "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA");
 
             verify(jwtTokenProvider, times(1)).validateToken(any(String.class));
-            verify(jwtTokenProvider, times(1)).getAuthentication(any(String.class));
+            verify(jwtTokenProvider, times(1)).resolveToken(any(String.class));
             verify(refreshTokenRepository, times(1)).findById(any(Long.class));
-            verify(jwtTokenProvider, times(1)).createToken(any(Authentication.class));
+            verify(jwtTokenProvider, times(1)).createToken(any(JwtPayload.class));
         }
 
         @Test
@@ -345,9 +336,8 @@ public class MemberServiceTest {
             given(jwtTokenProvider.validateToken(any(String.class))).willReturn(false);
 
             // when
-            Throwable exception = assertThrows(InvalidRefreshTokenException.class, () -> {
-                memberService.refresh(refreshRequestDto);
-            });
+            Throwable exception = assertThrows(InvalidRefreshTokenException.class,
+                () -> memberService.refresh(refreshRequestDto));
 
             // then
             assertEquals("Refresh Token 이 유효하지 않습니다.", exception.getMessage());
@@ -374,14 +364,8 @@ public class MemberServiceTest {
                     "https://fastly.picsum.photos/id/866/200/300.jpg?hmac=rcadCENKh4rD6MAp6V_ma-AyWv641M4iiOpe1RyFHeI")
                 .role(Role.ROLE_USER)
                 .build();
-            UserDetails principal = new User(String.valueOf(member.getId()), "",
-                Arrays.stream(new String[]{member.getRole().name()})
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
-            Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "",
-                Arrays.stream(new String[]{member.getRole().name()})
-                    .map(SimpleGrantedAuthority::new)
-                    .toList());
+            JwtPayload jwtPayload = new JwtPayload(String.valueOf(member.getId()),
+                member.getRole().name());
             RefreshToken refreshToken = RefreshToken.builder()
                 .id(1L)
                 .token(
@@ -389,20 +373,19 @@ public class MemberServiceTest {
                 .build();
 
             given(jwtTokenProvider.validateToken(any(String.class))).willReturn(true);
-            given(jwtTokenProvider.getAuthentication(any(String.class))).willReturn(authentication);
+            given(jwtTokenProvider.resolveToken(any(String.class))).willReturn(jwtPayload);
             given(refreshTokenRepository.findById(any(Long.class))).willReturn(
                 Optional.of(refreshToken));
 
             // when
-            Throwable exception = assertThrows(UnmatchedMemberException.class, () -> {
-                memberService.refresh(refreshRequestDto);
-            });
+            Throwable exception = assertThrows(UnmatchedMemberException.class,
+                () -> memberService.refresh(refreshRequestDto));
 
             // then
             assertEquals("토큰의 회원 정보가 일치하지 않습니다.", exception.getMessage());
 
             verify(jwtTokenProvider, times(1)).validateToken(any(String.class));
-            verify(jwtTokenProvider, times(1)).getAuthentication(any(String.class));
+            verify(jwtTokenProvider, times(1)).resolveToken(any(String.class));
             verify(refreshTokenRepository, times(1)).findById(any(Long.class));
         }
     }
