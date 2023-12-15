@@ -77,11 +77,11 @@ public class AdminServiceTest {
             given(articleQueryService.findReportedArticles(any())).willReturn(articlesResponses);
 
             // when
-            List<ArticlesResponse> postList = adminService.findReportedPost(0);
+            List<ArticlesResponse> articleList = adminService.findReportedPost(0);
 
             //then
-            Assertions.assertThat(postList.get(0).title()).isEqualTo("testTitle1");
-            Assertions.assertThat(postList.get(1).title()).isEqualTo("testTitle2");
+            Assertions.assertThat(articleList.get(0).title()).isEqualTo("testTitle1");
+            Assertions.assertThat(articleList.get(1).title()).isEqualTo("testTitle2");
         }
 
     }
