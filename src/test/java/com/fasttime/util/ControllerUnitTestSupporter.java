@@ -11,7 +11,7 @@ import com.fasttime.domain.member.controller.EmailController;
 import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.AdminService;
-import com.fasttime.domain.member.service.EmailService;
+import com.fasttime.domain.member.service.EmailUseCase;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.domain.memberArticleLike.controller.MemberArticleLikeRestController;
 import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
@@ -61,7 +61,7 @@ public abstract class ControllerUnitTestSupporter {
     protected SecurityUtil securityUtil;
 
     @MockBean
-    protected EmailService emailService;
+    protected EmailUseCase emailUseCase;
 
     @MockBean
     protected AdminService adminService;
