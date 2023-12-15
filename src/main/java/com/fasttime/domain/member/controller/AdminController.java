@@ -31,25 +31,25 @@ public class AdminController {
             , "신고가 10번이상된 게시글들을 보여줍니다.", adminService.findReportedPost(page)));
     }
 
-    @GetMapping("/{post_id}")
-    public ResponseEntity<ResponseDTO> postDetail
-        (@PathVariable("post_id") Long post_id)  {
+    @GetMapping("/{article_id}")
+    public ResponseEntity<ResponseDTO> articleDetail
+        (@PathVariable("article_id") Long article_id)  {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
-            , "신고가 10번이상된 게시글을 보여줍니다.", adminService.findOneReportedPost(post_id)));
+            , "신고가 10번이상된 게시글을 보여줍니다.", adminService.findOneReportedPost(article_id)));
     }
 
-    @GetMapping("/{post_id}/delete") // 문제가 있는 Post를 삭제
+    @GetMapping("/{article_id}/delete") // 문제가 있는 Post를 삭제
     public ResponseEntity<ResponseDTO> deletePost
-        (@PathVariable("post_id") Long post_id) {
-        adminService.deletePost(post_id);
+        (@PathVariable("article_id") Long article_id) {
+        adminService.deletePost(article_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 삭제합니다."));
     }
 
-    @GetMapping("/{post_id}/pass") // 문제가 없는 Post 검토완료로 변경
+    @GetMapping("/{article_id}/pass") // 문제가 없는 Post 검토완료로 변경
     public ResponseEntity<ResponseDTO> passPost
-        (@PathVariable("post_id") Long post_id) {
-        adminService.passPost(post_id);
+        (@PathVariable("article_id") Long article_id) {
+        adminService.passPost(article_id);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글을 복구합니다."));
     }

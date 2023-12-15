@@ -17,13 +17,13 @@ public class ArticleCommandService implements ArticleCommandUseCase {
 
     private final ArticleSettingProvider articleSettingProvider;
     private final MemberService memberService;
-    private final ArticleRepository postRepository;
+    private final ArticleRepository articleRepository;
 
     public ArticleCommandService(ArticleSettingProvider articleSettingProvider,
-        MemberService memberService, ArticleRepository postRepository) {
+        MemberService memberService, ArticleRepository articleRepository) {
         this.articleSettingProvider = articleSettingProvider;
         this.memberService = memberService;
-        this.postRepository = postRepository;
+        this.articleRepository = articleRepository;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ArticleCommandService implements ArticleCommandUseCase {
         final Article createdArticle = Article.createNewArticle(writeMember, serviceDto.title(),
             serviceDto.content(), serviceDto.isAnonymity());
 
-        Article savedArticle = postRepository.save(createdArticle);
+        Article savedArticle = articleRepository.save(createdArticle);
 
         return ArticleResponse.builder()
             .id(savedArticle.getId())
@@ -53,18 +53,18 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     public ArticleResponse update(ArticleUpdateServiceRequest serviceDto) {
 
         final Member updateRequestMember = memberService.getMember(serviceDto.memberId());
-        Article post = findArticleById(serviceDto.articleId());
+        Article article = findArticleById(serviceDto.articleId());
 
-        isWriter(updateRequestMember, post);
-        post.update(serviceDto.title(), serviceDto.content());
+        isWriter(updateRequestMember, article);
+        article.update(serviceDto.title(), serviceDto.content());
 
         return ArticleResponse.builder()
-            .id(post.getId())
-            .title(post.getTitle())
-            .content(post.getContent())
-            .isAnonymity(post.isAnonymity())
-            .likeCount(post.getLikeCount())
-            .hateCount(post.getHateCount())
+            .id(article.getId())
+            .title(article.getTitle())
+            .content(article.getContent())
+            .isAnonymity(article.isAnonymity())
+            .likeCount(article.getLikeCount())
+            .hateCount(article.getHateCount())
             .build();
     }
 
@@ -72,33 +72,33 @@ public class ArticleCommandService implements ArticleCommandUseCase {
     public void delete(ArticleDeleteServiceRequest serviceDto) {
 
         final Member deleteRequestMember = memberService.getMember(serviceDto.memberId());
-        final Article post = findArticleById(serviceDto.articleId());
+        final Article article = findArticleById(serviceDto.articleId());
 
-        validateAuthority(deleteRequestMember, post);
+        validateAuthority(deleteRequestMember, article);
 
-        post.delete(serviceDto.deletedAt());
+        article.delete(serviceDto.deletedAt());
     }
 
     @Override
     public void likeOrHate(ArticleLikeOrHateServiceRequest serviceDto) {
-        Article post = findArticleById(serviceDto.articleId());
-        post.likeOrHate(serviceDto.isLike(), serviceDto.isIncrease());
+        Article article = findArticleById(serviceDto.articleId());
+        article.likeOrHate(serviceDto.isLike(), serviceDto.isIncrease());
     }
 
-    private Article findArticleById(Long postId) {
-        return postRepository.findById(postId)
-            .orElseThrow(() -> new ArticleNotFoundException(postId));
+    private Article findArticleById(Long articleId) {
+        return articleRepository.findById(articleId)
+            .orElseThrow(() -> new ArticleNotFoundException(articleId));
     }
 
-    private void validateAuthority(Member requestUser, Article post) {
-        isWriter(requestUser, post);
+    private void validateAuthority(Member requestUser, Article article) {
+        isWriter(requestUser, article);
     }
 
-    private void isWriter(Member requestMember, Article post) {
-        if (!requestMember.getId().equals(post.getMember().getId())) {
+    private void isWriter(Member requestMember, Article article) {
+        if (!requestMember.getId().equals(article.getMember().getId())) {
             throw new NotArticleWriterException(String.format(
-                "This member has no auth to control this post / targetArticleId = %d, requestMemberId = %d",
-                post.getId(), requestMember.getId()));
+                "This member has no auth to control this article / targetArticleId = %d, requestMemberId = %d",
+                article.getId(), requestMember.getId()));
         }
     }
 }

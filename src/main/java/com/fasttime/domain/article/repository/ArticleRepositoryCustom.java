@@ -1,12 +1,12 @@
 package com.fasttime.domain.article.repository;
 
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ArticleRepositoryCustom {
 
-    List<ArticleQueryResponse> search(ArticlesSearchRequest searchCondition);
+    List<ArticleQueryResponse> search(ArticlesSearchRequestServiceDto searchCondition);
 
     record ArticleQueryResponse(
         Long id,

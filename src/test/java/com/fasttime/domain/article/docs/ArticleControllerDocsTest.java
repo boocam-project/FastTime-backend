@@ -33,7 +33,7 @@ import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.Article
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleUpdateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase;
-import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequest;
+import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import com.fasttime.global.util.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,7 +83,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .session(session)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
-            .andDo(document("article-create",
+            .andDo(document("articles/v1/create",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestFields(
@@ -118,15 +118,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
     void searchArticles() throws Exception {
 
         // given
-        ArticlesSearchRequest.builder()
-            .title("패스")
-            .nickname("패캠러")
-            .likeCount(10)
-            .pageSize(10)
-            .page(0)
-            .build();
-
-        when(articleQueryUseCase.search(any(ArticlesSearchRequest.class)))
+        when(articleQueryUseCase.search(any(ArticlesSearchRequestServiceDto.class)))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
                     .nickname("패캠러").isAnonymity(false).createdAt(LocalDateTime.now())
@@ -148,7 +140,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .queryParam("pageSize", "10")
             )
             .andExpect(status().isOk())
-            .andDo(document("articles-search",
+            .andDo(document("articles/v1/search",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 queryParameters(
@@ -206,7 +198,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
         mockMvc.perform(get("/api/v1/article/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andDo(document("article-search",
+            .andDo(document("articles/v1/get-detail",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 pathParameters(
@@ -264,7 +256,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .session(session)
             )
             .andExpect(status().isOk())
-            .andDo(document("article-update",
+            .andDo(document("articles/v1/update",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestFields(
@@ -313,7 +305,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .session(session)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isOk())
-            .andDo(document("article-delete",
+            .andDo(document("articles/v1/delete",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestFields(

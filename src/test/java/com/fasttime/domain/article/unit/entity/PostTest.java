@@ -23,14 +23,14 @@ class ArticleTest {
         // given
         String title = "제목1";
         String content = "내용1";
-        boolean anounumity = true;
+        boolean anonymity = true;
 
         // when
-        Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
+        Article createdArticle = Article.createNewArticle(null, title, content, anonymity);
 
         // then
-        assertThat(createdArticle).extracting("title", "content", "isAnonymity")
-            .containsExactly(title, content, anounumity);
+        assertThat(createdArticle).extracting("title", "content", "anonymity")
+            .containsExactly(title, content, anonymity);
     }
 
     @Nested
@@ -42,8 +42,8 @@ class ArticleTest {
             // given
             String title = "제목1";
             String content = "내용1";
-            boolean anounumity = true;
-            Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
+            boolean anonymity = true;
+            Article createdArticle = Article.createNewArticle(null, title, content, anonymity);
 
             // when
             String updateTitle = "새로운 제목1";
@@ -51,8 +51,8 @@ class ArticleTest {
             createdArticle.update(updateTitle, updateContent);
 
             // then
-            assertThat(createdArticle).extracting("title", "content", "isAnonymity")
-                .containsExactly(updateTitle, updateContent, anounumity);
+            assertThat(createdArticle).extracting("title", "content", "anonymity")
+                .containsExactly(updateTitle, updateContent, anonymity);
         }
 
         @DisplayName("게시글이 검토중인 상태에서는 수정 할 수 없다.")
@@ -61,8 +61,8 @@ class ArticleTest {
             // given
             String title = "제목1";
             String content = "내용1";
-            boolean anounumity = true;
-            Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
+            boolean anonymity = true;
+            Article createdArticle = Article.createNewArticle(null, title, content, anonymity);
             createdArticle.transToWaitForReview();
 
             // when
@@ -78,8 +78,8 @@ class ArticleTest {
             // given
             String title = "제목1";
             String content = "내용1";
-            boolean anounumity = true;
-            Article createdArticle = Article.createNewArticle(null, title, content, anounumity);
+            boolean anonymity = true;
+            Article createdArticle = Article.createNewArticle(null, title, content, anonymity);
             createdArticle.delete(LocalDateTime.now());
 
             // when

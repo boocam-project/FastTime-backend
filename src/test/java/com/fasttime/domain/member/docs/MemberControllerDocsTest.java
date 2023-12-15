@@ -237,7 +237,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void join() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword", "testNickname");
+        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+            "testNickname");
 
         //when
         when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
@@ -271,7 +272,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void recover() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword", "testNickname");
+        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+            "testNickname");
 
         //when
         when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))

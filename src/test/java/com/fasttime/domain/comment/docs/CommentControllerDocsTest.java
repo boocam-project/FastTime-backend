@@ -91,9 +91,9 @@ class CommentControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("content").type(JsonFieldType.STRING).description("내용")
                         .attributes(key("constraints").value(
                             createCommentRequestConstraints.descriptionsForProperty("content"))),
-                    fieldWithPath("isAnonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
+                    fieldWithPath("anonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
                         .attributes(key("constraints").value(
-                            createCommentRequestConstraints.descriptionsForProperty("isAnonymity"))),
+                            createCommentRequestConstraints.descriptionsForProperty("anonymity"))),
                     fieldWithPath("parentCommentId").type(JsonFieldType.NUMBER)
                         .description("부모 댓글 식별자").optional()),
                 responseFields(
@@ -108,7 +108,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
-                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.parentCommentId").type(JsonFieldType.NUMBER)
                         .description("부모 댓글 식별자"),
@@ -208,7 +208,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
                         .description("작성자 닉네임"),
                     fieldWithPath("data.comments[].content").type(JsonFieldType.STRING)
                         .description("댓글 내용"),
-                    fieldWithPath("data.comments[].isAnonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.comments[].anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.comments[].parentCommentId").type(JsonFieldType.NUMBER)
                         .description("부모 댓글 식별자"),
@@ -224,7 +224,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 수정 API 문서화")
     @Test
-    void postUpdate() throws Exception {
+    void articleUpdate() throws Exception {
         // given
         String content = objectMapper.writeValueAsString(UpdateCommentRequestDTO.builder()
             .content("얼마나 걸리셨을까요?")
@@ -271,7 +271,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
-                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.parentCommentId").type(JsonFieldType.NUMBER)
                         .description("부모 댓글 식별자"),
@@ -285,7 +285,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
 
     @DisplayName("게시글 삭제 API 문서화")
     @Test
-    void postDelete() throws Exception {
+    void articleDelete() throws Exception {
         // given
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("MEMBER", 1L);
@@ -323,7 +323,7 @@ class CommentControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
-                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
+                    fieldWithPath("data.anonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.parentCommentId").type(JsonFieldType.NUMBER)
                         .description("부모 댓글 식별자"),

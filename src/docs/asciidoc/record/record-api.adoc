@@ -12,13 +12,13 @@
 
 === HttpRequest
 
-include::{snippets}/record-create/http-request.adoc[]
-include::{snippets}/record-create/request-fields.adoc[]
+include::{snippets}/memberArticleLike-create/http-request.adoc[]
+include::{snippets}/memberArticleLike-create/request-fields.adoc[]
 
 === HttpResponse
 
-include::{snippets}/record-create/http-response.adoc[]
-include::{snippets}/record-create/response-fields.adoc[]
+include::{snippets}/memberArticleLike-create/http-response.adoc[]
+include::{snippets}/memberArticleLike-create/response-fields.adoc[]
 
 [[Record-Get]]
 == 좋아요/싫어요 조회
@@ -27,13 +27,13 @@ include::{snippets}/record-create/response-fields.adoc[]
 
 === HttpRequest
 
-include::{snippets}/record-get/http-request.adoc[]
-include::{snippets}/record-get/path-parameters.adoc[]
+include::{snippets}/memberArticleLike-get/http-request.adoc[]
+include::{snippets}/memberArticleLike-get/path-parameters.adoc[]
 
 === HttpResponse
 
-include::{snippets}/record-get/http-response.adoc[]
-include::{snippets}/record-get/response-fields.adoc[]
+include::{snippets}/memberArticleLike-get/http-response.adoc[]
+include::{snippets}/memberArticleLike-get/response-fields.adoc[]
 
 [[Record-Delete]]
 == 좋아요/싫어요 취소
@@ -42,10 +42,10 @@ include::{snippets}/record-get/response-fields.adoc[]
 
 === HttpRequest
 
-include::{snippets}/record-delete/http-request.adoc[]
-include::{snippets}/record-delete/request-fields.adoc[]
+include::{snippets}/memberArticleLike-delete/http-request.adoc[]
+include::{snippets}/memberArticleLike-delete/request-fields.adoc[]
 
 === HttpResponse
 
-include::{snippets}/record-delete/http-response.adoc[]
-include::{snippets}/record-delete/response-fields.adoc[]
+include::{snippets}/memberArticleLike-delete/http-response.adoc[]
+include::{snippets}/memberArticleLike-delete/response-fields.adoc[]

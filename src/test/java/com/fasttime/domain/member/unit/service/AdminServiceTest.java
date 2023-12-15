@@ -36,7 +36,7 @@ public class AdminServiceTest {
     private AdminService adminService;
 
     @Mock
-    private ArticleRepository postRepository;
+    private ArticleRepository articleRepository;
 
     @Mock
     private ArticleQueryService articleQueryService;
@@ -83,7 +83,6 @@ public class AdminServiceTest {
             Assertions.assertThat(articleList.get(0).title()).isEqualTo("testTitle1");
             Assertions.assertThat(articleList.get(1).title()).isEqualTo("testTitle2");
         }
-
     }
 
 
@@ -109,7 +108,7 @@ public class AdminServiceTest {
                 .likeCount(0)
                 .hateCount(0)
                 .build();
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when
             ArticleResponse oneReportedPost = adminService.findOneReportedPost(1L);
 
@@ -121,7 +120,7 @@ public class AdminServiceTest {
         @Test
         void NotFound_willFail() {
             //given
-            given(postRepository.findById(anyLong())).willThrow(new ArticleNotFoundException());
+            given(articleRepository.findById(anyLong())).willThrow(new ArticleNotFoundException());
 
             //when, then
             Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
@@ -144,7 +143,7 @@ public class AdminServiceTest {
                 .likeCount(0)
                 .hateCount(0)
                 .build();
-            given(postRepository.findById(anyLong())).willReturn(Optional.of(article1));
+            given(articleRepository.findById(anyLong())).willReturn(Optional.of(article1));
             //when ,then
             Assertions.assertThatThrownBy(() -> adminService.findOneReportedPost(1L)).isInstanceOf(
                 BadArticleReportStatusException.class).hasMessage("신고 후처리를 할 수 없습니다.");

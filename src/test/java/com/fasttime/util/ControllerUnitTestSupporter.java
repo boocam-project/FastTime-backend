@@ -7,7 +7,6 @@ import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.member.controller.MemberController;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
-import com.fasttime.global.jwt.JwtProvider;
 import com.fasttime.global.util.SecurityUtil;
 import org.apache.catalina.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +30,10 @@ public abstract class ControllerUnitTestSupporter {
     protected ObjectMapper objectMapper;
 
     @MockBean
-    protected ArticleCommandService postCommandService;
+    protected ArticleCommandService articleCommandService;
 
     @MockBean
-    protected ArticleQueryService postQueryService;
+    protected ArticleQueryService articleQueryService;
 
     @MockBean
     protected MemberService memberService;
@@ -44,6 +43,5 @@ public abstract class ControllerUnitTestSupporter {
 
     @MockBean
     protected SecurityUtil securityUtil;
-
 
 }

@@ -27,14 +27,14 @@ public class Report extends BaseTimeEntity {
     @ManyToOne
     private Member member;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "article_id")
     @ManyToOne
-    private Article post;
+    private Article article;
 
     @Builder
-    public Report(Long id, Member member, Article post) {
+    public Report(Long id, Member member, Article article) {
         this.id = id;
         this.member = member;
-        this.post = post;
+        this.article = article;
     }
 }
