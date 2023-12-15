@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
@@ -21,18 +22,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Profile("!local || !test")
 @RequiredArgsConstructor
 @Transactional
-public class EmailService {
+public class EmailService implements EmailUseCase{
 
     private final JavaMailSender javaMailSender;
 
-
-    private String TEST_ID_EMAIL = "fasttime123@naver.com";
+    private static final String TEST_ID_EMAIL = "fasttime123@naver.com";
 
     private final Map<String, String> verificationCodes = new HashMap<>();
 
-    public String sendVerificationEmail(String to) throws Exception {
+    @Override
+    public String sendVerificationEmail(String to)
+        throws MessagingException, UnsupportedEncodingException {
         String authCode = generateAuthCode();
         MimeMessage message = createMessage(to, authCode);
         try {
@@ -44,6 +47,7 @@ public class EmailService {
         }
     }
 
+    @Override
     public boolean verifyEmailCode(String email, String code) {
         String storedCode = verificationCodes.get(email);
         return storedCode != null && storedCode.equals(code);

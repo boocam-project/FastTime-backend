@@ -1,0 +1,3 @@
+[submodule "boocam-be-vaults"]
+	path = boocam-be-vaults
+	url = https://github.com/fcstudy-project/boocam-be-vaults.git
