@@ -333,7 +333,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
             LoginRequestDTO dto = new LoginRequestDTO("", "testPassword");
             String data = objectMapper.writeValueAsString(dto);
             //when,then
-            mockMvc.perform(post("/api/v1/login")
+            mockMvc.perform(post("/api/v2/login")
                     .content(data)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message").value("must not be blank"))
@@ -346,12 +346,12 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
         @WithMockUser
         void Email_willFail() throws Exception {
             //given
-            LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
+            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "testPassword");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
                 .thenThrow(new MemberNotMatchInfoException());
             //when,then
-            mockMvc.perform(post("/api/v1/login")
+            mockMvc.perform(post("/api/v2/login")
                     .content(data)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
@@ -366,12 +366,12 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
         @WithMockUser
         void password_willFail() throws Exception {
             //given
-            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
+            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
                 .thenThrow(new MemberNotMatchInfoException());
             //when,then
-            mockMvc.perform(post("/api/v1/login")
+            mockMvc.perform(post("/api/v2/login")
                     .content(data)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(400))
@@ -385,12 +385,12 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
         @WithMockUser
         void softDeleted_willFail() throws Exception {
             //given
-            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "Password");
+            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
             String data = objectMapper.writeValueAsString(dto);
             when(memberService.loginMember(any(LoginRequestDTO.class)))
                 .thenThrow(new MemberSoftDeletedException());
             //when,then
-            mockMvc.perform(post("/api/v1/login")
+            mockMvc.perform(post("/api/v2/login")
                     .content(data)
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.code").value(404))
