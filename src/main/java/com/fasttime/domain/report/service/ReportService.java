@@ -33,7 +33,7 @@ public class ReportService {
             .orElseThrow(ArticleNotFoundException::new);
         checkPostAlreadyDeleted(article);
         Member member = memberService.getMember(memberId);
-        List<Report> reports = reportRepository.findAllByPost(article).orElseGet(ArrayList::new);
+        List<Report> reports = reportRepository.findAllByArticle(article).orElseGet(ArrayList::new);
         checkDuplicateReports(reports, member);
         checkHowManyReportsOfPost(reports, article);
         reportRepository.save(Report.builder().member(member).article(article).build());

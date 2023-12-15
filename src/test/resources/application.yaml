@@ -5,5 +5,14 @@ spring:
     driver-class-name: org.h2.Driver
 
   mail:
+    host: "smtp.naver.com"
     username: test
     password: 1234
+
+  jwt:
+    secret: THISISTHEJWTSECRETKEYFORTESTAPPLICATIONDONTUSETHISCODEINPRODUCTIONPROFILE
+
+  data:
+    redis:
+      host: localhost
+      port: 6379

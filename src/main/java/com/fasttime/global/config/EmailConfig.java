@@ -11,6 +11,9 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Configuration
 public class EmailConfig {
 
+    @Value("${spring.mail.host}")
+    private String emailHost;
+
     @Value("${spring.mail.username}")
     private String username;
 
@@ -20,7 +23,7 @@ public class EmailConfig {
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-        javaMailSender.setHost("smtp.naver.com"); // smtp 서버 주소
+        javaMailSender.setHost(emailHost); // smtp 서버 주소
         javaMailSender.setPort(465); // 메일 인증 서버 포트
         javaMailSender.setUsername(username); // 아이디 입력
         javaMailSender.setPassword(password); // 비밀번호 입력
@@ -36,7 +39,7 @@ public class EmailConfig {
         properties.setProperty("mail.smtp.auth", "true"); // smtp 인증
         properties.setProperty("mail.smtp.starttls.enable", "true"); // smtp strattles 사용
         properties.setProperty("mail.debug", "true"); // 디버그 사용
-        properties.setProperty("mail.smtp.ssl.trust", "smtp.naver.com");
+        properties.setProperty("mail.smtp.ssl.trust", emailHost);
         properties.setProperty("mail.smtp.ssl.enable", "true"); // ssl 사용
 
         return properties;
