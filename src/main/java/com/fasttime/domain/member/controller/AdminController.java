@@ -1,9 +1,11 @@
 package com.fasttime.domain.member.controller;
 
+import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.member.dto.request.CreateMemberDTO;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.global.util.ResponseDTO;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,8 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> articleList(@RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<ResponseDTO<List<ArticlesResponse>>> postList
+        (@RequestParam(defaultValue = "0",name = "page") int page) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
             , "신고가 10번이상된 게시글들을 보여줍니다.", adminService.findReportedPost(page)));
     }

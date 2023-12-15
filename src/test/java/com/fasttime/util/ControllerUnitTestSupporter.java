@@ -43,4 +43,5 @@ public abstract class ControllerUnitTestSupporter {
 
     @MockBean
     protected SecurityUtil securityUtil;
+
 }

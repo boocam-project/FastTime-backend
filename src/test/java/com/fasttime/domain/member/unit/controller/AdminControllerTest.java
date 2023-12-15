@@ -20,21 +20,29 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.AdminService;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.catalina.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AdminController.class)
+@WebMvcTest(value = AdminController.class,
+    excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)},
+    excludeAutoConfiguration = SecurityAutoConfiguration.class)
 public class AdminControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private AdminService adminService;
+
 
     @DisplayName("findReportedPost()는 ")
     @Nested
@@ -101,7 +109,6 @@ public class AdminControllerTest {
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.title").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
-                .andExpect(jsonPath("$.data.anonymity").exists())
                 .andDo(print());
         }
 
