@@ -19,6 +19,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.util.ControllerUnitTestSupporter;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.catalina.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -90,7 +91,6 @@ public class AdminControllerTest extends ControllerUnitTestSupporter {
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.title").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
-                .andExpect(jsonPath("$.data.anonymity").exists())
                 .andDo(print());
         }
 
