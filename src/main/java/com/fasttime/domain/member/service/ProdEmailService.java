@@ -22,10 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Profile("!local || !test")
+@Profile("prod")
 @RequiredArgsConstructor
 @Transactional
-public class EmailService implements EmailUseCase{
+public class ProdEmailService implements EmailUseCase{
 
     private final JavaMailSender javaMailSender;
 
