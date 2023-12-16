@@ -3,6 +3,7 @@ package com.fasttime.domain.member.controller;
 import com.fasttime.domain.member.dto.request.EmailRequest;
 import com.fasttime.domain.member.service.EmailUseCase;
 import com.fasttime.global.util.ResponseDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,9 @@ public class EmailController {
     private final EmailUseCase emailUseCase;
 
     @PostMapping("/api/v1/confirm")
-    public ResponseEntity<ResponseDTO<String>> mailConfirm(@RequestBody EmailRequest emailRequest)
+    public ResponseEntity<ResponseDTO<String>> mailConfirm(@Valid @RequestBody EmailRequest emailRequest)
         throws Exception {
-        emailUseCase.sendVerificationEmail(emailRequest.getEmail());
+        emailUseCase.sendVerificationEmail(emailRequest.email());
         return ResponseEntity.ok(
             ResponseDTO.res(HttpStatus.OK, "인증 이메일이 성공적으로 전송되었습니다.", null)
         );

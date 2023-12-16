@@ -8,9 +8,10 @@ import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
@@ -31,7 +32,7 @@ public class ProdEmailService implements EmailUseCase{
 
     private static final String TEST_ID_EMAIL = "fasttime123@naver.com";
 
-    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
 
     @Override
     public String sendVerificationEmail(String to)
@@ -79,14 +80,14 @@ public class ProdEmailService implements EmailUseCase{
         String title = "회원가입 인증 번호";
 
         MimeMessage message = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
 
         String emailTemplate = loadEmailTemplate("email_template.html");
 
         emailTemplate = emailTemplate.replace("{{authCode}}", authCode);
 
         helper.setSubject(title);
-        helper.setFrom(new InternetAddress(setFrom, "boocam", "UTF-8"));
+        helper.setFrom(new InternetAddress(setFrom, "boocam", StandardCharsets.UTF_8.name()));
         helper.setTo(to);
         helper.setText(emailTemplate, true);
 
@@ -98,7 +99,7 @@ public class ProdEmailService implements EmailUseCase{
             Resource resource = new ClassPathResource("templates/" + templateName);
             InputStream inputStream = resource.getInputStream();
             byte[] templateBytes = inputStream.readAllBytes();
-            return new String(templateBytes, "UTF-8");
+            return new String(templateBytes, StandardCharsets.UTF_8);
         } catch (IOException ex) {
             throw new EmailTemplateLoadException();
         }
