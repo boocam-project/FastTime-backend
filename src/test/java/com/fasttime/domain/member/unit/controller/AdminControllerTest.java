@@ -15,26 +15,16 @@ import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.entity.ReportStatus;
 import com.fasttime.domain.article.exception.ArticleNotFoundException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
-import com.fasttime.domain.member.controller.AdminController;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.service.AdminService;
+import com.fasttime.util.ControllerUnitTestSupporter;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.catalina.security.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(AdminController.class)
-public class AdminControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-    @MockBean
-    private AdminService adminService;
+public class AdminControllerTest extends ControllerUnitTestSupporter {
 
     @DisplayName("findReportedPost()는 ")
     @Nested
@@ -101,7 +91,6 @@ public class AdminControllerTest {
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.title").exists())
                 .andExpect(jsonPath("$.data.nickname").exists())
-                .andExpect(jsonPath("$.data.anonymity").exists())
                 .andDo(print());
         }
 

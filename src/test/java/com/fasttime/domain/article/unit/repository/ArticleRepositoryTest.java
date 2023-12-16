@@ -50,7 +50,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = articleRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .title(searchTarget)
                     .pageSize(10)
                     .build());
@@ -76,7 +76,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = articleRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .nickname(searchTarget)
                     .pageSize(10)
                     .build());
@@ -102,7 +102,7 @@ class ArticleRepositoryTest {
 
             // when
             List<ArticleQueryResponse> result = articleRepository
-                .search(ArticlesSearchRequest.builder()
+                .search(ArticlesSearchRequestServiceDto.builder()
                     .likeCount(searchTarget)
                     .pageSize(10)
                     .build());

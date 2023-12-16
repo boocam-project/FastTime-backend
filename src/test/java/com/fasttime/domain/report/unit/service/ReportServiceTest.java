@@ -66,7 +66,7 @@ public class ReportServiceTest {
             Optional<List<Report>> reports = Optional.of(new ArrayList<>());
             given(articleRepository.findById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.findAllByPost(any(Article.class))).willReturn(reports);
+            given(reportRepository.findAllByArticle(any(Article.class))).willReturn(reports);
             given(reportRepository.save(any(Report.class))).willReturn(report);
 
             // when
@@ -75,7 +75,7 @@ public class ReportServiceTest {
             // then
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
-            verify(reportRepository, times(1)).findAllByPost(any(Article.class));
+            verify(reportRepository, times(1)).findAllByArticle(any(Article.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
 
@@ -94,7 +94,7 @@ public class ReportServiceTest {
 
             given(articleRepository.findById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.findAllByPost(any(Article.class))).willReturn(reports);
+            given(reportRepository.findAllByArticle(any(Article.class))).willReturn(reports);
 
             // when
             reportService.createReport(request, 11L);
@@ -102,7 +102,7 @@ public class ReportServiceTest {
             // then
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
-            verify(reportRepository, times(1)).findAllByPost(any(Article.class));
+            verify(reportRepository, times(1)).findAllByArticle(any(Article.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
 
@@ -120,7 +120,7 @@ public class ReportServiceTest {
             }
             given(articleRepository.findById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.findAllByPost(any(Article.class))).willReturn(reports);
+            given(reportRepository.findAllByArticle(any(Article.class))).willReturn(reports);
 
             // when
             reportService.createReport(request, 21L);
@@ -128,7 +128,7 @@ public class ReportServiceTest {
             // then
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
-            verify(reportRepository, times(1)).findAllByPost(any(Article.class));
+            verify(reportRepository, times(1)).findAllByArticle(any(Article.class));
             verify(reportRepository, times(1)).save(any(Report.class));
         }
 
@@ -148,7 +148,7 @@ public class ReportServiceTest {
             assertEquals("존재하지 않는 게시글입니다.", exception.getMessage());
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, never()).getMember(any(Long.class));
-            verify(reportRepository, never()).findAllByPost(any(Article.class));
+            verify(reportRepository, never()).findAllByArticle(any(Article.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
 
@@ -171,7 +171,7 @@ public class ReportServiceTest {
 
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, never()).getMember(any(Long.class));
-            verify(reportRepository, never()).findAllByPost(any(Article.class));
+            verify(reportRepository, never()).findAllByArticle(any(Article.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
 
@@ -195,7 +195,7 @@ public class ReportServiceTest {
 
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
-            verify(reportRepository, never()).findAllByPost(any(Article.class));
+            verify(reportRepository, never()).findAllByArticle(any(Article.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
 
@@ -212,7 +212,7 @@ public class ReportServiceTest {
 
             given(articleRepository.findById(any(Long.class))).willReturn(article);
             given(memberService.getMember(any(Long.class))).willReturn(member);
-            given(reportRepository.findAllByPost(any(Article.class))).willReturn(reports);
+            given(reportRepository.findAllByArticle(any(Article.class))).willReturn(reports);
 
             // when, then
             Throwable exception = assertThrows(DuplicateReportException.class, () -> {
@@ -222,7 +222,7 @@ public class ReportServiceTest {
 
             verify(articleRepository, times(1)).findById(any(Long.class));
             verify(memberService, times(1)).getMember(any(Long.class));
-            verify(reportRepository, times(1)).findAllByPost(any(Article.class));
+            verify(reportRepository, times(1)).findAllByArticle(any(Article.class));
             verify(reportRepository, never()).save(any(Report.class));
         }
     }

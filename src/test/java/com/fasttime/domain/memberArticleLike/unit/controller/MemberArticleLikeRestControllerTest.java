@@ -11,29 +11,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.memberArticleLike.controller.MemberArticleLikeRestController;
 import com.fasttime.domain.memberArticleLike.dto.MemberArticleLikeDTO;
 import com.fasttime.domain.memberArticleLike.dto.request.CreateMemberArticleLikeRequestDTO;
 import com.fasttime.domain.memberArticleLike.dto.request.DeleteMemberArticleLikeRequestDTO;
-import com.fasttime.domain.memberArticleLike.service.MemberArticleLikeService;
+import com.fasttime.util.ControllerUnitTestSupporter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(MemberArticleLikeRestController.class)
-public class MemberArticleLikeRestControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    MemberArticleLikeService memberArticleLikeService;
+public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSupporter {
 
     @Nested
     @DisplayName("createMemberArticleLike()는")
