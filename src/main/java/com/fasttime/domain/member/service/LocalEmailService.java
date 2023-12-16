@@ -1,9 +1,9 @@
 package com.fasttime.domain.member.service;
 
 import com.fasttime.domain.member.exception.EmailSendingException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.MailException;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LocalEmailService implements EmailUseCase {
 
-    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>();
 
     @Override
     public String sendVerificationEmail(String to) {
