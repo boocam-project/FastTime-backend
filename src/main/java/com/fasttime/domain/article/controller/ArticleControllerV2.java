@@ -1,8 +1,7 @@
 package com.fasttime.domain.article.controller;
 
 import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
-import com.fasttime.domain.article.dto.controller.request.ArticleDeleteRequest;
-import com.fasttime.domain.article.dto.controller.request.ArticleUpdateRequest;
+import com.fasttime.domain.article.dto.controller.request.ArticleUpdateRequestV2;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase;
@@ -29,22 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @deprecated 2023.12.05
- * spring security를 사용하면서 더 이상 memberId 값을 받아올 필요가 없어졌습니다.
- * 해당 이유로 다음 api를 deprecated 하고 v2로 제공합니다.
- */
 @Slf4j
-@Deprecated(since = "2023.12.05")
-@RequestMapping("/api/v1/article")
+@RequestMapping("/api/v2/articles")
 @RestController
-public class ArticleController {
+public class ArticleControllerV2 {
 
     private final ArticleCommandUseCase articleCommandUseCase;
     private final ArticleQueryUseCase articleQueryUseCase;
     private final SecurityUtil securityUtil;
 
-    public ArticleController(ArticleCommandUseCase articleCommandUseCase,
+    public ArticleControllerV2(ArticleCommandUseCase articleCommandUseCase,
         ArticleQueryUseCase articleQueryUseCase, SecurityUtil securityUtil) {
         this.articleCommandUseCase = articleCommandUseCase;
         this.articleQueryUseCase = articleQueryUseCase;
@@ -52,37 +45,38 @@ public class ArticleController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<ArticleResponse>> createArticle(
+    public ResponseEntity<ResponseDTO<String>> createArticle(
         @RequestBody @Valid ArticleCreateRequest requestDto) {
+        ArticleResponse response = articleCommandUseCase.write(
+            new ArticleCreateServiceRequest(securityUtil.getCurrentMemberId(), requestDto.title(),
+                requestDto.content(), requestDto.isAnonymity()));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ResponseDTO.res(HttpStatus.CREATED, articleCommandUseCase.write(
-                new ArticleCreateServiceRequest(securityUtil.getCurrentMemberId(),
-                    requestDto.title(),
-                    requestDto.content(),
-                    requestDto.isAnonymity()))));
+            .body(ResponseDTO.res(HttpStatus.CREATED, "성공!",
+                "/api/v2/articles/%d".formatted(response.id())));
     }
 
-    @PutMapping
+    @PutMapping("/{articleId}")
     public ResponseEntity<ResponseDTO<ArticleResponse>> updateArticle(
-        @RequestBody @Valid ArticleUpdateRequest requestDto) {
+        @PathVariable Long articleId,
+        @RequestBody @Valid ArticleUpdateRequestV2 requestDto) {
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseDTO.res(HttpStatus.OK, articleCommandUseCase.update(
                 new ArticleUpdateServiceRequest(
-                    requestDto.articleId(),
-                    requestDto.memberId(),
+                    articleId,
+                    securityUtil.getCurrentMemberId(),
                     requestDto.title(),
                     requestDto.isAnonymity(), requestDto.content()
                 ))));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{articleId}")
     public ResponseEntity<ResponseDTO<Void>> deleteArticle(
-        @RequestBody @Valid ArticleDeleteRequest requestDto) {
+        @PathVariable Long articleId) {
 
         articleCommandUseCase.delete(new ArticleDeleteServiceRequest(
-            requestDto.articleId(),
+            articleId,
             securityUtil.getCurrentMemberId(),
             LocalDateTime.now()
         ));

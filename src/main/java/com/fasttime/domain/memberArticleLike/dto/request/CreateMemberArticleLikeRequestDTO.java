@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CreateMemberArticleLikeRequestDTO {
 
     @NotNull(message = "게시글 ID를 입력하세요.")
-    private Long postId;
+    private Long articleId;
 
     @NotNull(message = "좋아요 = true, 싫어요 = false 를 입력하세요.")
     private Boolean isLike;

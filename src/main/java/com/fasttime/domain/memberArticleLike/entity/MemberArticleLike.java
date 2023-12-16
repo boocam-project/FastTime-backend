@@ -54,7 +54,7 @@ public class MemberArticleLike extends BaseTimeEntity {
   public MemberArticleLikeDTO toDTO() {
     return MemberArticleLikeDTO.builder()
         .id(this.id)
-        .postId(this.article.getId())
+        .articleId(this.article.getId())
         .memberId(this.member.getId())
         .isLike(this.isLike)
         .build();

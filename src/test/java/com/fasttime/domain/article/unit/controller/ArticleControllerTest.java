@@ -14,9 +14,9 @@ import org.springframework.mock.web.MockHttpSession;
 
 class ArticleControllerTest extends ControllerUnitTestSupporter {
 
-    @DisplayName("writePost(PostCreateRequestDto)는")
+    @DisplayName("writeArticle(ArticleCreateRequestDto)는")
     @Nested
-    class Context_WritePost {
+    class Context_WriteArticle {
 
         @DisplayName("게시글을 저장할 수 있다.")
         @Test
@@ -36,22 +36,6 @@ class ArticleControllerTest extends ControllerUnitTestSupporter {
                     .content(objectMapper.writeValueAsString(requestDto)))
                 .andDo(print())
                 .andExpect(status().isCreated());
-        }
-
-        @DisplayName("회원 ID가 없는 경우 회원 관련 에러가 발생한다.")
-        @Test
-        void whenMemberId_isNull_willSend400Error() throws Exception {
-
-            // given
-            ArticleCreateRequest requestDto = new ArticleCreateRequest("title",
-                "this is content", false);
-
-            // when then
-            mockMvc.perform(post("/api/v1/article")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestDto)))
-                .andDo(print())
-                .andExpect(status().isForbidden());
         }
     }
 }

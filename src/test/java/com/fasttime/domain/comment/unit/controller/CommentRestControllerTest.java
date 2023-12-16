@@ -14,33 +14,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasttime.domain.comment.controller.CommentRestController;
 import com.fasttime.domain.comment.dto.request.CreateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.request.GetCommentsRequestDTO;
 import com.fasttime.domain.comment.dto.request.UpdateCommentRequestDTO;
 import com.fasttime.domain.comment.dto.response.CommentListResponseDTO;
 import com.fasttime.domain.comment.dto.response.CommentResponseDTO;
-import com.fasttime.domain.comment.service.CommentService;
+import com.fasttime.util.ControllerUnitTestSupporter;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(CommentRestController.class)
-public class CommentRestControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    CommentService commentService;
+public class CommentRestControllerTest extends ControllerUnitTestSupporter {
 
     @Nested
     @DisplayName("createComment()은")

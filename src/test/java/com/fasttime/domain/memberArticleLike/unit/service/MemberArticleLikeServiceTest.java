@@ -46,10 +46,10 @@ public class MemberArticleLikeServiceTest {
     private MemberArticleLikeRepository memberArticleLikeRepository;
 
     @Mock
-    private ArticleQueryService postQueryService;
+    private ArticleQueryService articleQueryService;
 
     @Mock
-    private ArticleCommandService postCommandService;
+    private ArticleCommandService articleCommandService;
 
     @Mock
     private MemberService memberService;
@@ -63,12 +63,12 @@ public class MemberArticleLikeServiceTest {
     public void setup() {
         testMember = Member.builder().id(1L).build();
         testArticle = ArticleResponse.builder().id(1L).build();
-        createLikeRequest = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(true).build();
-        createHateRequest = CreateMemberArticleLikeRequestDTO.builder().postId(1L).isLike(false).build();
+        createLikeRequest = CreateMemberArticleLikeRequestDTO.builder().articleId(1L).isLike(true).build();
+        createHateRequest = CreateMemberArticleLikeRequestDTO.builder().articleId(1L).isLike(false).build();
     }
 
     private void mockForSuccess() {
-        given(postQueryService.queryById(any(Long.class))).willReturn(testArticle);
+        given(articleQueryService.queryById(any(Long.class))).willReturn(testArticle);
         given(memberService.getMember(any(Long.class))).willReturn(testMember);
         given(memberArticleLikeRepository.findByMemberIdAndArticleId(any(long.class),any(long.class))).willReturn(Optional.empty());
     }
@@ -90,7 +90,7 @@ public class MemberArticleLikeServiceTest {
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
-            verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
+            verify(articleCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
         @Test
@@ -104,7 +104,7 @@ public class MemberArticleLikeServiceTest {
 
             // then
             verify(memberArticleLikeRepository, times(1)).save(any(MemberArticleLike.class));
-            verify(postCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
+            verify(articleCommandService, times(1)).likeOrHate(any(ArticleLikeOrHateServiceRequest.class));
         }
 
         @Test
@@ -147,12 +147,12 @@ public class MemberArticleLikeServiceTest {
     class Context_getMemberArticleLike {
 
         private Member member;
-        private Article post;
+        private Article article;
 
         @BeforeEach
         void setUp() {
             member = Member.builder().id(1L).build();
-            post = Article.builder().id(1L).build();
+            article = Article.builder().id(1L).build();
         }
 
         private void mockRepositoryResponse(Optional<MemberArticleLike> record) {
@@ -160,16 +160,16 @@ public class MemberArticleLikeServiceTest {
                 .willReturn(record);
         }
 
-        private void assertMemberArticleLikeDTO(MemberArticleLikeDTO result, Long id, Long postId, Long memberId, Boolean isLike) {
-            assertThat(result).extracting("id", "postId", "memberId", "isLike")
-                .containsExactly(id, postId, memberId, isLike);
+        private void assertMemberArticleLikeDTO(MemberArticleLikeDTO result, Long id, Long articleId, Long memberId, Boolean isLike) {
+            assertThat(result).extracting("id", "articleId", "memberId", "isLike")
+                .containsExactly(id, articleId, memberId, isLike);
         }
 
         @Test
         @DisplayName("회원이 해당 게시물에 대해 등록한 좋아요/싫어요 내역을 가져올 수 있다.")
         void _willSuccess() {
             // given
-            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).article(post).member(member).isLike(true).build());
+            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).article(article).member(member).isLike(true).build());
             mockRepositoryResponse(record);
 
             // when
@@ -201,12 +201,12 @@ public class MemberArticleLikeServiceTest {
     class Context_deleteMemberArticleLike {
 
         private Member member;
-        private Article post;
+        private Article article;
 
         @BeforeEach
         void setUp() {
             member = Member.builder().id(1L).build();
-            post = Article.builder().id(1L).build();
+            article = Article.builder().id(1L).build();
         }
 
         private void mockRepositoryResponse(Optional<MemberArticleLike> record) {
@@ -217,8 +217,8 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("게시글 좋아요/싫어요를 취소할 수 있다.")
         void _willSuccess() {
             // given
-            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
-            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).member(member).article(post).isLike(true).build());
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().articleId(1L).build();
+            Optional<MemberArticleLike> record = Optional.of(MemberArticleLike.builder().id(1L).member(member).article(article).isLike(true).build());
             mockRepositoryResponse(record);
 
             // when
@@ -232,7 +232,7 @@ public class MemberArticleLikeServiceTest {
         @DisplayName("게시글 좋아요/싫어요 한 적이 없다면 좋아요/싫어요를 취소할 수 없다.")
         void recordNotFound_willSuccess() {
             // given
-            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().postId(1L).build();
+            DeleteMemberArticleLikeRequestDTO request = DeleteMemberArticleLikeRequestDTO.builder().articleId(1L).build();
             mockRepositoryResponse(Optional.empty());
 
             // when, then

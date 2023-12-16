@@ -19,20 +19,24 @@ import com.fasttime.domain.member.exception.LoggedOutException;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
+import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.exception.UnmatchedMemberException;
 import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.repository.RefreshTokenRepository;
+import com.fasttime.global.jwt.JwtPayload;
 import com.fasttime.global.jwt.JwtProvider;
 import com.fasttime.global.util.ResponseDTO;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,7 +111,7 @@ public class MemberService {
     public MyPageInfoDTO getMyPageInfoById(Long memberId) throws MemberNotFoundException {
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException());
+            .orElseThrow(MemberNotFoundException::new);
 
         return new MyPageInfoDTO(
             member.getNickname(),
@@ -115,7 +119,6 @@ public class MemberService {
             member.getEmail()
         );
     }
-
 
     public boolean checkDuplicateNickname(String nickname) {
         return memberRepository.findByNickname(nickname).isPresent();
@@ -130,7 +133,7 @@ public class MemberService {
 
     public Member getMember(Long id) throws MemberNotFoundException {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new MemberNotFoundException("User not found with id: " + id));
+            .orElseThrow(MemberNotFoundException::new);
     }
 
     public MemberResponse rePassword(RePasswordRequest request, Long id) {
@@ -145,9 +148,9 @@ public class MemberService {
 
     public LogInResponseDto loginMember(LoginRequestDTO dto) throws MemberNotFoundException {
         Member member = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
-            () -> new MemberNotFoundException("User not found with email: " + dto.getEmail()));
+            MemberNotMatchInfoException::new);
         if (member.getDeletedAt() != null) {
-            throw new MemberNotFoundException("이미 탈퇴한 계정입니다");
+            throw new MemberSoftDeletedException();
         }
         if (!passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
             throw new MemberNotMatchInfoException();
@@ -155,34 +158,47 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject()
             .authenticate(authenticationToken);
-        TokenResponseDto tokenResponseDto = provider.createToken(authentication);
+
+        String serializedGrantedAuthority = extractGrantedAuthority(authentication);
+
+        TokenResponseDto tokenResponseDto = provider.createToken(
+            new JwtPayload(authentication.getName(), serializedGrantedAuthority));
+
         RefreshToken refreshToken = RefreshToken.builder()
             .id(Long.parseLong(authentication.getName()))
             .token(tokenResponseDto.getRefreshToken())
             .build();
+
         refreshTokenRepository.save(refreshToken);
         return LogInResponseDto.builder()
             .member(MemberResponseDto.of(member))
             .token(tokenResponseDto).build();
+    }
 
+    private String extractGrantedAuthority(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(","));
     }
 
     public LogInResponseDto refresh(RefreshRequestDto dto) {
         if (!provider.validateToken(dto.getRefreshToken())) {
             throw new InvalidRefreshTokenException();
         }
-        Authentication authentication = provider.getAuthentication(
-            dto.getAccessToken());
+        JwtPayload jwtPayload = provider.resolveToken(dto.getAccessToken());
         RefreshToken refreshToken = refreshTokenRepository.findById(
-            Long.parseLong(authentication.getName())).orElseThrow(LoggedOutException::new);
+            Long.parseLong(jwtPayload.name())).orElseThrow(LoggedOutException::new);
+
         if (!refreshToken.getToken().equals(dto.getRefreshToken())) {
             throw new UnmatchedMemberException();
         }
-        TokenResponseDto tokenResponseDto = provider.createToken(authentication);
-        refreshToken.updateValue(tokenResponseDto.getRefreshToken());
+
+        TokenResponseDto extendedExpirationRefreshTokenResponse = provider.createToken(jwtPayload);
+        refreshToken.updateToken(extendedExpirationRefreshTokenResponse.getRefreshToken());
+
         return LogInResponseDto.builder()
             .member(MemberResponseDto.of(getMember(refreshToken.getId())))
-            .token(tokenResponseDto)
+            .token(extendedExpirationRefreshTokenResponse)
             .build();
     }
 }

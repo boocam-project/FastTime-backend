@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -18,14 +20,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasttime.docs.RestDocsSupport;
-import com.fasttime.domain.article.controller.ArticleController;
+import com.fasttime.domain.article.controller.ArticleControllerV2;
 import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
-import com.fasttime.domain.article.dto.controller.request.ArticleDeleteRequest;
+import com.fasttime.domain.article.dto.controller.request.ArticleUpdateRequestV2;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase;
@@ -40,11 +40,10 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.snippet.Attributes.Attribute;
 
-class ArticleControllerDocsTest extends RestDocsSupport {
+class ArticleControllerV2DocsTest extends RestDocsSupport {
 
     private final ArticleQueryUseCase articleQueryUseCase = mock(ArticleQueryUseCase.class);
     private final ArticleCommandUseCase articleCommandUseCase = mock(ArticleCommandUseCase.class);
@@ -52,10 +51,10 @@ class ArticleControllerDocsTest extends RestDocsSupport {
 
     @Override
     public Object initController() {
-        return new ArticleController(articleCommandUseCase, articleQueryUseCase, securityUtil);
+        return new ArticleControllerV2(articleCommandUseCase, articleQueryUseCase, securityUtil);
     }
 
-    @DisplayName("게시글 작성 API 문서화")
+    @DisplayName("게시글 작성 API V2 문서화")
     @Test
     void createArticle() throws Exception {
 
@@ -74,16 +73,12 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .lastModifiedAt(null)
                 .build());
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
-
         // when then
-        mockMvc.perform(post("/api/v1/article")
+        mockMvc.perform(post("/api/v2/articles")
                 .contentType(MediaType.APPLICATION_JSON)
-                .session(session)
                 .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated())
-            .andDo(document("articles/v1/create",
+            .andDo(document("articles/v2/create",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 requestFields(
@@ -96,20 +91,87 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).optional()
                         .description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.STRING).description("생성된 게시글의 조회 URL")
+                )
+            ));
+    }
+
+    @DisplayName("게시글 수정 API V2 문서화")
+    @Test
+    void updateArticle() throws Exception {
+
+        // given
+        ArticleUpdateRequestV2 request = new ArticleUpdateRequestV2(
+            "새로운 게시글 제목입니다.",
+            "새로운 게시글 본문입니다.",
+            true);
+
+        when(articleCommandUseCase.update(any(ArticleUpdateServiceRequest.class)))
+            .thenReturn(ArticleResponse.builder()
+                .id(1L)
+                .nickname("패캠러")
+                .title(request.title())
+                .content(request.content())
+                .isAnonymity(false)
+                .likeCount(5)
+                .hateCount(1)
+                .createdAt(LocalDateTime.now())
+                .lastModifiedAt(LocalDateTime.now())
+                .build());
+
+        // when then
+        mockMvc.perform(put("/api/v2/articles/{article_id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isOk())
+            .andDo(document("articles/v2/update",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("article_id").description("수정할 게시글 식별자")),
+                requestFields(
+                    fieldWithPath("title").type(JsonFieldType.STRING).description("제목")
+                        .attributes(new Attribute("constraints", "50자 이하")),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
+                    fieldWithPath("isAnonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
+                ),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
-                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
                     fieldWithPath("data.nickname").type(JsonFieldType.STRING)
                         .description("작성자 닉네임"),
+                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
                     fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
                         .description("익명 여부"),
                     fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                     fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.NULL)
-                        .description("최종 수정 일시")
+                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING)
+                        .description("수정 일시")
                 )
+            ));
+    }
+
+    @DisplayName("게시글 삭제 API V2 문서화")
+    @Test
+    void deleteArticle() throws Exception {
+
+        // given
+        doNothing().when(articleCommandUseCase).delete(any(ArticleDeleteServiceRequest.class));
+
+        // when then
+        mockMvc.perform(delete("/api/v2/articles/{article_id}", 1))
+            .andExpect(status().isOk())
+            .andDo(document("articles/v2/delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("article_id").description("삭제할 게시글 식별자"))
             ));
     }
 
@@ -118,6 +180,14 @@ class ArticleControllerDocsTest extends RestDocsSupport {
     void searchArticles() throws Exception {
 
         // given
+        ArticlesSearchRequestServiceDto.builder()
+            .title("패스")
+            .nickname("패캠러")
+            .likeCount(10)
+            .pageSize(10)
+            .page(0)
+            .build();
+
         when(articleQueryUseCase.search(any(ArticlesSearchRequestServiceDto.class)))
             .thenReturn(List.of(
                 ArticlesResponse.builder().id(1L).title("공 잘 패스하는법 알려줌!").likeCount(20).hateCount(1)
@@ -132,7 +202,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
             ));
 
         // when then
-        mockMvc.perform(get("/api/v1/article")
+        mockMvc.perform(get("/api/v2/articles")
                 .queryParam("title", "패스")
                 .queryParam("nickname", "패캠러")
                 .queryParam("likeCount", "10")
@@ -140,7 +210,7 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .queryParam("pageSize", "10")
             )
             .andExpect(status().isOk())
-            .andDo(document("articles/v1/search",
+            .andDo(document("articles/v2/search",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 queryParameters(
@@ -195,10 +265,10 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                 .build());
 
         // when then
-        mockMvc.perform(get("/api/v1/article/{id}", 1)
+        mockMvc.perform(get("/api/v2/articles/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andDo(document("articles/v1/get-detail",
+            .andDo(document("articles/v2/get-detail",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 pathParameters(
@@ -221,96 +291,6 @@ class ArticleControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
                     fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING)
                         .description("수정 일시")
-                )
-            ));
-    }
-
-    @DisplayName("게시글 수정 API 문서화")
-    @Test
-    void updateArticle() throws Exception {
-
-        // given
-        ArticleUpdateServiceRequest requestDto = new ArticleUpdateServiceRequest(1L, 1L, "새로운 게시글 제목입니다.",
-            true, "새로운 게시글 본문입니다.");
-
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
-
-        when(articleCommandUseCase.update(any(ArticleUpdateServiceRequest.class)))
-            .thenReturn(ArticleResponse.builder()
-                .id(1L)
-                .nickname("패캠러")
-                .title(requestDto.title())
-                .content(requestDto.content())
-                .isAnonymity(false)
-                .likeCount(5)
-                .hateCount(1)
-                .createdAt(LocalDateTime.now())
-                .lastModifiedAt(LocalDateTime.now())
-                .build());
-
-        // when then
-        mockMvc.perform(put("/api/v1/article")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestDto))
-                .session(session)
-            )
-            .andExpect(status().isOk())
-            .andDo(document("articles/v1/update",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
-                    fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자"),
-                    fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자"),
-                    fieldWithPath("title").type(JsonFieldType.STRING).description("제목")
-                        .attributes(new Attribute("constraints", "50자 이하")),
-                    fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
-                    fieldWithPath("isAnonymity").type(JsonFieldType.BOOLEAN).description("익명여부")
-                ),
-                responseFields(
-                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
-                        .description("메시지"),
-                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 식별자"),
-                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
-                        .description("작성자 닉네임"),
-                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 본문"),
-                    fieldWithPath("data.isAnonymity").type(JsonFieldType.BOOLEAN)
-                        .description("익명 여부"),
-                    fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                    fieldWithPath("data.hateCount").type(JsonFieldType.NUMBER).description("싫어요 수"),
-                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성 일시"),
-                    fieldWithPath("data.lastModifiedAt").type(JsonFieldType.STRING)
-                        .description("수정 일시")
-                )
-            ));
-    }
-
-    @DisplayName("게시글 삭제 API 문서화")
-    @Test
-    void deleteArticle() throws Exception {
-
-        // given
-        ArticleDeleteRequest requestDto = new ArticleDeleteRequest(1L, 1L);
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
-
-        doNothing().when(articleCommandUseCase).delete(any(ArticleDeleteServiceRequest.class));
-
-        // when then
-        mockMvc.perform(delete("/api/v1/article")
-                .contentType(MediaType.APPLICATION_JSON)
-                .session(session)
-                .content(objectMapper.writeValueAsString(requestDto)))
-            .andExpect(status().isOk())
-            .andDo(document("articles/v1/delete",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
-                    fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자"),
-                    fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자")
                 )
             ));
     }

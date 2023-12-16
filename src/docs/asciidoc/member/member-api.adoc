@@ -22,21 +22,20 @@ include::{snippets}/member-login/request-fields.adoc[]
 include::{snippets}/member-login/http-response.adoc[]
 include::{snippets}/member-login/response-fields.adoc[]
 
-[[Member-Logout]]
-== 회원 로그아웃
+[[Member-Refresh]]
+== 회원 토큰 재발급
 
-사용자가 로그아웃하는 API 입니다.
-
-로그인된 사용자의 세션 데이터를 삭제해야 합니다.
+액세스 토큰의 재발급이 필요할 때, 사용하는 API 입니다.
 
 === HttpRequest
 
-include::{snippets}/member-logout/http-request.adoc[]
-
+include::{snippets}/member-refresh/http-request.adoc[]
+include::{snippets}/member-refresh/request-fields.adoc[]
 
 === HttpResponse
 
-include::{snippets}/member-logout/http-response.adoc[]
+include::{snippets}/member-refresh/http-response.adoc[]
+include::{snippets}/member-refresh/response-fields.adoc[]
 
 
 [[Member-RePassword]]
