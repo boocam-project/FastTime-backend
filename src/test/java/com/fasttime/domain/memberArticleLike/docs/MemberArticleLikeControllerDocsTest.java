@@ -63,7 +63,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         session.setAttribute("MEMBER", 1L);
 
         // when, then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/record").content(json)
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/article-like").content(json)
                 .contentType(MediaType.APPLICATION_JSON).session(session))
             .andExpect(status().isCreated()).andDo(
                 document("record-create", preprocessRequest(prettyPrint()),
@@ -95,7 +95,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/v1/record/{articleId}", 1L).session(session))
+                RestDocumentationRequestBuilders.get("/api/v1/article-like/{articleId}", 1L).session(session))
             .andExpect(status().isOk()).andDo(
                 document("record-get", preprocessRequest(prettyPrint()),
                     preprocessResponse(prettyPrint()),
@@ -125,7 +125,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         String json = new ObjectMapper().writeValueAsString(request);
 
         // when, then
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/record").content(json)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/article-like").content(json)
             .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(
             document("record-delete", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
