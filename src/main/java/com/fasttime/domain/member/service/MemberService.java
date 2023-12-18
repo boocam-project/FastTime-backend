@@ -22,7 +22,6 @@ import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
 import com.fasttime.domain.member.exception.MemberSoftDeletedException;
 import com.fasttime.domain.member.exception.NicknameAlreadyExistsException;
 import com.fasttime.domain.member.exception.UnmatchedMemberException;
-import com.fasttime.domain.member.repository.FcMemberRepository;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.repository.RefreshTokenRepository;
 import com.fasttime.global.jwt.JwtPayload;
@@ -48,7 +47,6 @@ public class MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final MemberRepository memberRepository;
-    private final FcMemberRepository fcMemberRepository;
     private final JwtProvider provider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
@@ -87,9 +85,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public boolean isEmailExistsInFcmember(String email) {
-        return fcMemberRepository.existsByEmail(email);
-    }
 
     public boolean isEmailExistsInMember(String email) {
         return memberRepository.existsByEmail(email);
