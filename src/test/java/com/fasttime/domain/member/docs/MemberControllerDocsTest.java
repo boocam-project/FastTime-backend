@@ -3,6 +3,7 @@ package com.fasttime.domain.member.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -42,6 +43,7 @@ import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
+import java.util.Optional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -359,60 +361,50 @@ class MemberControllerDocsTest extends RestDocsSupport {
     }
 
 
-    @Disabled
-    @DisplayName("회원 정보 수정 API 문서화")
+
+    @DisplayName("회원 정보 수정 API 테스트")
     @Test
     void updateMember() throws Exception {
         // Given
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
+        Long expectedMemberId = 1L;
+        EditRequest editRequest = new EditRequest("NewNickname", "new-image-url");
+        Member updatedMember = Member.builder()
+            .id(expectedMemberId)
+            .nickname("NewNickname")
+            .image("new-image-url")
+            .email("test@example.com")
+            .build();
 
-        EditRequest editRequest = new EditRequest();
-        editRequest.setNickname("NewNickname");
-        editRequest.setImage("new-image-url");
 
-        Member member = new Member();
-        member.setId(1L);
-        member.setNickname("NewNickname");
-        member.setImage("new-image-url");
-
-        member.setEmail(null);
-
-//        when(memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
-//            .thenReturn(Optional.of(member));
+        when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
+        when(memberService.updateMemberInfo(any(EditRequest.class), eq(expectedMemberId)))
+            .thenReturn(Optional.of(updatedMember));
 
         // When
         ResultActions result = mockMvc.perform(
             put("/api/v1/retouch-member")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(editRequest))
-                .session(session));
+                .content(objectMapper.writeValueAsString(editRequest)));
 
         // Then
         result.andExpect(status().isOk())
-//            .andExpect(
-//                jsonPath("$.code").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus().value()))
-//            .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage()))
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("new-image-url"))
-            .andExpect(
-                jsonPath("$.data.email").doesNotExist()) // Expect email to not exist if it's null
+            .andExpect(jsonPath("$.data.email").value("test@example.com"))
             .andDo(document("member-update",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
                     fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
                     fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
-                    fieldWithPath("data.nickname").description("변경된 닉네임")
-                        .type(JsonFieldType.STRING),
-                    fieldWithPath("data.image").description("변경된 이미지 URL")
-                        .type(JsonFieldType.STRING),
-
-                    fieldWithPath("data.email").description("이메일 (변경되지 않았을 수 있음)")
-                        .type(JsonFieldType.STRING).optional()
+                    fieldWithPath("data.nickname").description("변경된 닉네임").type(JsonFieldType.STRING),
+                    fieldWithPath("data.image").description("변경된 이미지 URL").type(JsonFieldType.STRING),
+                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
                 )
             ));
     }
 
-
 }
+
+
+
