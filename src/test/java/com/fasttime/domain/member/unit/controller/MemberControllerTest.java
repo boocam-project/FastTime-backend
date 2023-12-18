@@ -44,7 +44,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
-class MemberControllerTest extends ControllerUnitTestSupporter{
+class MemberControllerTest extends ControllerUnitTestSupporter {
 
 
     @Nested
@@ -133,21 +133,22 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
         @Test
         @DisplayName("회원 탈퇴한다.")
         void testDeleteMember() throws Exception {
+            // Given
+            Long expectedMemberId = 1L;
             Member member = new Member();
-            member.setId(1L);
+            member.setId(expectedMemberId);
 
-            MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", member.getId());
+            when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
+            when(memberService.getMember(expectedMemberId)).thenReturn(member);
+            doNothing().when(memberService).softDeleteMember(any(Member.class));
 
-            given(memberService.getMember(member.getId())).willReturn(member);
-
-            doNothing().when(memberService).softDeleteMember(member);
-
-            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/delete").session(session))
+            // When
+            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다."));
 
-            verify(memberService).softDeleteMember(member);
+            // Then
+            verify(memberService).softDeleteMember(any(Member.class));
         }
 
 
@@ -231,8 +232,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
         @DisplayName("성공한다. : 로그인된 사용자 정보 조회")
         void testGetMyPageInfoWhenLoggedIn() throws Exception {
             // Given
+            Long expectedMemberId = 1L;
             Member loggedInMember = new Member();
-            loggedInMember.setId(1L);
+            loggedInMember.setId(expectedMemberId);
             loggedInMember.setNickname("testuser");
             loggedInMember.setEmail("test@example.com");
             loggedInMember.setImage("testImage");
@@ -249,7 +251,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
             given(memberService.getMyPageInfoById(any(Long.class))).willReturn(myPageInfoDto);
 
             // Then
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypages").session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
                 .andExpect(
@@ -258,281 +260,275 @@ class MemberControllerTest extends ControllerUnitTestSupporter{
 
         }
 
-        @Test
-        @DisplayName("실패한다. : 로그인하지 않은 사용자 정보 조회")
-        void testGetMyPageInfoWhenNotLoggedIn() throws Exception {
-            // Given
-            MockHttpSession session = new MockHttpSession();
 
-            // Then
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypage").session(session))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("접근 권한이 없습니다."));
-        }
-    }
+        @DisplayName("loginMember()는")
+        @Nested
+        class Login {
 
-    @DisplayName("loginMember()는")
-    @Nested
-    class Login {
-        @Test
-        @DisplayName("로그인 할 수 있다.")
-        void _willSuccess() throws Exception {
-            // given
-            LoginRequestDTO request = LoginRequestDTO.builder()
-                .email("test@mail.com")
-                .password("qwer1234$$")
-                .build();
-            MemberResponseDto memberResponseDto = MemberResponseDto.builder()
-                .memberId(1L)
-                .email("test@mail.com")
-                .nickname("test")
-                .image("")
-                .build();
-            TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
-                .grantType("Bearer")
-                .accessToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
-                .accessTokenExpiresIn(1700586928520L)
-                .refreshToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
-                .build();
-            LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-                .member(memberResponseDto)
-                .token(tokenResponseDto)
-                .build();
+            @Test
+            @DisplayName("로그인 할 수 있다.")
+            void _willSuccess() throws Exception {
+                // given
+                LoginRequestDTO request = LoginRequestDTO.builder()
+                    .email("test@mail.com")
+                    .password("qwer1234$$")
+                    .build();
+                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                    .memberId(1L)
+                    .email("test@mail.com")
+                    .nickname("test")
+                    .image("")
+                    .build();
+                TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                    .grantType("Bearer")
+                    .accessToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+                    .accessTokenExpiresIn(1700586928520L)
+                    .refreshToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+                    .build();
+                LogInResponseDto logInResponseDto = LogInResponseDto.builder()
+                    .member(memberResponseDto)
+                    .token(tokenResponseDto)
+                    .build();
 
-            given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(logInResponseDto);
+                given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(
+                    logInResponseDto);
 
-            // when then
-            mockMvc.perform(post("/api/v2/login")
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").isNumber())
-                .andExpect(jsonPath("$.message").isString())
-                .andExpect(jsonPath("$.data").isMap())
-                .andExpect(jsonPath("$.data.member").isMap())
-                .andExpect(jsonPath("$.data.member.memberId").isNumber())
-                .andExpect(jsonPath("$.data.member.email").isString())
-                .andExpect(jsonPath("$.data.member.nickname").isString())
-                .andExpect(jsonPath("$.data.member.image").isString())
-                .andExpect(jsonPath("$.data.token").isMap())
-                .andExpect(jsonPath("$.data.token.grantType").isString())
-                .andExpect(jsonPath("$.data.token.accessToken").isString())
-                .andExpect(jsonPath("$.data.token.accessTokenExpiresIn").isNumber())
-                .andExpect(jsonPath("$.data.token.refreshToken").isString())
-                .andDo(print());
-        }
+                // when then
+                mockMvc.perform(post("/api/v2/login")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").isNumber())
+                    .andExpect(jsonPath("$.message").isString())
+                    .andExpect(jsonPath("$.data").isMap())
+                    .andExpect(jsonPath("$.data.member").isMap())
+                    .andExpect(jsonPath("$.data.member.memberId").isNumber())
+                    .andExpect(jsonPath("$.data.member.email").isString())
+                    .andExpect(jsonPath("$.data.member.nickname").isString())
+                    .andExpect(jsonPath("$.data.member.image").isString())
+                    .andExpect(jsonPath("$.data.token").isMap())
+                    .andExpect(jsonPath("$.data.token.grantType").isString())
+                    .andExpect(jsonPath("$.data.token.accessToken").isString())
+                    .andExpect(jsonPath("$.data.token.accessTokenExpiresIn").isNumber())
+                    .andExpect(jsonPath("$.data.token.refreshToken").isString())
+                    .andDo(print());
+            }
 
 
-        @DisplayName("로그인을 검증으로 인해 실패한다.")
-        @Test
-        @WithMockUser
-        void Validation_willFail() throws Exception {
-            //given
-            LoginRequestDTO dto = new LoginRequestDTO("", "testPassword");
-            String data = objectMapper.writeValueAsString(dto);
-            //when,then
-            mockMvc.perform(post("/api/v2/login")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("must not be blank"))
-                .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(print());
-        }
+            @DisplayName("로그인을 검증으로 인해 실패한다.")
+            @Test
+            @WithMockUser
+            void Validation_willFail() throws Exception {
+                //given
+                LoginRequestDTO dto = new LoginRequestDTO("", "testPassword");
+                String data = objectMapper.writeValueAsString(dto);
+                //when,then
+                mockMvc.perform(post("/api/v2/login")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.message").value("must not be blank"))
+                    .andExpect(jsonPath("$.data").isEmpty())
+                    .andDo(print());
+            }
 
-        @DisplayName("로그인을 등록되지않는 이메일로 인해 실패한다.")
-        @Test
-        @WithMockUser
-        void Email_willFail() throws Exception {
-            //given
-            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "testPassword");
-            String data = objectMapper.writeValueAsString(dto);
-            when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new MemberNotMatchInfoException());
-            //when,then
-            mockMvc.perform(post("/api/v2/login")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message")
-                    .value("아이디 또는 비밀번호가 일치하지 않습니다."))
-                .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(print());
-        }
+            @DisplayName("로그인을 등록되지않는 이메일로 인해 실패한다.")
+            @Test
+            @WithMockUser
+            void Email_willFail() throws Exception {
+                //given
+                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "testPassword");
+                String data = objectMapper.writeValueAsString(dto);
+                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                    .thenThrow(new MemberNotMatchInfoException());
+                //when,then
+                mockMvc.perform(post("/api/v2/login")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.code").value(400))
+                    .andExpect(jsonPath("$.message")
+                        .value("아이디 또는 비밀번호가 일치하지 않습니다."))
+                    .andExpect(jsonPath("$.data").isEmpty())
+                    .andDo(print());
+            }
 
-        @DisplayName("로그인을 비밀번호가 달라 실패한다.")
-        @Test
-        @WithMockUser
-        void password_willFail() throws Exception {
-            //given
-            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
-            String data = objectMapper.writeValueAsString(dto);
-            when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new MemberNotMatchInfoException());
-            //when,then
-            mockMvc.perform(post("/api/v2/login")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message")
-                    .value("아이디 또는 비밀번호가 일치하지 않습니다."))
-                .andDo(print());
-        }
+            @DisplayName("로그인을 비밀번호가 달라 실패한다.")
+            @Test
+            @WithMockUser
+            void password_willFail() throws Exception {
+                //given
+                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
+                String data = objectMapper.writeValueAsString(dto);
+                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                    .thenThrow(new MemberNotMatchInfoException());
+                //when,then
+                mockMvc.perform(post("/api/v2/login")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.code").value(400))
+                    .andExpect(jsonPath("$.message")
+                        .value("아이디 또는 비밀번호가 일치하지 않습니다."))
+                    .andDo(print());
+            }
 
-        @DisplayName("로그인을 이미 탈퇴한 회원이라서 실패한다.")
-        @Test
-        @WithMockUser
-        void softDeleted_willFail() throws Exception {
-            //given
-            LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
-            String data = objectMapper.writeValueAsString(dto);
-            when(memberService.loginMember(any(LoginRequestDTO.class)))
-                .thenThrow(new MemberSoftDeletedException());
-            //when,then
-            mockMvc.perform(post("/api/v2/login")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.code").value(404))
-                .andExpect(jsonPath("$.message")
-                    .value("이미 탈퇴한 회원입니다."))
-                .andDo(print());
+            @DisplayName("로그인을 이미 탈퇴한 회원이라서 실패한다.")
+            @Test
+            @WithMockUser
+            void softDeleted_willFail() throws Exception {
+                //given
+                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
+                String data = objectMapper.writeValueAsString(dto);
+                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                    .thenThrow(new MemberSoftDeletedException());
+                //when,then
+                mockMvc.perform(post("/api/v2/login")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.code").value(404))
+                    .andExpect(jsonPath("$.message")
+                        .value("이미 탈퇴한 회원입니다."))
+                    .andDo(print());
+            }
+
         }
 
-    }
 
+        @DisplayName("rePassword()는")
+        @Nested
+        class RePassword {
 
-    @DisplayName("rePassword()는")
-    @Nested
-    class RePassword {
+            @DisplayName("비밀번호 재설정을 성공한다.")
+            @Test
+            @WithMockUser
+            void _willSuccess() throws Exception {
+                //given
+                RePasswordRequest request = new RePasswordRequest
+                    ("newPassword", "newPassword");
+                MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+                when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
+                    .thenReturn(memberResponse);
 
-        @DisplayName("비밀번호 재설정을 성공한다.")
-        @Test
-        @WithMockUser
-        void _willSuccess() throws Exception {
-            //given
-            RePasswordRequest request = new RePasswordRequest
-                ("newPassword", "newPassword");
-            MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
-            when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
-                .thenReturn(memberResponse);
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
 
-            MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", 1L);
+                String data = objectMapper.writeValueAsString(request);
 
-            String data = objectMapper.writeValueAsString(request);
+                //when, then
+                mockMvc.perform(post("/api/v1/RePassword")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .session(session))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.id").exists())
+                    .andExpect(jsonPath("$.data.nickname").exists())
+                    .andDo(print());
+            }
 
-            //when, then
-            mockMvc.perform(post("/api/v1/RePassword")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .session(session))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").exists())
-                .andExpect(jsonPath("$.data.nickname").exists())
-                .andDo(print());
+            @DisplayName("비밀번호 재설정을 검증으로 인해 실패한다.")
+            @Test
+            @WithMockUser
+            void validation_willFail() throws Exception {
+                //given
+                RePasswordRequest request = new RePasswordRequest
+                    ("", "newPassword");
+
+                String data = objectMapper.writeValueAsString(request);
+
+                //when, then
+                mockMvc.perform(post("/api/v1/RePassword")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.message").value("must not be blank"))
+                    .andExpect(jsonPath("$.data").isEmpty())
+                    .andDo(print());
+            }
+
+            @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
+            @Test
+            @WithMockUser
+            void Re_willFail() throws Exception {
+                //given
+                RePasswordRequest request = new RePasswordRequest
+                    ("newPassword", "new");
+                when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
+                    .thenThrow(new MemberNotMatchRePasswordException());
+                String data = objectMapper.writeValueAsString(request);
+
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("MEMBER", 1L);
+
+                //when, then
+                mockMvc.perform(post("/api/v1/RePassword")
+                        .content(data)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .session(session))
+                    .andExpect(jsonPath("$.code").value(400))
+                    .andExpect(jsonPath("$.message").value("비밀번호 재확인이 일치하지 않습니다."))
+                    .andDo(print());
+            }
         }
 
-        @DisplayName("비밀번호 재설정을 검증으로 인해 실패한다.")
-        @Test
-        @WithMockUser
-        void validation_willFail() throws Exception {
-            //given
-            RePasswordRequest request = new RePasswordRequest
-                ("", "newPassword");
+        @Nested
+        @DisplayName("refresh()은")
+        class Context_refresh {
 
-            String data = objectMapper.writeValueAsString(request);
+            @Test
+            @DisplayName("토큰을 재발급 할 수 있다.")
+            void _willSuccess() throws Exception {
+                // given
+                RefreshRequestDto request = RefreshRequestDto.builder()
+                    .accessToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+                    .refreshToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+                    .build();
+                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                    .memberId(1L)
+                    .email("test@mail.com")
+                    .nickname("test")
+                    .image("")
+                    .build();
+                TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                    .grantType("Bearer")
+                    .accessToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
+                    .accessTokenExpiresIn(1700586928520L)
+                    .refreshToken(
+                        "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
+                    .build();
+                LogInResponseDto logInResponseDto = LogInResponseDto.builder()
+                    .member(memberResponseDto)
+                    .token(tokenResponseDto)
+                    .build();
 
-            //when, then
-            mockMvc.perform(post("/api/v1/RePassword")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message").value("must not be blank"))
-                .andExpect(jsonPath("$.data").isEmpty())
-                .andDo(print());
-        }
+                given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(
+                    logInResponseDto);
 
-        @DisplayName("비밀번호 재확인이 일치하지 않음으로 실패한다.")
-        @Test
-        @WithMockUser
-        void Re_willFail() throws Exception {
-            //given
-            RePasswordRequest request = new RePasswordRequest
-                ("newPassword", "new");
-            when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
-                .thenThrow(new MemberNotMatchRePasswordException());
-            String data = objectMapper.writeValueAsString(request);
-
-            MockHttpSession session = new MockHttpSession();
-            session.setAttribute("MEMBER", 1L);
-
-            //when, then
-            mockMvc.perform(post("/api/v1/RePassword")
-                    .content(data)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .session(session))
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("비밀번호 재확인이 일치하지 않습니다."))
-                .andDo(print());
-        }
-    }
-    @Nested
-    @DisplayName("refresh()은")
-    class Context_refresh {
-
-        @Test
-        @DisplayName("토큰을 재발급 할 수 있다.")
-        void _willSuccess() throws Exception {
-            // given
-            RefreshRequestDto request = RefreshRequestDto.builder()
-                .accessToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
-                .refreshToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
-                .build();
-            MemberResponseDto memberResponseDto = MemberResponseDto.builder()
-                .memberId(1L)
-                .email("test@mail.com")
-                .nickname("test")
-                .image("")
-                .build();
-            TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
-                .grantType("Bearer")
-                .accessToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
-                .accessTokenExpiresIn(1700586928520L)
-                .refreshToken(
-                    "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
-                .build();
-            LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-                .member(memberResponseDto)
-                .token(tokenResponseDto)
-                .build();
-
-            given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(logInResponseDto);
-
-            // when then
-            mockMvc.perform(post("/api/v2/refresh")
-                    .content(objectMapper.writeValueAsString(request))
-                    .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").isNumber())
-                .andExpect(jsonPath("$.message").isString())
-                .andExpect(jsonPath("$.data").isMap())
-                .andExpect(jsonPath("$.data.member").isMap())
-                .andExpect(jsonPath("$.data.member.memberId").isNumber())
-                .andExpect(jsonPath("$.data.member.email").isString())
-                .andExpect(jsonPath("$.data.member.nickname").isString())
-                .andExpect(jsonPath("$.data.member.image").isString())
-                .andExpect(jsonPath("$.data.token").isMap())
-                .andExpect(jsonPath("$.data.token.grantType").isString())
-                .andExpect(jsonPath("$.data.token.accessToken").isString())
-                .andExpect(jsonPath("$.data.token.accessTokenExpiresIn").isNumber())
-                .andExpect(jsonPath("$.data.token.refreshToken").isString())
-                .andDo(print());
+                // when then
+                mockMvc.perform(post("/api/v2/refresh")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").isNumber())
+                    .andExpect(jsonPath("$.message").isString())
+                    .andExpect(jsonPath("$.data").isMap())
+                    .andExpect(jsonPath("$.data.member").isMap())
+                    .andExpect(jsonPath("$.data.member.memberId").isNumber())
+                    .andExpect(jsonPath("$.data.member.email").isString())
+                    .andExpect(jsonPath("$.data.member.nickname").isString())
+                    .andExpect(jsonPath("$.data.member.image").isString())
+                    .andExpect(jsonPath("$.data.token").isMap())
+                    .andExpect(jsonPath("$.data.token.grantType").isString())
+                    .andExpect(jsonPath("$.data.token.accessToken").isString())
+                    .andExpect(jsonPath("$.data.token.accessTokenExpiresIn").isNumber())
+                    .andExpect(jsonPath("$.data.token.refreshToken").isString())
+                    .andDo(print());
+            }
         }
     }
 }
+
 
 
 
