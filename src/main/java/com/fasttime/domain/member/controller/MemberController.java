@@ -80,7 +80,7 @@ public class MemberController {
 
     }
 
-    @GetMapping("/api/v1/mypage")
+    @GetMapping("/api/v1/mypages")
     public ResponseEntity<ResponseDTO> getMyPageInfo() {
 
         MyPageInfoDTO myPageInfoDto = memberService
