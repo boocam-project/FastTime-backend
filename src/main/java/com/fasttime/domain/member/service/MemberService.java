@@ -61,7 +61,7 @@ public class MemberService {
             Member member = softDeletedMember.get();
             member.restore();
             member.setNickname(createMemberRequest.getNickname());
-            save(member);
+            memberRepository.save(member);
             return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
 
         }
@@ -70,12 +70,12 @@ public class MemberService {
         } else if (checkDuplicateNickname(createMemberRequest.getNickname())) {
             throw new NicknameAlreadyExistsException();
         }
-        save(createMemberRequest);
+        saveNewMember(createMemberRequest);
         return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
     }
 
 
-    public void save(CreateMemberRequest createMemberRequest) {
+    public void saveNewMember(CreateMemberRequest createMemberRequest) {
 
         Member member = new Member();
         member.setEmail(createMemberRequest.getEmail());
@@ -91,11 +91,8 @@ public class MemberService {
     }
 
 
-    public void save(Member member) {
-        memberRepository.save(member);
-    }
-
-    public Optional<Member> updateMemberInfo(UpdateMemberRequest updateMemberRequest, Long memberId) {
+    public Optional<Member> updateMemberInfo(UpdateMemberRequest updateMemberRequest,
+        Long memberId) {
 
         return memberRepository.findById(memberId).map(member -> {
             member.update(updateMemberRequest.getNickname(), updateMemberRequest.getImage());
