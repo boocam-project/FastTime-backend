@@ -52,8 +52,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public ResponseDTO<Object> registerOrRecoverMember(CreateMemberRequest createMemberRequest) {
-
+    public ResponseDTO<Object> recoverMember(CreateMemberRequest createMemberRequest) {
         Optional<Member> softDeletedMember = memberRepository.findSoftDeletedByEmail(
             createMemberRequest.getEmail(), LocalDateTime.now().minusYears(1));
 
@@ -63,8 +62,11 @@ public class MemberService {
             member.setNickname(createMemberRequest.getNickname());
             memberRepository.save(member);
             return ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!");
-
         }
+        return null;
+    }
+
+    public ResponseDTO<Object> registerMember(CreateMemberRequest createMemberRequest) {
         if (isEmailExistsInMember(createMemberRequest.getEmail())) {
             throw new EmailAlreadyExistsException();
         } else if (checkDuplicateNickname(createMemberRequest.getNickname())) {
@@ -72,6 +74,14 @@ public class MemberService {
         }
         saveNewMember(createMemberRequest);
         return ResponseDTO.res(HttpStatus.OK, "가입 성공!");
+    }
+
+    public ResponseDTO<Object> registerOrRecoverMember(CreateMemberRequest createMemberRequest) {
+        ResponseDTO<Object> recoveryResponse = recoverMember(createMemberRequest);
+        if (recoveryResponse != null) {
+            return recoveryResponse;
+        }
+        return registerMember(createMemberRequest);
     }
 
 
