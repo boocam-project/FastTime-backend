@@ -325,7 +325,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
     }
 
 
-    @DisplayName("마이페이지 조회 API 테스트")
+    @DisplayName("마이페이지 조회 API 문서화")
     @Test
     void testGetMyPageInfo() throws Exception {
         // Given
@@ -342,12 +342,12 @@ class MemberControllerDocsTest extends RestDocsSupport {
 
         // Then
         result.andExpect(status().isOk())
-            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
-            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다.")) // 메시지 확인
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("newimageURL"))
             .andExpect(jsonPath("$.data.email").value("test@example.com"))
-            .andDo(document("member-getMyPageInfo", // 문서화 설정
+            .andDo(document("member-getMyPageInfo",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
@@ -359,7 +359,6 @@ class MemberControllerDocsTest extends RestDocsSupport {
                 )
             ));
     }
-
 
 
     @DisplayName("회원 정보 수정 API 테스트")
@@ -374,7 +373,6 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .image("new-image-url")
             .email("test@example.com")
             .build();
-
 
         when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
         when(memberService.updateMemberInfo(any(EditRequest.class), eq(expectedMemberId)))
@@ -397,14 +395,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
                 responseFields(
                     fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
                     fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
-                    fieldWithPath("data.nickname").description("변경된 닉네임").type(JsonFieldType.STRING),
-                    fieldWithPath("data.image").description("변경된 이미지 URL").type(JsonFieldType.STRING),
+                    fieldWithPath("data.nickname").description("변경된 닉네임")
+                        .type(JsonFieldType.STRING),
+                    fieldWithPath("data.image").description("변경된 이미지 URL")
+                        .type(JsonFieldType.STRING),
                     fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
                 )
             ));
     }
 
+
 }
-
-
-
