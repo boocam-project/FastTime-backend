@@ -93,7 +93,6 @@ class MemberControllerDocsTest extends RestDocsSupport {
 
         given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(logInResponseDto);
 
-
         // when
         mockMvc.perform(post("/api/v2/login")
                 .content(objectMapper.writeValueAsString(loginRequestDTO))
@@ -106,14 +105,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                         .attributes(key("constraints").value("Not Blank"))), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                     fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                     fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
                         .description("회원 식별자"),
                     fieldWithPath("data.member.email").type(JsonFieldType.STRING)
                         .description("이메일"),
-                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING)
+                        .description("이름"),
                     fieldWithPath("data.member.image").type(JsonFieldType.STRING)
                         .description("프로필 이미지"),
                     fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
@@ -175,14 +176,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
                         .description("Refresh Token")
                         .attributes(key("constraints").value("Not Blank"))), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                     fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                     fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
                         .description("회원 식별자"),
                     fieldWithPath("data.member.email").type(JsonFieldType.STRING)
                         .description("이메일"),
-                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING)
+                        .description("이름"),
                     fieldWithPath("data.member.image").type(JsonFieldType.STRING)
                         .description("프로필 이미지"),
                     fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
@@ -198,7 +201,6 @@ class MemberControllerDocsTest extends RestDocsSupport {
             ));
 
     }
-
 
 
     @DisplayName("회원 비밀번호 재설정 API 문서화")
@@ -314,48 +316,44 @@ class MemberControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(
                 delete("/api/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
-            .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다.")) // 메시지 확인
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다."))
             .andDo(document("member-delete", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
     }
 
-    @Disabled
-    @DisplayName("마이페이지 조회 API 문서화")
+
+    @DisplayName("마이페이지 조회 API 테스트")
     @Test
     void testGetMyPageInfo() throws Exception {
         // Given
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
-
+        Long expectedMemberId = 1L;
         MyPageInfoDTO myPageInfoDTO = new MyPageInfoDTO("NewNickname", "newimageURL",
             "test@example.com");
-        when(memberService.getMyPageInfoById(1L)).thenReturn(myPageInfoDTO);
+
+        when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
+        when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(myPageInfoDTO);
 
         // When
-        ResultActions result = mockMvc.perform(get("/api/v1/mypage").session(session)
+        ResultActions result = mockMvc.perform(get("/api/v1/mypages")
             .contentType(MediaType.APPLICATION_JSON));
 
         // Then
         result.andExpect(status().isOk())
-            .andExpect(content().contentType("application/json;charset=UTF-8"))
-            .andExpect(jsonPath("$.code").value(200))
-//            .andExpect(
-//                jsonPath("$.message").value(ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
+            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다.")) // 메시지 확인
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("newimageURL"))
             .andExpect(jsonPath("$.data.email").value("test@example.com"))
-            .andDo(document("member-getMyPageInfo",
+            .andDo(document("member-getMyPageInfo", // 문서화 설정
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
-                    fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
-                    fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
-                    fieldWithPath("data.nickname").description("사용자 닉네임")
-                        .type(JsonFieldType.STRING),
-                    fieldWithPath("data.image").description("프로필 이미지 URL")
-                        .type(JsonFieldType.STRING),
-                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
+                    fieldWithPath("code").description("응답 상태 코드"),
+                    fieldWithPath("message").description("응답 메시지"),
+                    fieldWithPath("data.nickname").description("사용자 닉네임"),
+                    fieldWithPath("data.image").description("프로필 이미지 URL"),
+                    fieldWithPath("data.email").description("사용자 이메일")
                 )
             ));
     }
