@@ -1,18 +1,17 @@
-package com.fasttime.domain.member.dto.request;
+package com.fasttime.domain.member.dto.response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditRequest {
+@Builder
+public class UpdateMemberResponse {
 
-    @NotNull
+    private String email;
     private String nickname;
     private String image;
 

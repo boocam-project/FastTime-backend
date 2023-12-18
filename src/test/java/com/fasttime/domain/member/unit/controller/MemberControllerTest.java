@@ -13,16 +13,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
-import com.fasttime.domain.member.dto.request.EditRequest;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
+import com.fasttime.domain.member.dto.request.UpdateMemberRequest;
+import com.fasttime.domain.member.dto.request.LoginRequest;
 import com.fasttime.domain.member.dto.request.RePasswordRequest;
-import com.fasttime.domain.member.dto.request.RefreshRequestDto;
-import com.fasttime.domain.member.dto.response.LogInResponseDto;
-import com.fasttime.domain.member.dto.response.MemberResponse;
-import com.fasttime.domain.member.dto.response.MemberResponseDto;
-import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
-import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.dto.request.RefreshRequest;
+import com.fasttime.domain.member.dto.response.LoginResponse;
+import com.fasttime.domain.member.dto.response.RepasswordResponse;
+import com.fasttime.domain.member.dto.response.RefreshResponse;
+import com.fasttime.domain.member.dto.response.GetMyInfoResponse;
+import com.fasttime.domain.member.dto.response.TokenResponse;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotMatchInfoException;
 import com.fasttime.domain.member.exception.MemberNotMatchRePasswordException;
@@ -59,7 +59,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("이미 가입된 회원일 때")
             void alreadyRegisteredMember() throws Exception {
                 when(
-                    memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+                    memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
@@ -82,7 +82,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("닉네임이 중복일 때")
             void duplicateNickname() throws Exception {
 
-                when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+                when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
@@ -109,7 +109,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @Test
             @DisplayName("회원가입 성공")
             void join_Success() throws Exception {
-                when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+                when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
                     .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
                 ResultActions resultActions = mockMvc.perform(
@@ -167,28 +167,28 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 member.setNickname("oldNickname");
                 member.setImage("oldImage");
 
-                EditRequest editRequest = new EditRequest();
-                editRequest.setNickname("newNickname");
-                editRequest.setImage("newImage");
+                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest();
+                updateMemberRequest.setNickname("newNickname");
+                updateMemberRequest.setImage("newImage");
 
                 Member updatedMember = new Member();
                 updatedMember.setId(member.getId());
                 updatedMember.setEmail(member.getEmail());
                 updatedMember.setPassword(member.getPassword());
-                updatedMember.setNickname(editRequest.getNickname());
-                updatedMember.setImage(editRequest.getImage());
+                updatedMember.setNickname(updateMemberRequest.getNickname());
+                updatedMember.setImage(updateMemberRequest.getImage());
 
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", member.getId());
 
                 given(
-                    memberService.updateMemberInfo(any(EditRequest.class), anyLong()))
+                    memberService.updateMemberInfo(any(UpdateMemberRequest.class), anyLong()))
                     .willReturn(Optional.of(updatedMember));
 
                 // When & Then
                 mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editRequest))
+                        .content(objectMapper.writeValueAsString(updateMemberRequest))
                         .session(session))
                     .andExpect(status().isOk())
                     .andExpect(
@@ -201,21 +201,21 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("실패한다: 사용자를 찾을 수 없음")
             void updateMember_NotFound() throws Exception {
                 // Given
-                EditRequest editRequest = new EditRequest();
-                editRequest.setNickname("newNickname");
-                editRequest.setImage("newImage");
+                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest();
+                updateMemberRequest.setNickname("newNickname");
+                updateMemberRequest.setImage("newImage");
 
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
 
                 given(
-                    memberService.updateMemberInfo(any(EditRequest.class), anyLong()))
+                    memberService.updateMemberInfo(any(UpdateMemberRequest.class), anyLong()))
                     .willReturn(Optional.empty());
 
                 // When & Then
                 mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editRequest))
+                        .content(objectMapper.writeValueAsString(updateMemberRequest))
                         .session(session))
                     .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                     .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_NOT_FOUND.getMessage()))
@@ -242,13 +242,14 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", loggedInMember.getId());
 
-            MyPageInfoDTO myPageInfoDto = new MyPageInfoDTO(
+            GetMyInfoResponse getMyInfoResponse = new GetMyInfoResponse(
                 loggedInMember.getNickname(),
                 loggedInMember.getImage(),
                 loggedInMember.getEmail()
             );
 
-            given(memberService.getMyPageInfoById(any(Long.class))).willReturn(myPageInfoDto);
+            given(memberService.getMyPageInfoById(any(Long.class))).willReturn(
+                getMyInfoResponse);
 
             // Then
             mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypages").session(session))
@@ -269,17 +270,17 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("로그인 할 수 있다.")
             void _willSuccess() throws Exception {
                 // given
-                LoginRequestDTO request = LoginRequestDTO.builder()
+                LoginRequest request = LoginRequest.builder()
                     .email("test@mail.com")
                     .password("qwer1234$$")
                     .build();
-                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                RefreshResponse refreshResponse = RefreshResponse.builder()
                     .memberId(1L)
                     .email("test@mail.com")
                     .nickname("test")
                     .image("")
                     .build();
-                TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                TokenResponse tokenResponse = TokenResponse.builder()
                     .grantType("Bearer")
                     .accessToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -287,13 +288,13 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .refreshToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
                     .build();
-                LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-                    .member(memberResponseDto)
-                    .token(tokenResponseDto)
+                LoginResponse logInResponse = LoginResponse.builder()
+                    .member(refreshResponse)
+                    .token(tokenResponse)
                     .build();
 
-                given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(
-                    logInResponseDto);
+                given(memberService.loginMember(any(LoginRequest.class))).willReturn(
+                    logInResponse);
 
                 // when then
                 mockMvc.perform(post("/api/v2/login")
@@ -322,7 +323,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @WithMockUser
             void Validation_willFail() throws Exception {
                 //given
-                LoginRequestDTO dto = new LoginRequestDTO("", "testPassword");
+                LoginRequest dto = new LoginRequest("", "testPassword");
                 String data = objectMapper.writeValueAsString(dto);
                 //when,then
                 mockMvc.perform(post("/api/v2/login")
@@ -338,9 +339,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @WithMockUser
             void Email_willFail() throws Exception {
                 //given
-                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "testPassword");
+                LoginRequest dto = new LoginRequest("email@gmail.com", "testPassword");
                 String data = objectMapper.writeValueAsString(dto);
-                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                when(memberService.loginMember(any(LoginRequest.class)))
                     .thenThrow(new MemberNotMatchInfoException());
                 //when,then
                 mockMvc.perform(post("/api/v2/login")
@@ -358,9 +359,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @WithMockUser
             void password_willFail() throws Exception {
                 //given
-                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
+                LoginRequest dto = new LoginRequest("email@gmail.com", "Password");
                 String data = objectMapper.writeValueAsString(dto);
-                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                when(memberService.loginMember(any(LoginRequest.class)))
                     .thenThrow(new MemberNotMatchInfoException());
                 //when,then
                 mockMvc.perform(post("/api/v2/login")
@@ -377,9 +378,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @WithMockUser
             void softDeleted_willFail() throws Exception {
                 //given
-                LoginRequestDTO dto = new LoginRequestDTO("email@gmail.com", "Password");
+                LoginRequest dto = new LoginRequest("email@gmail.com", "Password");
                 String data = objectMapper.writeValueAsString(dto);
-                when(memberService.loginMember(any(LoginRequestDTO.class)))
+                when(memberService.loginMember(any(LoginRequest.class)))
                     .thenThrow(new MemberSoftDeletedException());
                 //when,then
                 mockMvc.perform(post("/api/v2/login")
@@ -405,9 +406,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 //given
                 RePasswordRequest request = new RePasswordRequest
                     ("newPassword", "newPassword");
-                MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+                RepasswordResponse repasswordResponse = new RepasswordResponse(1L, "땅땅띠라랑");
                 when(memberService.rePassword(any(RePasswordRequest.class), anyLong()))
-                    .thenReturn(memberResponse);
+                    .thenReturn(repasswordResponse);
 
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", 1L);
@@ -477,19 +478,19 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("토큰을 재발급 할 수 있다.")
             void _willSuccess() throws Exception {
                 // given
-                RefreshRequestDto request = RefreshRequestDto.builder()
+                RefreshRequest request = RefreshRequest.builder()
                     .accessToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
                     .refreshToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
                     .build();
-                MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+                RefreshResponse refreshResponse = RefreshResponse.builder()
                     .memberId(1L)
                     .email("test@mail.com")
                     .nickname("test")
                     .image("")
                     .build();
-                TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+                TokenResponse tokenResponse = TokenResponse.builder()
                     .grantType("Bearer")
                     .accessToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -497,13 +498,13 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .refreshToken(
                         "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
                     .build();
-                LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-                    .member(memberResponseDto)
-                    .token(tokenResponseDto)
+                LoginResponse logInResponse = LoginResponse.builder()
+                    .member(refreshResponse)
+                    .token(tokenResponse)
                     .build();
 
-                given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(
-                    logInResponseDto);
+                given(memberService.refresh(any(RefreshRequest.class))).willReturn(
+                    logInResponse);
 
                 // when then
                 mockMvc.perform(post("/api/v2/refresh")

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MyPageInfoDTO {
+public class GetMyInfoResponse {
     private String nickname;
     private String image;
     private String email;

@@ -11,12 +11,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.LoginRequest;
 import com.fasttime.domain.member.dto.request.RePasswordRequest;
-import com.fasttime.domain.member.dto.request.RefreshRequestDto;
-import com.fasttime.domain.member.dto.response.LogInResponseDto;
-import com.fasttime.domain.member.dto.response.MemberResponse;
-import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.dto.request.RefreshRequest;
+import com.fasttime.domain.member.dto.response.LoginResponse;
+import com.fasttime.domain.member.dto.response.RepasswordResponse;
+import com.fasttime.domain.member.dto.response.TokenResponse;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.entity.RefreshToken;
 import com.fasttime.domain.member.entity.Role;
@@ -84,7 +84,7 @@ public class MemberServiceTest {
         @DisplayName("로그인을 할 수 있다.")
         void _willSuccess() {
             // given
-            LoginRequestDTO signInRequestDto = LoginRequestDTO.builder()
+            LoginRequest signInRequestDto = LoginRequest.builder()
                 .email("test@mail.com")
                 .password("qwer1234$$")
                 .build();
@@ -105,7 +105,7 @@ public class MemberServiceTest {
                 Arrays.stream(new String[]{member.getRole().name()})
                     .map(SimpleGrantedAuthority::new)
                     .toList());
-            TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+            TokenResponse tokenResponse = TokenResponse.builder()
                 .grantType("Bearer")
                 .accessToken(
                     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -124,11 +124,11 @@ public class MemberServiceTest {
             given(authenticationManager.authenticate(any(Authentication.class))).willReturn(
                 authentication);
             given(jwtTokenProvider.createToken(any(JwtPayload.class))).willReturn(
-                tokenResponseDto);
+                tokenResponse);
             given(refreshTokenRepository.save(any(RefreshToken.class))).willReturn(refreshToken);
 
             // when
-            LogInResponseDto result = memberService.loginMember(signInRequestDto);
+            LoginResponse result = memberService.loginMember(signInRequestDto);
 
             // then
             assertNotNull(result);
@@ -153,7 +153,7 @@ public class MemberServiceTest {
         @Test
         void Email_willFail() {
             //given
-            LoginRequestDTO dto = new LoginRequestDTO("email", "testPassword");
+            LoginRequest dto = new LoginRequest("email", "testPassword");
 
             given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.empty());
 
@@ -175,7 +175,7 @@ public class MemberServiceTest {
                 .password("testPassword")
                 .nickname("땅땅띠라랑").build();
 
-            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
+            LoginRequest dto = new LoginRequest("testEmail", "testPassword");
 
             given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.of(member));
             given(passwordEncoder.matches(any(String.class), any(String.class))).willReturn(false);
@@ -197,7 +197,7 @@ public class MemberServiceTest {
                 .password("testPassword")
                 .nickname("땅땅띠라랑").build();
             member.delete(LocalDateTime.now());
-            LoginRequestDTO dto = new LoginRequestDTO("testEmail", "testPassword");
+            LoginRequest dto = new LoginRequest("testEmail", "testPassword");
 
             given(memberRepository.findByEmail(any(String.class))).willReturn(Optional.of(member));
 
@@ -230,10 +230,10 @@ public class MemberServiceTest {
             given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
             //when
-            MemberResponse memberResponse = memberService.rePassword(request, member.getId());
+            RepasswordResponse repasswordResponse = memberService.rePassword(request, member.getId());
 
             //then
-            assertThat(memberResponse).extracting("id", "nickname")
+            assertThat(repasswordResponse).extracting("id", "nickname")
                 .containsExactly(member.getId(), member.getNickname());
 
         }
@@ -262,7 +262,7 @@ public class MemberServiceTest {
         @DisplayName("토큰을 재발급 할 수 있다.")
         void _willSuccess() {
             // given
-            RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+            RefreshRequest refreshRequest = RefreshRequest.builder()
                 .accessToken(
                     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
                 .refreshToken(
@@ -279,7 +279,7 @@ public class MemberServiceTest {
                 .build();
             JwtPayload jwtPayload = new JwtPayload(String.valueOf(member.getId()),
                 member.getRole().name());
-            TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+            TokenResponse tokenResponse = TokenResponse.builder()
                 .grantType("Bearer")
                 .accessToken(
                     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -298,11 +298,11 @@ public class MemberServiceTest {
             given(refreshTokenRepository.findById(any(Long.class))).willReturn(
                 Optional.of(refreshToken));
             given(jwtTokenProvider.createToken(any(JwtPayload.class))).willReturn(
-                tokenResponseDto);
+                tokenResponse);
             given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
             // when
-            LogInResponseDto result = memberService.refresh(refreshRequestDto);
+            LoginResponse result = memberService.refresh(refreshRequest);
 
             // then
             assertNotNull(result);
@@ -326,7 +326,7 @@ public class MemberServiceTest {
         @DisplayName("유효하지 않은 refresh 토큰이라면, 토큰을 재발급 할 수 없다.")
         void invalidToken_willFail() {
             // given
-            RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+            RefreshRequest refreshRequest = RefreshRequest.builder()
                 .accessToken(
                     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
                 .refreshToken(
@@ -337,7 +337,7 @@ public class MemberServiceTest {
 
             // when
             Throwable exception = assertThrows(InvalidRefreshTokenException.class,
-                () -> memberService.refresh(refreshRequestDto));
+                () -> memberService.refresh(refreshRequest));
 
             // then
             assertEquals("Refresh Token 이 유효하지 않습니다.", exception.getMessage());
@@ -349,7 +349,7 @@ public class MemberServiceTest {
         @DisplayName("DB에 있는 Refresh 토큰과 일치하지 않는다면, 토큰을 재발급 할 수 없다.")
         void unmatchedMember_willFail() {
             // given
-            RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+            RefreshRequest refreshRequest = RefreshRequest.builder()
                 .accessToken(
                     "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
                 .refreshToken(
@@ -379,7 +379,7 @@ public class MemberServiceTest {
 
             // when
             Throwable exception = assertThrows(UnmatchedMemberException.class,
-                () -> memberService.refresh(refreshRequestDto));
+                () -> memberService.refresh(refreshRequest));
 
             // then
             assertEquals("토큰의 회원 정보가 일치하지 않습니다.", exception.getMessage());

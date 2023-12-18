@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -21,30 +20,28 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.MemberController;
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
-import com.fasttime.domain.member.dto.request.EditRequest;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
+import com.fasttime.domain.member.dto.request.UpdateMemberRequest;
+import com.fasttime.domain.member.dto.request.LoginRequest;
 import com.fasttime.domain.member.dto.request.RePasswordRequest;
-import com.fasttime.domain.member.dto.request.RefreshRequestDto;
-import com.fasttime.domain.member.dto.response.LogInResponseDto;
-import com.fasttime.domain.member.dto.response.MemberResponse;
-import com.fasttime.domain.member.dto.response.MemberResponseDto;
-import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
-import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.dto.request.RefreshRequest;
+import com.fasttime.domain.member.dto.response.LoginResponse;
+import com.fasttime.domain.member.dto.response.RepasswordResponse;
+import com.fasttime.domain.member.dto.response.RefreshResponse;
+import com.fasttime.domain.member.dto.response.GetMyInfoResponse;
+import com.fasttime.domain.member.dto.response.TokenResponse;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import java.util.Optional;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -70,17 +67,17 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @DisplayName("회원 로그인 API 문서화")
     void login() throws Exception {
         // given
-        LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
+        LoginRequest loginRequest = LoginRequest.builder()
             .email("test@mail.com")
             .password("qwer1234$$")
             .build();
-        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+        RefreshResponse refreshResponse = RefreshResponse.builder()
             .memberId(1L)
             .email("test@mail.com")
             .nickname("test")
             .image("")
             .build();
-        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+        TokenResponse tokenResponse = TokenResponse.builder()
             .grantType("Bearer")
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -88,16 +85,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-            .member(memberResponseDto)
-            .token(tokenResponseDto)
+        LoginResponse logInResponse = LoginResponse.builder()
+            .member(refreshResponse)
+            .token(tokenResponse)
             .build();
 
-        given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(logInResponseDto);
+        given(memberService.loginMember(any(LoginRequest.class))).willReturn(logInResponse);
 
         // when
         mockMvc.perform(post("/api/v2/login")
-                .content(objectMapper.writeValueAsString(loginRequestDTO))
+                .content(objectMapper.writeValueAsString(loginRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(document("member-login", preprocessRequest(prettyPrint()),
@@ -137,19 +134,19 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @DisplayName("토큰 재발급 API 문서화")
     void refresh() throws Exception {
         // given
-        RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+        RefreshRequest refreshRequest = RefreshRequest.builder()
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+        RefreshResponse refreshResponse = RefreshResponse.builder()
             .memberId(1L)
             .email("test@mail.com")
             .nickname("test")
             .image("")
             .build();
-        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+        TokenResponse tokenResponse = TokenResponse.builder()
             .grantType("Bearer")
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -157,16 +154,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-            .member(memberResponseDto)
-            .token(tokenResponseDto)
+        LoginResponse logInResponse = LoginResponse.builder()
+            .member(refreshResponse)
+            .token(tokenResponse)
             .build();
 
-        given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(logInResponseDto);
+        given(memberService.refresh(any(RefreshRequest.class))).willReturn(logInResponse);
 
         // when
         mockMvc.perform(post("/api/v2/refresh")
-                .content(objectMapper.writeValueAsString(refreshRequestDto))
+                .content(objectMapper.writeValueAsString(refreshRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(document("member-refresh", preprocessRequest(prettyPrint()),
@@ -211,11 +208,11 @@ class MemberControllerDocsTest extends RestDocsSupport {
         //given
         MockHttpSession session = new MockHttpSession();
         RePasswordRequest dto = new RePasswordRequest("testPassword", "testPassword");
-        MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+        RepasswordResponse repasswordResponse = new RepasswordResponse(1L, "땅땅띠라랑");
 
         session.setAttribute("MEMBER", 1L);
         when(memberService.rePassword(any(RePasswordRequest.class), anyLong())).thenReturn(
-            memberResponse);
+            repasswordResponse);
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then
@@ -241,14 +238,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void join() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
             "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
-        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
+        String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
@@ -276,14 +273,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void recover() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
             "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
 
-        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
+        String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
@@ -330,11 +327,11 @@ class MemberControllerDocsTest extends RestDocsSupport {
     void testGetMyPageInfo() throws Exception {
         // Given
         Long expectedMemberId = 1L;
-        MyPageInfoDTO myPageInfoDTO = new MyPageInfoDTO("NewNickname", "newimageURL",
+        GetMyInfoResponse getMyInfoResponse = new GetMyInfoResponse("NewNickname", "newimageURL",
             "test@example.com");
 
         when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
-        when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(myPageInfoDTO);
+        when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(getMyInfoResponse);
 
         // When
         ResultActions result = mockMvc.perform(get("/api/v1/mypages")
@@ -366,7 +363,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
     void updateMember() throws Exception {
         // Given
         Long expectedMemberId = 1L;
-        EditRequest editRequest = new EditRequest("NewNickname", "new-image-url");
+        UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("NewNickname", "new-image-url");
         Member updatedMember = Member.builder()
             .id(expectedMemberId)
             .nickname("NewNickname")
@@ -375,14 +372,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .build();
 
         when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
-        when(memberService.updateMemberInfo(any(EditRequest.class), eq(expectedMemberId)))
+        when(memberService.updateMemberInfo(any(UpdateMemberRequest.class), eq(expectedMemberId)))
             .thenReturn(Optional.of(updatedMember));
 
         // When
         ResultActions result = mockMvc.perform(
             put("/api/v1/retouch-member")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(editRequest)));
+                .content(objectMapper.writeValueAsString(updateMemberRequest)));
 
         // Then
         result.andExpect(status().isOk())
