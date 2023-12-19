@@ -3,7 +3,6 @@ package com.fasttime.domain.article.entity;
 import com.fasttime.domain.article.exception.ArticleDeletedException;
 import com.fasttime.domain.article.exception.ArticleReportedException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
-import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.ConstraintMode;
@@ -18,11 +17,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -46,9 +42,6 @@ public class Article extends BaseTimeEntity {
     @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Member member;
 
-    @OneToMany(mappedBy = "article")
-    private List<Comment> comments = new ArrayList<>();
-
     private String title;
 
     @Embedded
@@ -60,12 +53,14 @@ public class Article extends BaseTimeEntity {
 
     private int hateCount;
 
+    private int commentCount;
+
     @Enumerated(EnumType.STRING)
     private ReportStatus reportStatus;
 
     @Builder
     private Article(Long id, Member member, String title, String content, boolean anonymity,
-        int likeCount, int hateCount, ReportStatus reportStatus) {
+        int likeCount, int hateCount, int commentCount, ReportStatus reportStatus) {
         this.id = id;
         this.member = member;
         this.title = title;
@@ -73,6 +68,7 @@ public class Article extends BaseTimeEntity {
         this.anonymity = anonymity;
         this.likeCount = likeCount;
         this.hateCount = hateCount;
+        this.commentCount = commentCount;
         this.reportStatus = reportStatus;
     }
 
@@ -85,6 +81,7 @@ public class Article extends BaseTimeEntity {
             .anonymity(anonymity)
             .likeCount(0)
             .hateCount(0)
+            .commentCount(0)
             .reportStatus(ReportStatus.NORMAL)
             .build();
     }
@@ -108,6 +105,15 @@ public class Article extends BaseTimeEntity {
 
     public String getContent() {
         return content.getContent();
+    }
+
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
     }
 
     @Override

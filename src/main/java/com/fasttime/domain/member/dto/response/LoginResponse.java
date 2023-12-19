@@ -7,18 +7,18 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class LogInResponseDto {
-    private MemberResponseDto member;
-    private TokenResponseDto token;
+public class LoginResponse {
+    private RefreshResponse member;
+    private TokenResponse token;
 
     @Builder
-    public LogInResponseDto(MemberResponseDto member, TokenResponseDto token) {
+    public LoginResponse(RefreshResponse member, TokenResponse token) {
         this.member = member;
         this.token = token;
     }
 
-    public static LogInResponseDto of(MemberResponseDto member, TokenResponseDto token) {
-        return LogInResponseDto.builder()
+    public static LoginResponse of(RefreshResponse member, TokenResponse token) {
+        return LoginResponse.builder()
             .member(member)
             .token(token)
             .build();

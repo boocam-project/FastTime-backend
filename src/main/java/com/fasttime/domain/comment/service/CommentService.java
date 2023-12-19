@@ -11,6 +11,8 @@ import com.fasttime.domain.comment.entity.Comment;
 import com.fasttime.domain.comment.exception.CommentNotFoundException;
 import com.fasttime.domain.comment.exception.MultipleSearchConditionException;
 import com.fasttime.domain.comment.exception.NotCommentAuthorException;
+import com.fasttime.domain.comment.infra.CommentCreateEvent;
+import com.fasttime.domain.comment.infra.CommentDeleteEvent;
 import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.service.MemberService;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,22 +33,26 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ArticleQueryService articleQueryService;
     private final MemberService memberService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public CommentResponseDTO createComment(long articleId, long memberId,
         CreateCommentRequestDTO createCommentRequestDTO) {
         boolean isChildComment = createCommentRequestDTO.getParentCommentId() != null;
         Comment parentComment =
             isChildComment ? getComment(createCommentRequestDTO.getParentCommentId()) : null;
-        return commentRepository.save(Comment.builder()
-                .article(Article.builder()
-                    .id(articleQueryService.queryById(articleId).id())
-                    .build())
-                .member(memberService.getMember(memberId))
-                .content(createCommentRequestDTO.getContent())
-                .anonymity(createCommentRequestDTO.getAnonymity())
-                .parentComment(parentComment)
+
+        Comment savedComment = commentRepository.save(Comment.builder()
+            .article(Article.builder()
+                .id(articleQueryService.queryById(articleId).id())
                 .build())
-            .toCommentResponseDTO();
+            .member(memberService.getMember(memberId))
+            .content(createCommentRequestDTO.getContent())
+            .anonymity(createCommentRequestDTO.getAnonymity())
+            .parentComment(parentComment)
+            .build());
+
+        eventPublisher.publishEvent(new CommentCreateEvent(savedComment.getId(), articleId));
+        return savedComment.toCommentResponseDTO();
     }
 
     public CommentListResponseDTO getComments(GetCommentsRequestDTO getCommentsRequestDTO,
@@ -79,6 +86,8 @@ public class CommentService {
             throw new NotCommentAuthorException();
         }
         comment.delete(LocalDateTime.now());
+        eventPublisher.publishEvent(
+            new CommentDeleteEvent(commentId, comment.getArticle().getId()));
         return comment.toCommentResponseDTO();
     }
 

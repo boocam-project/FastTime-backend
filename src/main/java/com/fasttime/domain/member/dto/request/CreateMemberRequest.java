@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateMemberDTO {
+public class CreateMemberRequest {
 
     @NotNull
     @Email(message = "이메일 형식이 유효하지 않습니다.")

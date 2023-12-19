@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class saveAdminDTO {
+public class CreateAdminRequest {
 
     private String email;
     private String password;

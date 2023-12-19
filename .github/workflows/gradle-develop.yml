@@ -16,19 +16,18 @@ jobs:
     steps:
     - name: Repository 로딩
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.VAULT_KEY }}
+        submodules: true
+
+    - name: Vault에 있는 설정 파일을 프로젝트로 복사
+      run: cp ${{ secrets.PROFILE_PATH }} ./src/main/resources
 
     - name: JDK 21 설치
       uses: actions/setup-java@v3
       with:
         java-version: '21'
         distribution: 'temurin'
-
-    - name: 환경변수 생성
-      run: echo "$DEVELOP_CONFIG" > src/main/resources/application-develop.yml
-
-      env:
-        DEVELOP_CONFIG: ${{ secrets.DEVELOP_CONFIG }}
-
 
     - name: gradlew 접근권한 설정
       run: chmod +x gradlew
@@ -53,24 +52,24 @@ jobs:
     - name: SSH Agent 설정
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        ssh-private-key: ${{ secrets.DEVELOP_SSH_KEY }}
 
     - name: AWS Lightsail 배포 - 파일전송
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-        REMOTE_HOST: ${{ secrets.LIGHTSAIL_HOST }}
-        REMOTE_USER: ${{ secrets.LIGHTSAIL_USERNAME }}
+        SSH_PRIVATE_KEY: ${{ secrets.DEVELOP_SSH_KEY }}
+        REMOTE_HOST: ${{ secrets.DEVELOP_HOST }}
+        REMOTE_USER: ${{ secrets.DEVELOP_USERNAME }}
         SOURCE: 'build/libs/'
         TARGET: '~/app/boocam'
         EXCLUDE: '/**/*.jar'
 
     - name: jar 파일 실행
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.LIGHTSAIL_USERNAME }}@${{ secrets.LIGHTSAIL_HOST }} << EOF
+        ssh -o StrictHostKeyChecking=no ${{ secrets.DEVELOP_USERNAME }}@${{ secrets.DEVELOP_HOST }} << EOF
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
           cd ~/app/boocam
           nohup java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
         EOF
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.DEVELOP_SSH_KEY }}

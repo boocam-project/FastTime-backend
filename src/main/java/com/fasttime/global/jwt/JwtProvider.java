@@ -1,6 +1,6 @@
 package com.fasttime.global.jwt;
 
-import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.dto.response.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +31,7 @@ public class JwtProvider implements InitializingBean {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenResponseDto createToken(JwtPayload payload) {
+    public TokenResponse createToken(JwtPayload payload) {
         long now = new Date().getTime();
 
         String accessToken = Jwts.builder()
@@ -47,7 +47,7 @@ public class JwtProvider implements InitializingBean {
             .compact();
 
         log.debug("[createToken] JwtProvider: token 생성");
-        return TokenResponseDto.builder()
+        return TokenResponse.builder()
             .grantType(JwtProperties.TOKEN_PREFIX)
             .accessToken(accessToken)
             .accessTokenExpiresIn(new Date(now + JwtProperties.ACCESS_EXPIRATION_TIME).getTime())

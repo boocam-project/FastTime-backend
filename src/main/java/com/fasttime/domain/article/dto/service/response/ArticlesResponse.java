@@ -9,7 +9,7 @@ public record ArticlesResponse(
     String title,
     String nickname,
     boolean isAnonymity,
-    int commentCounts,
+    long commentCounts,
     int likeCount,
     int hateCount,
     LocalDateTime createdAt,
