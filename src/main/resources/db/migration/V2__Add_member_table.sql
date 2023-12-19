@@ -7,9 +7,8 @@ CREATE TABLE member
     email      VARCHAR(255)          NULL,
     password   VARCHAR(255)          NULL,
     nickname   VARCHAR(255)          NULL,
-    `role`     VARCHAR(255)          NULL,
+    `role`     enum('ROLE_USER', 'ROLE_ADMIN')          NULL,
     image      TEXT                  NULL,
 
     CONSTRAINT pk_member PRIMARY KEY (id)
 );
-ALTER TABLE article ADD COLUMN comment_count INTEGER

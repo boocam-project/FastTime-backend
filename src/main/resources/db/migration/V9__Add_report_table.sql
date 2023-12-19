@@ -5,12 +5,12 @@ CREATE TABLE report
     updated_at datetime              NULL,
     deleted_at datetime              NULL,
     member_id  BIGINT                NULL,
-    post_id    BIGINT                NULL,
+    article_id BIGINT                NULL,
     CONSTRAINT pk_report PRIMARY KEY (id)
 );
 
 ALTER TABLE report
-    ADD CONSTRAINT FK_REPORT_ON_MEMBER FOREIGN KEY (member_id) REFERENCES member (id);
+    ADD CONSTRAINT FK_REPORT_ON_ARTICLE FOREIGN KEY (article_id) REFERENCES article (id);
 
 ALTER TABLE report
-    ADD CONSTRAINT FK_REPORT_ON_POST FOREIGN KEY (post_id) REFERENCES article (id);
+    ADD CONSTRAINT FK_REPORT_ON_MEMBER FOREIGN KEY (member_id) REFERENCES member (id);

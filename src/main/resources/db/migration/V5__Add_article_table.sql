@@ -10,12 +10,9 @@ CREATE TABLE article
     like_count    INT                   NOT NULL,
     hate_count    INT                   NOT NULL,
     comment_count INT                   NOT NULL,
-    report_status VARCHAR(255)          NULL,
+    report_status enum('NORMAL', 'WAIT_FOR_REPORT_REVIEW', 'REPORT_ACCEPT', 'REPORT_REJECT')          NULL,
     content       LONGTEXT              NULL,
     CONSTRAINT pk_article PRIMARY KEY (id)
 );
 
 CREATE INDEX idx_created_at ON article (created_at);
-
-ALTER TABLE article
-    ADD CONSTRAINT `` FOREIGN KEY (member_id) REFERENCES member (id);
