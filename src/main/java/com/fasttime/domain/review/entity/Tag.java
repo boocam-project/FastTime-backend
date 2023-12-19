@@ -9,7 +9,7 @@ import java.util.Set;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
     @Id
@@ -18,7 +18,6 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags")
     private Set<Review> reviews;
-
 
     private String content;
 
