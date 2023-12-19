@@ -6,5 +6,5 @@
 :toclevels: 2
 
 == 게시글 API Version
-=== link:article/v1-api.html[v1 API, window=blank]
-=== link:article/v2-api.html[v2 API, window=blank]
+=== link:v1-api.html[v1 API, window=blank]
+=== link:v2-api.html[v2 API, window=blank]

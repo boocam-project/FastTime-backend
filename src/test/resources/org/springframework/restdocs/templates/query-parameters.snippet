@@ -1,11 +1,12 @@
 ==== Request Parameters
 |===
-|파라미터명|설명|Optional|제약조건
+|파라미터명|설명|Optional|제약조건|기본값
 
 {{#parameters}}
 |{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
 |{{#tableCellContent}}{{#optional}}O{{/optional}}{{/tableCellContent}}
 |{{#tableCellContent}}{{#constraints}}{{constraints}}{{/constraints}}{{/tableCellContent}}
+|{{#tableCellContent}}{{#defaultValue}}{{defaultValue}}{{/defaultValue}}{{/tableCellContent}}
 {{/parameters}}
 |===

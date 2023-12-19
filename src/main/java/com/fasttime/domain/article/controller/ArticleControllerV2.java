@@ -4,6 +4,7 @@ import com.fasttime.domain.article.dto.controller.request.ArticleCreateRequest;
 import com.fasttime.domain.article.dto.controller.request.ArticleUpdateRequestV2;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
+import com.fasttime.domain.article.repository.OrderBy;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleDeleteServiceRequest;
@@ -98,6 +99,8 @@ public class ArticleControllerV2 {
         @RequestParam(required = false) String nickname,
         @RequestParam(defaultValue = "0") int likeCount,
         @RequestParam(defaultValue = "10") int pageSize,
+        @RequestParam(defaultValue = "createdAt") String orderBy,
+        @RequestParam(defaultValue = "false") boolean isAscending,
         @RequestParam(defaultValue = "0") int page) {
 
         List<ArticlesResponse> serviceResponse = articleQueryUseCase.search(
@@ -105,6 +108,8 @@ public class ArticleControllerV2 {
                 .title(title)
                 .nickname(nickname)
                 .likeCount(likeCount)
+                .orderBy(OrderBy.of(orderBy))
+                .isAscending(isAscending)
                 .pageSize(pageSize)
                 .page(page)
                 .build());
