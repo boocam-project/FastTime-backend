@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tag {
 
