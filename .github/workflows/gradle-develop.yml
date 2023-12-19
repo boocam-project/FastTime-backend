@@ -16,19 +16,18 @@ jobs:
     steps:
     - name: Repository 로딩
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.VAULT_KEY }}
+        submodules: true
+
+    - name: Vault에 있는 설정 파일을 프로젝트로 복사
+      run: cp ${{ secrets.PROFILE_PATH }} ./src/main/resources
 
     - name: JDK 21 설치
       uses: actions/setup-java@v3
       with:
         java-version: '21'
         distribution: 'temurin'
-
-    - name: 환경변수 생성
-      run: echo "$DEVELOP_CONFIG" > src/main/resources/application-develop.yml
-
-      env:
-        DEVELOP_CONFIG: ${{ secrets.DEVELOP_CONFIG }}
-
 
     - name: gradlew 접근권한 설정
       run: chmod +x gradlew

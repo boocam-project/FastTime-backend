@@ -3,9 +3,9 @@ package com.fasttime.domain.member.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -20,29 +20,28 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.member.controller.MemberController;
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
-import com.fasttime.domain.member.dto.request.EditRequest;
-import com.fasttime.domain.member.dto.request.LoginRequestDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
+import com.fasttime.domain.member.dto.request.UpdateMemberRequest;
+import com.fasttime.domain.member.dto.request.LoginRequest;
 import com.fasttime.domain.member.dto.request.RePasswordRequest;
-import com.fasttime.domain.member.dto.request.RefreshRequestDto;
-import com.fasttime.domain.member.dto.response.LogInResponseDto;
-import com.fasttime.domain.member.dto.response.MemberResponse;
-import com.fasttime.domain.member.dto.response.MemberResponseDto;
-import com.fasttime.domain.member.dto.response.MyPageInfoDTO;
-import com.fasttime.domain.member.dto.response.TokenResponseDto;
+import com.fasttime.domain.member.dto.request.RefreshRequest;
+import com.fasttime.domain.member.dto.response.LoginResponse;
+import com.fasttime.domain.member.dto.response.RepasswordResponse;
+import com.fasttime.domain.member.dto.response.RefreshResponse;
+import com.fasttime.domain.member.dto.response.GetMyInfoResponse;
+import com.fasttime.domain.member.dto.response.TokenResponse;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.member.service.MemberService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
-import org.junit.jupiter.api.Disabled;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -68,17 +67,17 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @DisplayName("회원 로그인 API 문서화")
     void login() throws Exception {
         // given
-        LoginRequestDTO loginRequestDTO = LoginRequestDTO.builder()
+        LoginRequest loginRequest = LoginRequest.builder()
             .email("test@mail.com")
             .password("qwer1234$$")
             .build();
-        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+        RefreshResponse refreshResponse = RefreshResponse.builder()
             .memberId(1L)
             .email("test@mail.com")
             .nickname("test")
             .image("")
             .build();
-        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+        TokenResponse tokenResponse = TokenResponse.builder()
             .grantType("Bearer")
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -86,17 +85,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-            .member(memberResponseDto)
-            .token(tokenResponseDto)
+        LoginResponse logInResponse = LoginResponse.builder()
+            .member(refreshResponse)
+            .token(tokenResponse)
             .build();
 
-        given(memberService.loginMember(any(LoginRequestDTO.class))).willReturn(logInResponseDto);
-
+        given(memberService.loginMember(any(LoginRequest.class))).willReturn(logInResponse);
 
         // when
         mockMvc.perform(post("/api/v2/login")
-                .content(objectMapper.writeValueAsString(loginRequestDTO))
+                .content(objectMapper.writeValueAsString(loginRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(document("member-login", preprocessRequest(prettyPrint()),
@@ -106,14 +104,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
                         .attributes(key("constraints").value("Not Blank"))), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                     fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                     fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
                         .description("회원 식별자"),
                     fieldWithPath("data.member.email").type(JsonFieldType.STRING)
                         .description("이메일"),
-                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING)
+                        .description("이름"),
                     fieldWithPath("data.member.image").type(JsonFieldType.STRING)
                         .description("프로필 이미지"),
                     fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
@@ -134,19 +134,19 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @DisplayName("토큰 재발급 API 문서화")
     void refresh() throws Exception {
         // given
-        RefreshRequestDto refreshRequestDto = RefreshRequestDto.builder()
+        RefreshRequest refreshRequest = RefreshRequest.builder()
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        MemberResponseDto memberResponseDto = MemberResponseDto.builder()
+        RefreshResponse refreshResponse = RefreshResponse.builder()
             .memberId(1L)
             .email("test@mail.com")
             .nickname("test")
             .image("")
             .build();
-        TokenResponseDto tokenResponseDto = TokenResponseDto.builder()
+        TokenResponse tokenResponse = TokenResponse.builder()
             .grantType("Bearer")
             .accessToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTcwMDU4NjkyOH0.lof7WjalCH1gGPy2q7YYi9VTcgn_aoFMwEMQvITtddsUIcJN-YzNODt_RQde5J5dH98NKMXDOvy7YwNlt6BCfg")
@@ -154,16 +154,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .refreshToken(
                 "eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3MDExODk5Mjh9.uZuIAxsnf4Ubz5K9YzysJTu9Gh25XNTsPVAPSElw1lS78gS8S08L97Z4RkfGodegGXZ9UFFNkVXdhRzF9Pr-uA")
             .build();
-        LogInResponseDto logInResponseDto = LogInResponseDto.builder()
-            .member(memberResponseDto)
-            .token(tokenResponseDto)
+        LoginResponse logInResponse = LoginResponse.builder()
+            .member(refreshResponse)
+            .token(tokenResponse)
             .build();
 
-        given(memberService.refresh(any(RefreshRequestDto.class))).willReturn(logInResponseDto);
+        given(memberService.refresh(any(RefreshRequest.class))).willReturn(logInResponse);
 
         // when
         mockMvc.perform(post("/api/v2/refresh")
-                .content(objectMapper.writeValueAsString(refreshRequestDto))
+                .content(objectMapper.writeValueAsString(refreshRequest))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(document("member-refresh", preprocessRequest(prettyPrint()),
@@ -175,14 +175,16 @@ class MemberControllerDocsTest extends RestDocsSupport {
                         .description("Refresh Token")
                         .attributes(key("constraints").value("Not Blank"))), responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional().description("메시지"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                        .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                     fieldWithPath("data.member").type(JsonFieldType.OBJECT).description("회원 정보"),
                     fieldWithPath("data.member.memberId").type(JsonFieldType.NUMBER)
                         .description("회원 식별자"),
                     fieldWithPath("data.member.email").type(JsonFieldType.STRING)
                         .description("이메일"),
-                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING).description("이름"),
+                    fieldWithPath("data.member.nickname").type(JsonFieldType.STRING)
+                        .description("이름"),
                     fieldWithPath("data.member.image").type(JsonFieldType.STRING)
                         .description("프로필 이미지"),
                     fieldWithPath("data.token").type(JsonFieldType.OBJECT).description("토큰 정보"),
@@ -200,18 +202,17 @@ class MemberControllerDocsTest extends RestDocsSupport {
     }
 
 
-
     @DisplayName("회원 비밀번호 재설정 API 문서화")
     @Test
     void rePassword() throws Exception {
         //given
         MockHttpSession session = new MockHttpSession();
         RePasswordRequest dto = new RePasswordRequest("testPassword", "testPassword");
-        MemberResponse memberResponse = new MemberResponse(1L, "땅땅띠라랑");
+        RepasswordResponse repasswordResponse = new RepasswordResponse(1L, "땅땅띠라랑");
 
         session.setAttribute("MEMBER", 1L);
         when(memberService.rePassword(any(RePasswordRequest.class), anyLong())).thenReturn(
-            memberResponse);
+            repasswordResponse);
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then
@@ -237,14 +238,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void join() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
             "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
-        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
+        String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
@@ -272,14 +273,14 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void recover() throws Exception {
         //given
-        CreateMemberDTO createMemberDTO = new CreateMemberDTO("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
             "testNickname");
 
         //when
-        when(memberService.registerOrRecoverMember(any(CreateMemberDTO.class)))
+        when(memberService.registerOrRecoverMember(any(CreateMemberRequest.class)))
             .thenReturn(ResponseDTO.res(HttpStatus.OK, "계정이 성공적으로 복구되었습니다!"));
 
-        String data = new ObjectMapper().writeValueAsString(createMemberDTO);
+        String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
         mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
@@ -314,34 +315,32 @@ class MemberControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(
                 delete("/api/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200)) // 상태 코드 200 확인
-            .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다.")) // 메시지 확인
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다."))
             .andDo(document("member-delete", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())));
     }
 
-    @Disabled
+
     @DisplayName("마이페이지 조회 API 문서화")
     @Test
     void testGetMyPageInfo() throws Exception {
         // Given
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
-
-        MyPageInfoDTO myPageInfoDTO = new MyPageInfoDTO("NewNickname", "newimageURL",
+        Long expectedMemberId = 1L;
+        GetMyInfoResponse getMyInfoResponse = new GetMyInfoResponse("NewNickname", "newimageURL",
             "test@example.com");
-        when(memberService.getMyPageInfoById(1L)).thenReturn(myPageInfoDTO);
+
+        when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
+        when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(getMyInfoResponse);
 
         // When
-        ResultActions result = mockMvc.perform(get("/api/v1/mypage").session(session)
+        ResultActions result = mockMvc.perform(get("/api/v1/mypages")
             .contentType(MediaType.APPLICATION_JSON));
 
         // Then
         result.andExpect(status().isOk())
-            .andExpect(content().contentType("application/json;charset=UTF-8"))
-            .andExpect(jsonPath("$.code").value(200))
-//            .andExpect(
-//                jsonPath("$.message").value(ErrorCode.MY_PAGE_RETRIEVED_SUCCESS.getMessage()))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.message").value("사용자 정보를 성공적으로 조회하였습니다."))
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("newimageURL"))
             .andExpect(jsonPath("$.data.email").value("test@example.com"))
@@ -349,56 +348,44 @@ class MemberControllerDocsTest extends RestDocsSupport {
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
-                    fieldWithPath("code").description("응답 상태 코드").type(JsonFieldType.NUMBER),
-                    fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
-                    fieldWithPath("data.nickname").description("사용자 닉네임")
-                        .type(JsonFieldType.STRING),
-                    fieldWithPath("data.image").description("프로필 이미지 URL")
-                        .type(JsonFieldType.STRING),
-                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
+                    fieldWithPath("code").description("응답 상태 코드"),
+                    fieldWithPath("message").description("응답 메시지"),
+                    fieldWithPath("data.nickname").description("사용자 닉네임"),
+                    fieldWithPath("data.image").description("프로필 이미지 URL"),
+                    fieldWithPath("data.email").description("사용자 이메일")
                 )
             ));
     }
 
 
-    @Disabled
-    @DisplayName("회원 정보 수정 API 문서화")
+    @DisplayName("회원 정보 수정 API 테스트")
     @Test
     void updateMember() throws Exception {
         // Given
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("MEMBER", 1L);
+        Long expectedMemberId = 1L;
+        UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("NewNickname", "new-image-url");
+        Member updatedMember = Member.builder()
+            .id(expectedMemberId)
+            .nickname("NewNickname")
+            .image("new-image-url")
+            .email("test@example.com")
+            .build();
 
-        EditRequest editRequest = new EditRequest();
-        editRequest.setNickname("NewNickname");
-        editRequest.setImage("new-image-url");
-
-        Member member = new Member();
-        member.setId(1L);
-        member.setNickname("NewNickname");
-        member.setImage("new-image-url");
-
-        member.setEmail(null);
-
-//        when(memberService.updateMemberInfo(any(EditRequest.class), any(HttpSession.class)))
-//            .thenReturn(Optional.of(member));
+        when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
+        when(memberService.updateMemberInfo(any(UpdateMemberRequest.class), eq(expectedMemberId)))
+            .thenReturn(Optional.of(updatedMember));
 
         // When
         ResultActions result = mockMvc.perform(
             put("/api/v1/retouch-member")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(editRequest))
-                .session(session));
+                .content(objectMapper.writeValueAsString(updateMemberRequest)));
 
         // Then
         result.andExpect(status().isOk())
-//            .andExpect(
-//                jsonPath("$.code").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getHttpStatus().value()))
-//            .andExpect(jsonPath("$.message").value(ErrorCode.MEMBER_UPDATE_SUCCESS.getMessage()))
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("new-image-url"))
-            .andExpect(
-                jsonPath("$.data.email").doesNotExist()) // Expect email to not exist if it's null
+            .andExpect(jsonPath("$.data.email").value("test@example.com"))
             .andDo(document("member-update",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -409,9 +396,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
                         .type(JsonFieldType.STRING),
                     fieldWithPath("data.image").description("변경된 이미지 URL")
                         .type(JsonFieldType.STRING),
-
-                    fieldWithPath("data.email").description("이메일 (변경되지 않았을 수 있음)")
-                        .type(JsonFieldType.STRING).optional()
+                    fieldWithPath("data.email").description("사용자 이메일").type(JsonFieldType.STRING)
                 )
             ));
     }

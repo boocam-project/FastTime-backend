@@ -1,19 +1,14 @@
 package com.fasttime.domain.member.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class EditResponse {
+public class RepasswordResponse {
 
-    private String email;
+    private Long id;
     private String nickname;
-    private String image;
-
-
 }

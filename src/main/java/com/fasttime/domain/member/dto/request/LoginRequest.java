@@ -3,7 +3,6 @@ package com.fasttime.domain.member.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 @NoArgsConstructor
 @Data
-public class LoginRequestDTO {
+public class LoginRequest {
 
     @NotBlank
     @Email
@@ -21,7 +20,7 @@ public class LoginRequestDTO {
     private String password;
 
     @Builder
-    public LoginRequestDTO(String email,String password){
+    public LoginRequest(String email,String password){
         this.email = email;
         this.password = password;
     }

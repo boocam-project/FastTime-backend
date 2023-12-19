@@ -18,6 +18,8 @@ public interface ArticleQueryUseCase {
     record ArticlesSearchRequestServiceDto(
         String nickname,
         String title,
+        String orderByType,
+        boolean isAscending,
         int likeCount,
         int pageSize,
         int page

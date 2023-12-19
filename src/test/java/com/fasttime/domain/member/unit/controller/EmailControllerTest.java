@@ -1,4 +1,4 @@
-package com.fasttime.domain.member.controller;
+package com.fasttime.domain.member.unit.controller;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -27,7 +27,6 @@ class EmailControllerTest extends ControllerUnitTestSupporter {
             String email = "test@example.com";
             EmailRequest request = new EmailRequest(email);
 
-            when(memberService.isEmailExistsInFcmember(anyString())).thenReturn(true);
             when(emailUseCase.sendVerificationEmail(anyString())).thenReturn("123456");
 
             mockMvc.perform(post("/api/v1/confirm")
@@ -43,8 +42,6 @@ class EmailControllerTest extends ControllerUnitTestSupporter {
         void requestEmail_isNotEmailFormat_will400Error() throws Exception {
             String email = "this_is_not_email_format_request";
             EmailRequest request = new EmailRequest(email);
-
-            when(memberService.isEmailExistsInFcmember(anyString())).thenReturn(false);
 
             mockMvc.perform(post("/api/v1/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
