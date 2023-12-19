@@ -3,6 +3,7 @@ package com.fasttime.domain.article.service.usecase;
 import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.entity.ReportStatus;
+import com.fasttime.domain.article.repository.OrderBy;
 import java.util.List;
 import lombok.Builder;
 
@@ -18,7 +19,7 @@ public interface ArticleQueryUseCase {
     record ArticlesSearchRequestServiceDto(
         String nickname,
         String title,
-        String orderByType,
+        OrderBy orderBy,
         boolean isAscending,
         int likeCount,
         int pageSize,

@@ -208,6 +208,8 @@ class ArticleControllerV2DocsTest extends RestDocsSupport {
                 .queryParam("likeCount", "10")
                 .queryParam("page", "0")
                 .queryParam("pageSize", "10")
+                .queryParam("orderBy", "likeCount")
+                .queryParam("isAscending", "true")
             )
             .andExpect(status().isOk())
             .andDo(document("articles/v2/search",
@@ -218,8 +220,18 @@ class ArticleControllerV2DocsTest extends RestDocsSupport {
                     parameterWithName("nickname").description("작성자 닉네임").optional(),
                     parameterWithName("likeCount").description("최소 좋아요 수").optional()
                         .attributes(new Attribute("constraints", "0보다 커야 합니다.")),
-                    parameterWithName("pageSize").description("조회당 불러올 건 수").optional(),
+                    parameterWithName("pageSize").description("조회당 불러올 건 수").optional()
+                        .attributes(new Attribute("defaultValue", "10")),
+                    parameterWithName("orderBy").description(
+                            "정렬 기준 : likeCount, commentCount, createdAt(default)").optional()
+                        .attributes(new Attribute("constraints",
+                                "likeCount : 좋아요 순\n commentCount : 댓글 갯수 순\n createdAt : 작성일 순"),
+                            new Attribute("defaultValue", "createdAt")),
+                    parameterWithName("isAscending").description("정렬 순서 (오름차순 or 내림차순)").optional()
+                        .attributes(new Attribute("constraints", "true : 오름차순\n false : 내림차순"),
+                            new Attribute("defaultValue", "false")),
                     parameterWithName("page").description("조회 페이지").optional()
+                        .attributes(new Attribute("defaultValue", "0"))
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
