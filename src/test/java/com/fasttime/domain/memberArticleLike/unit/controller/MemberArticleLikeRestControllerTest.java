@@ -43,7 +43,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                    post("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                         .session(session)).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
@@ -65,7 +65,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
             // when, then
             mockMvc.perform(
-                    post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                    post("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                         .session(session)).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
@@ -91,7 +91,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
                 // when, then
                 mockMvc.perform(
-                        post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        post("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                             .session(session)).andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").exists())
                     .andExpect(jsonPath("$.message").exists())
@@ -119,7 +119,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
                 // when, then
                 mockMvc.perform(
-                        post("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        post("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                             .session(session)).andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").exists())
                     .andExpect(jsonPath("$.message").exists())
@@ -146,7 +146,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
             session.setAttribute("MEMBER", 1L);
 
             // when, then
-            mockMvc.perform(get("/api/v1/record/{articleId}", 1L).session(session)
+            mockMvc.perform(get("/api/v1/article-like/{articleId}", 1L).session(session)
                     .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isMap()).andExpect(jsonPath("$.data.id").exists())
@@ -175,7 +175,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
             // when, then
             mockMvc.perform(
-                    delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                    delete("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                         .session(session)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").exists()).andExpect(jsonPath("$.message").exists())
                 .andExpect(jsonPath("$.data").isEmpty()).andDo(print());
@@ -201,7 +201,7 @@ public class MemberArticleLikeRestControllerTest extends ControllerUnitTestSuppo
 
                 // when, then
                 mockMvc.perform(
-                        delete("/api/v1/record").content(json).contentType(MediaType.APPLICATION_JSON)
+                        delete("/api/v1/article-like").content(json).contentType(MediaType.APPLICATION_JSON)
                             .session(session)).andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.code").exists())
                     .andExpect(jsonPath("$.message").exists())
