@@ -63,7 +63,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
             ));
 
         //when, then
-        mockMvc.perform(get("/api/v1/admin")
+        mockMvc.perform(get("/api/v1/admin/reports/articles")
                 .queryParam("page", "0"))
             .andExpect(status().isOk())
             .andDo(document("reportedPosts-search",
@@ -213,7 +213,7 @@ class AdminControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then
-        mockMvc.perform(post("/api/v1/admin/join")
+        mockMvc.perform(post("/api/v1/admin")
                 .contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk()).andDo(
                 document("admin-join", preprocessRequest(prettyPrint()),

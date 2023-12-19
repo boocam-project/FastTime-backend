@@ -24,7 +24,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @GetMapping
+    @GetMapping("/reports/articles")
     public ResponseEntity<ResponseDTO<List<ArticlesResponse>>> postList
         (@RequestParam(defaultValue = "0",name = "page") int page) {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res(HttpStatus.OK
@@ -55,7 +55,7 @@ public class AdminController {
     }
 
 
-    @PostMapping("/join")
+    @PostMapping
     public ResponseEntity<ResponseDTO> join(@RequestBody @Valid CreateMemberRequest dto) {
         adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
