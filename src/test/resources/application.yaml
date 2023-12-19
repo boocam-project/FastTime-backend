@@ -2,8 +2,10 @@ spring:
   profiles:
     include: test
   datasource:
-    driver-class-name: org.h2.Driver
-
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mydatabase?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: user
+    password: password
   mail:
     host: "smtp.naver.com"
     username: test
