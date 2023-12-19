@@ -2,9 +2,12 @@ package com.fasttime.domain.article.repository;
 
 
 import static com.fasttime.domain.article.entity.QArticle.article;
+import static com.fasttime.domain.comment.entity.QComment.comment;
 
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -20,14 +23,16 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
 
     @Override
     public List<ArticleQueryResponse> search(ArticlesSearchRequestServiceDto searchCondition) {
+
         return jpaQueryFactory
             .select(Projections.fields(ArticleQueryResponse.class,
                 article.id,
                 article.member.id.as("memberId"),
                 article.member.nickname,
                 article.title,
+                article.content.content,
                 article.anonymity,
-                article.comments.size().as("commentCount"),
+                article.commentCount,
                 article.likeCount,
                 article.hateCount,
                 article.createdAt,
@@ -35,14 +40,14 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
                 article.deletedAt
             ))
             .from(article)
-            .where(createSearchConditionBuilder(searchCondition))
+            .where(createArticleSearchConditionBuilder(searchCondition))
             .offset((long) searchCondition.page() * searchCondition.pageSize())
             .limit(searchCondition.pageSize())
-            .orderBy(article.createdAt.desc())
+            .orderBy(orderSpecifierProvider(searchCondition))
             .fetch();
     }
 
-    private BooleanBuilder createSearchConditionBuilder(
+    private BooleanBuilder createArticleSearchConditionBuilder(
         ArticlesSearchRequestServiceDto searchCondition) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
@@ -63,7 +68,18 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         return booleanBuilder;
     }
 
-    private boolean isEmpty(String target) {
-        return target == null || target.isBlank();
+    private boolean isEmpty(String validateTarget) {
+        return validateTarget == null || validateTarget.isBlank();
+    }
+
+    private OrderSpecifier<?> orderSpecifierProvider(
+        ArticlesSearchRequestServiceDto searchCondition) {
+        Order direction = searchCondition.isAscending() ? Order.ASC : Order.DESC;
+
+        return switch (searchCondition.orderByType()) {
+            case "commentCount" -> new OrderSpecifier<>(direction, comment.count());
+            case "likeCount" -> new OrderSpecifier<>(direction, article.likeCount);
+            case null, default -> new OrderSpecifier<>(direction, article.createdAt);
+        };
     }
 }
