@@ -66,7 +66,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/article-like").content(json)
                 .contentType(MediaType.APPLICATION_JSON).session(session))
             .andExpect(status().isCreated()).andDo(
-                document("record-create", preprocessRequest(prettyPrint()),
+                document("memberArticleLike-create", preprocessRequest(prettyPrint()),
                     preprocessResponse(prettyPrint()), requestFields(
                         fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자")
                             .attributes(key("constraints").value(
@@ -97,7 +97,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         mockMvc.perform(
                 RestDocumentationRequestBuilders.get("/api/v1/article-like/{articleId}", 1L).session(session))
             .andExpect(status().isOk()).andDo(
-                document("record-get", preprocessRequest(prettyPrint()),
+                document("memberArticleLike-get", preprocessRequest(prettyPrint()),
                     preprocessResponse(prettyPrint()),
                     pathParameters(parameterWithName("articleId").description("게시글 식별자")),
                     responseFields(
@@ -127,7 +127,7 @@ class MemberArticleLikeControllerDocsTest extends RestDocsSupport {
         // when, then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/article-like").content(json)
             .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andDo(
-            document("record-delete", preprocessRequest(prettyPrint()),
+            document("memberArticleLike-delete", preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()), requestFields(
                     fieldWithPath("articleId").type(JsonFieldType.NUMBER).description("게시글 식별자")
                         .attributes(key("constraints").value(
