@@ -1,6 +1,5 @@
 package com.fasttime.domain.review.entity;
 
-
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -39,10 +38,8 @@ public class Review extends BaseTimeEntity {
     )
     private Set<Tag> tags = new HashSet<>();
 
-
     @JoinColumn(name = "member_id")
     @ManyToOne
     private Member member;
-
 
 }
