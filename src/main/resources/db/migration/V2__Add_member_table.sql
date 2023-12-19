@@ -9,5 +9,7 @@ CREATE TABLE member
     nickname   VARCHAR(255)          NULL,
     `role`     VARCHAR(255)          NULL,
     image      TEXT                  NULL,
+
     CONSTRAINT pk_member PRIMARY KEY (id)
 );
+ALTER TABLE article ADD COLUMN comment_count INTEGER

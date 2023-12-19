@@ -9,10 +9,13 @@ CREATE TABLE article
     anonymity     BIT(1)                NOT NULL,
     like_count    INT                   NOT NULL,
     hate_count    INT                   NOT NULL,
+    comment_count INT                   NOT NULL,
     report_status VARCHAR(255)          NULL,
     content       LONGTEXT              NULL,
-    CONSTRAINT pk_article PRIMARY KEY (id),
-    FOREIGN KEY (member_id) REFERENCES member (id)
+    CONSTRAINT pk_article PRIMARY KEY (id)
 );
 
 CREATE INDEX idx_created_at ON article (created_at);
+
+ALTER TABLE article
+    ADD CONSTRAINT `` FOREIGN KEY (member_id) REFERENCES member (id);
