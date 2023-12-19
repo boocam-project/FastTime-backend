@@ -21,7 +21,7 @@ jobs:
         submodules: true
 
     - name: Vault에 있는 설정 파일을 프로젝트로 복사
-      run: copy ${{ secrets.PROFILE_PATH }} ./src/main/resources
+      run: cp ${{ secrets.PROFILE_PATH }} ./src/main/resources
 
     - name: JDK 21 설치
       uses: actions/setup-java@v3
