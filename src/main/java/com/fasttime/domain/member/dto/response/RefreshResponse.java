@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class MemberResponseDto {
+public class RefreshResponse {
 
     private Long memberId;
     private String email;
@@ -15,15 +15,15 @@ public class MemberResponseDto {
     private String image;
 
     @Builder
-    public MemberResponseDto(Long memberId, String email, String nickname, String image) {
+    public RefreshResponse(Long memberId, String email, String nickname, String image) {
         this.memberId = memberId;
         this.email = email;
         this.nickname = nickname;
         this.image = image;
     }
 
-    public static MemberResponseDto of(Member member) {
-        return MemberResponseDto.builder()
+    public static RefreshResponse of(Member member) {
+        return RefreshResponse.builder()
             .memberId(member.getId())
             .email(member.getEmail())
             .nickname(member.getNickname())

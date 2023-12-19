@@ -26,7 +26,7 @@ import com.fasttime.domain.article.dto.service.response.ArticleResponse;
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
 import com.fasttime.domain.article.service.usecase.ArticleCommandUseCase.ArticleCreateServiceRequest;
 import com.fasttime.domain.member.controller.AdminController;
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
 import com.fasttime.domain.member.service.AdminService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -204,12 +204,12 @@ class AdminControllerDocsTest extends RestDocsSupport {
     @Test
     void join() throws Exception {
         //given
-        CreateMemberDTO dto = CreateMemberDTO.builder()
+        CreateMemberRequest dto = CreateMemberRequest.builder()
             .email("test@gmail.com")
             .nickname("memberNickname")
             .password("1234")
             .build();
-        doNothing().when(adminService).save(any(CreateMemberDTO.class));
+        doNothing().when(adminService).save(any(CreateMemberRequest.class));
         String data = new ObjectMapper().writeValueAsString(dto);
 
         //when then

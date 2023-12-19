@@ -1,7 +1,7 @@
 package com.fasttime.domain.member.controller;
 
 import com.fasttime.domain.article.dto.service.response.ArticlesResponse;
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
 import com.fasttime.domain.member.service.AdminService;
 import com.fasttime.global.util.ResponseDTO;
 import jakarta.validation.Valid;
@@ -56,7 +56,7 @@ public class AdminController {
 
 
     @PostMapping("/join")
-    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid CreateMemberDTO dto) {
+    public ResponseEntity<ResponseDTO> join(@RequestBody @Valid CreateMemberRequest dto) {
         adminService.save(dto);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.res
             (HttpStatus.OK, "관리자 회원가입 완료"));

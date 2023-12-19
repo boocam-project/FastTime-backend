@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class RefreshRequestDto {
+public class RefreshRequest {
     @NotBlank(message = "Access Token 을 입력하세요.")
     private String accessToken;
     @NotBlank(message = "Refresh Token 을 입력하세요.")
     private String refreshToken;
 
     @Builder
-    public RefreshRequestDto(String accessToken, String refreshToken) {
+    public RefreshRequest(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class DeleteRequest { // 회원탈퇴 요청
+public class DeleteMemberRequest { // 회원탈퇴 요청
 
     private String password;
 }

@@ -9,7 +9,7 @@ import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.ArticleQueryService;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ReportedArticlesSearchRequestServiceDto;
-import com.fasttime.domain.member.dto.request.CreateMemberDTO;
+import com.fasttime.domain.member.dto.request.CreateMemberRequest;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.exception.AdminNotFoundException;
@@ -37,7 +37,7 @@ public class AdminService {
     private final AdminEmailRepository adminEmailRepository;
 
 
-    public void save(CreateMemberDTO dto) {
+    public void save(CreateMemberRequest dto) {
 
         if (memberService.isEmailExistsInMember(dto.getEmail())) {
             throw new MemberNotMatchInfoException();
