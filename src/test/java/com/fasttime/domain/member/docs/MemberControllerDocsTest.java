@@ -215,22 +215,38 @@ class MemberControllerDocsTest extends RestDocsSupport {
             repasswordResponse);
         String data = new ObjectMapper().writeValueAsString(dto);
 
-        //when then
-        mockMvc.perform(
-            post("/api/v1/RePassword").contentType(MediaType.APPLICATION_JSON).content(data)
-                .session(session)).andExpect(status().isOk()).andDo(
-            document("member-rePassword", preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()), requestFields(
-                    fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+    // when then
+    mockMvc
+        .perform(
+            post("/api/v1/members/me/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data)
+                .session(session))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "member-rePassword",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("password")
+                        .type(JsonFieldType.STRING)
+                        .description("비밀번호")
                         .attributes(key("constraints").value("Not Blank")),
-                    fieldWithPath("rePassword").type(JsonFieldType.STRING).description("비밀번호 재확인")
-                        .attributes(key("constraints").value("Not Blank"))), responseFields(
+                    fieldWithPath("rePassword")
+                        .type(JsonFieldType.STRING)
+                        .description("비밀번호 재확인")
+                        .attributes(key("constraints").value("Not Blank"))),
+                responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message").type(JsonFieldType.STRING).optional()
+                    fieldWithPath("message")
+                        .type(JsonFieldType.STRING)
+                        .optional()
                         .description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
-                    fieldWithPath("data.nickname").type(JsonFieldType.STRING)
+                    fieldWithPath("data.nickname")
+                        .type(JsonFieldType.STRING)
                         .description("사용자 닉네임"))));
     }
 
@@ -248,7 +264,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
-        mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
+        mockMvc.perform(post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.message").value("가입 성공!"))
@@ -283,7 +299,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
-        mockMvc.perform(post("/api/v1/join").contentType(MediaType.APPLICATION_JSON).content(data))
+        mockMvc.perform(post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.message").value("계정이 성공적으로 복구되었습니다!"))
@@ -314,7 +330,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
 
         // when, then
         mockMvc.perform(
-                delete("/api/v1/delete").session(session).contentType(MediaType.APPLICATION_JSON))
+                delete("/api/v1/members/me").session(session).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다."))
             .andDo(document("member-delete", preprocessRequest(prettyPrint()),
@@ -334,7 +350,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
         when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(getMyInfoResponse);
 
         // When
-        ResultActions result = mockMvc.perform(get("/api/v1/mypages")
+        ResultActions result = mockMvc.perform(get("/api/v1/members/me/page")
             .contentType(MediaType.APPLICATION_JSON));
 
         // Then
@@ -377,7 +393,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
 
         // When
         ResultActions result = mockMvc.perform(
-            put("/api/v1/retouch-member")
+            put("/api/v1/members/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateMemberRequest)));
 

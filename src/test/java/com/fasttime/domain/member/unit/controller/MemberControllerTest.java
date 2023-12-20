@@ -63,7 +63,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 가입된 회원입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/join")
+                    post("/api/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")
@@ -86,7 +86,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .thenReturn(ResponseDTO.res(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임 입니다."));
 
                 ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/join")
+                    post("/api/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")
@@ -113,7 +113,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .thenReturn(ResponseDTO.res(HttpStatus.OK, "가입 성공!"));
 
                 ResultActions resultActions = mockMvc.perform(
-                    post("/api/v1/join")
+                    post("/api/v1/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(
                             "{\"email\": \"test@example.com\", \"password\": \"password\", \"nickname\": \"testuser\"}")
@@ -143,7 +143,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             doNothing().when(memberService).softDeleteMember(any(Member.class));
 
             // When
-            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/delete"))
+            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/members/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("탈퇴가 완료되었습니다."));
 
@@ -186,7 +186,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .willReturn(Optional.of(updatedMember));
 
                 // When & Then
-                mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
+                mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/members/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateMemberRequest))
                         .session(session))
@@ -213,7 +213,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .willReturn(Optional.empty());
 
                 // When & Then
-                mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/retouch-member")
+                mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/members/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateMemberRequest))
                         .session(session))
@@ -252,7 +252,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 getMyInfoResponse);
 
             // Then
-            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/mypages").session(session))
+            mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/members/me/page").session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
                 .andExpect(
@@ -416,7 +416,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 String data = objectMapper.writeValueAsString(request);
 
                 //when, then
-                mockMvc.perform(post("/api/v1/RePassword")
+                mockMvc.perform(post("/api/v1/members/me/password")
                         .content(data)
                         .contentType(MediaType.APPLICATION_JSON)
                         .session(session))
@@ -437,7 +437,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 String data = objectMapper.writeValueAsString(request);
 
                 //when, then
-                mockMvc.perform(post("/api/v1/RePassword")
+                mockMvc.perform(post("/api/v1/members/me/password")
                         .content(data)
                         .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.message").value("must not be blank"))
@@ -460,7 +460,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 session.setAttribute("MEMBER", 1L);
 
                 //when, then
-                mockMvc.perform(post("/api/v1/RePassword")
+                mockMvc.perform(post("/api/v1/members/me/password")
                         .content(data)
                         .contentType(MediaType.APPLICATION_JSON)
                         .session(session))
@@ -529,10 +529,3 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
         }
     }
 }
-
-
-
-
-
-
-

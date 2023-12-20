@@ -38,14 +38,14 @@ public class MemberController {
 
     private final SecurityUtil securityUtil;
 
-    @PostMapping("/api/v1/join")
+    @PostMapping("/api/v1/members")
     public ResponseEntity<ResponseDTO<?>> join(
         @Valid @RequestBody CreateMemberRequest createMemberRequest) {
         ResponseDTO<Object> response = memberService.registerOrRecoverMember(createMemberRequest);
         return ResponseEntity.status(HttpStatus.valueOf(response.getCode())).body(response);
     }
 
-    @PutMapping("/api/v1/retouch-member")
+    @PutMapping("/api/v1/members/me")
     public ResponseEntity<ResponseDTO<UpdateMemberResponse>> updateMember(
         @Valid @RequestBody UpdateMemberRequest updateMemberRequest) {
 
@@ -65,7 +65,7 @@ public class MemberController {
     }
 
 
-    @DeleteMapping("/api/v1/delete")
+    @DeleteMapping("/api/v1/members/me")
     public ResponseEntity<ResponseDTO<Object>> deleteMember() {
 
         try {
@@ -80,7 +80,7 @@ public class MemberController {
 
     }
 
-    @GetMapping("/api/v1/mypages")
+    @GetMapping("/api/v1/members/me/page")
     public ResponseEntity<ResponseDTO> getMyPageInfo() {
 
         GetMyInfoResponse getMyInfoResponse = memberService
@@ -106,7 +106,7 @@ public class MemberController {
 
     }
 
-    @PostMapping("/api/v1/RePassword")
+    @PostMapping("/api/v1/members/me/password")
     public ResponseEntity<ResponseDTO<RepasswordResponse>> rePassword
         (@Validated @RequestBody RePasswordRequest request) {
 
@@ -117,4 +117,3 @@ public class MemberController {
     }
 
 }
-

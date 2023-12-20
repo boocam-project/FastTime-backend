@@ -58,7 +58,7 @@ public class AdminControllerTest extends ControllerUnitTestSupporter {
             when(adminService.findReportedPost(anyInt())).thenReturn(articles);
 
             // when, then
-            mockMvc.perform(get("/api/v1/admin"))
+            mockMvc.perform(get("/api/v1/admin/reports/articles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("신고가 10번이상된 게시글들을 보여줍니다."))
                 .andExpect(jsonPath("$.data").exists())
