@@ -76,9 +76,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryCustom {
         ArticlesSearchRequestServiceDto searchCondition) {
         Order direction = searchCondition.isAscending() ? Order.ASC : Order.DESC;
 
-        return switch (searchCondition.orderByType()) {
-            case "commentCount" -> new OrderSpecifier<>(direction, comment.count());
-            case "likeCount" -> new OrderSpecifier<>(direction, article.likeCount);
+        return switch (searchCondition.orderBy()) {
+            case OrderBy.COMMENT_COUNT -> new OrderSpecifier<>(direction, comment.count());
+            case OrderBy.LIKE_COUNT -> new OrderSpecifier<>(direction, article.likeCount);
             case null, default -> new OrderSpecifier<>(direction, article.createdAt);
         };
     }

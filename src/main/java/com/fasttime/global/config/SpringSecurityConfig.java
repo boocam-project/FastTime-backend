@@ -5,6 +5,7 @@ import com.fasttime.global.jwt.JwtAuthenticationEntryPoint;
 import com.fasttime.global.jwt.JwtAuthenticationFilter;
 import com.fasttime.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -39,7 +40,14 @@ public class SpringSecurityConfig {
         "/api/v1/join",
         "/api/v2/login",
         "/api/v2/refresh",
-        "/api/v1/admin/join"
+        "/api/v1/admin/join",
+        "/api/live/**",
+        "/api/dashboards/**",
+    };
+    private static final String[] GRAFANA_WHITE_LIST = {
+        "/public/**",
+        "/grafana/**",
+        "/dashboard/**"
     };
 
     @Bean
@@ -51,8 +59,10 @@ public class SpringSecurityConfig {
                 configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers(PERMIT_URL_ARRAY).permitAll()
+                .requestMatchers(GRAFANA_WHITE_LIST).permitAll()
                 .requestMatchers(HttpMethod.GET, "api/v1/article", "api/v2/articles").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .anyRequest().authenticated())
             .formLogin(AbstractHttpConfigurer::disable)
             .addFilter(corsFilter)

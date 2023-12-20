@@ -7,7 +7,7 @@ echo " __
 
 echo "update application profiles from boocam-be-vaults..."
 git submodule init
-git submodule update --remote
+git submodule foreach git pull origin main
 
 echo "done!"
 

@@ -52,6 +52,10 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //migration
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+
     // h2 for test database
     testImplementation 'com.h2database:h2:2.2.220'
 
@@ -98,14 +102,14 @@ bootJar {
 task copyDevelopConfig(type: Copy) {
     onlyIf { project.hasProperty('develop') }
     from 'src/main/resources'
-    include 'application-develop.yml'
+    include 'application-develop.yaml'
     into "$buildDir/resources/main"
 }
 
 task copyProdConfig(type: Copy) {
     onlyIf { project.hasProperty('prod') }
     from 'src/main/resources'
-    include 'application-prod.yml'
+    include 'application-prod.yaml'
     into "$buildDir/resources/main"
 }
 

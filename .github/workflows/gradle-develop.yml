@@ -54,7 +54,7 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.DEVELOP_SSH_KEY }}
 
-    - name: AWS Lightsail 배포 - 파일전송
+    - name: AWS EC2 배포 - 파일전송
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
         SSH_PRIVATE_KEY: ${{ secrets.DEVELOP_SSH_KEY }}

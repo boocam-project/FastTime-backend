@@ -37,6 +37,7 @@ public class Member extends BaseTimeEntity  {
     private String nickname;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('ROLE_USER', 'ROLE_ADMIN')")
     private Role role;
 
     @Override

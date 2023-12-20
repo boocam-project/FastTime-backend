@@ -5,6 +5,7 @@ import com.fasttime.domain.article.exception.ArticleReportedException;
 import com.fasttime.domain.article.exception.BadArticleReportStatusException;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -56,6 +57,7 @@ public class Article extends BaseTimeEntity {
     private int commentCount;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('NORMAL', 'WAIT_FOR_REPORT_REVIEW', 'REPORT_ACCEPT', 'REPORT_REJECT')")
     private ReportStatus reportStatus;
 
     @Builder
