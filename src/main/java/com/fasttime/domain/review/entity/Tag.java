@@ -7,11 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Tag {
 
