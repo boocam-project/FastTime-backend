@@ -1,0 +1,3 @@
+ALTER TABLE review
+    ADD COLUMN title VARCHAR(255) NULL,
+    ADD COLUMN bootcamp VARCHAR(255) NULL;

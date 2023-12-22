@@ -4,8 +4,6 @@ CREATE TABLE review
     created_at datetime              NULL,
     updated_at datetime              NULL,
     deleted_at datetime              NULL,
-    title      VARCHAR(255)          NULL,
-    bootcamp   VARCHAR(255)          NULL,
     rating     INT                   NOT NULL,
     content    VARCHAR(255)          NULL,
     member_id  BIGINT                NULL,
