@@ -34,7 +34,7 @@ include::{snippets}/comment-create/response-fields.adoc[]
 === HttpRequest
 
 include::{snippets}/comments-search/http-request.adoc[]
-include::{snippets}/comments-search/request-parameters.adoc[]
+include::{snippets}/comments-search/query-parameters.adoc[]
 
 === HttpResponse
 
