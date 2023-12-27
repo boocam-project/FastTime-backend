@@ -82,7 +82,7 @@ jobs:
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
           cd ~/app/boocam
           nohup java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
-          sudo systemctl reload prometheus
+          sudo systemctl restart prometheus
         EOF
       env:
         SSH_PRIVATE_KEY: ${{ secrets.DEVELOP_SSH_KEY }}
