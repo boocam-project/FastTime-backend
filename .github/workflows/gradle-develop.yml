@@ -64,9 +64,21 @@ jobs:
         TARGET: '~/app/boocam'
         EXCLUDE: '/**/*.jar'
 
+      # Prometheus 설정 파일 전송
+    - name: Prometheus 설정 파일 전송
+      uses: easingthemes/ssh-deploy@v2.1.5
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.DEVELOP_SSH_KEY }}
+        REMOTE_HOST: ${{ secrets.DEVELOP_HOST }}
+        REMOTE_USER: ${{ secrets.DEVELOP_USERNAME }}
+        SOURCE: 'src/main/resources/prometheus.yml'
+        TARGET: '/tmp'
+
+
     - name: jar 파일 실행
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.DEVELOP_USERNAME }}@${{ secrets.DEVELOP_HOST }} << EOF
+          sudo mv /tmp/prometheus.yml /etc/prometheus/prometheus.yml
           pkill -f 'FastTime-0.0.1-SNAPSHOT.jar' || true
           cd ~/app/boocam
           nohup java -jar -Dspring.profiles.active=develop FastTime-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
