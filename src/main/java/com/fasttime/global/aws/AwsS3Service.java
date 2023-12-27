@@ -4,7 +4,8 @@ import static software.amazon.awssdk.services.s3.model.DeleteObjectRequest.*;
 
 import jakarta.annotation.PreDestroy;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -34,17 +35,14 @@ public class AwsS3Service {
   public CompletableFuture<Void> upload(MultipartFile multipartFile) throws IOException {
     return CompletableFuture.runAsync(
         () -> {
-          try {
-            String fileName =
-                bucket
-                    + "/"
-                    + prefix
-                    + UUID.randomUUID()
-                    + "_"
-                    + multipartFile.getOriginalFilename();
+          try (InputStream fileStream = multipartFile.getInputStream()) {
+            String fileName = generateFileName(multipartFile);
+
+            PutObjectRequest putObjectRequest =
+                PutObjectRequest.builder().bucket(bucket).key(fileName).build();
+
             s3Client.putObject(
-                PutObjectRequest.builder().bucket(bucket).key(fileName).build(),
-                RequestBody.fromByteBuffer(ByteBuffer.wrap(multipartFile.getBytes())));
+                putObjectRequest, RequestBody.fromInputStream(fileStream, multipartFile.getSize()));
           } catch (IOException e) {
             log.error("Error uploading file: {}", e.getMessage());
             throw new RuntimeException("Error uploading file", e);
@@ -58,5 +56,19 @@ public class AwsS3Service {
     if (!executorService.isShutdown()) {
       executorService.shutdown();
     }
+  }
+
+  private String generateFileName(MultipartFile multipartFile) {
+    String originalFilename = multipartFile.getOriginalFilename();
+    String fileExtension =
+        Optional.ofNullable(originalFilename)
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(originalFilename.lastIndexOf(".") + 1))
+            .orElse("");
+    return prefix
+        + UUID.randomUUID()
+        + "_"
+        + originalFilename
+        + (fileExtension.isEmpty() ? "" : "." + fileExtension);
   }
 }
