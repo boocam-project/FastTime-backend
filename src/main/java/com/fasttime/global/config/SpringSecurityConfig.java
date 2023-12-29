@@ -38,9 +38,11 @@ public class SpringSecurityConfig {
         "/error",
         "/docs/**",
         "/api/v2/login",
+        "/api/v1/members",
         "/api/v2/refresh",
         "/api/live/**",
         "/api/dashboards/**",
+        "/actuator/**",
     };
     private static final String[] GRAFANA_WHITE_LIST = {
         "/public/**",
