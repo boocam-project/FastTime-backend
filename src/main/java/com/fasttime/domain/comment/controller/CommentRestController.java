@@ -34,7 +34,8 @@ public class CommentRestController {
     private final SecurityUtil securityUtil;
 
     @PostMapping("/{articleId}")
-    public ResponseEntity<ResponseDTO<Object>> createComment(@PathVariable long articleId,
+    public ResponseEntity<ResponseDTO<Object>> createComment(
+        @PathVariable(name = "articleId") long articleId,
         @Valid @RequestBody CreateCommentRequestDTO createCommentRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
             ResponseDTO.res(HttpStatus.CREATED, "댓글을 성공적으로 등록했습니다.",
@@ -65,7 +66,7 @@ public class CommentRestController {
 
     @PatchMapping("/{commentId}")
     public ResponseEntity<ResponseDTO<CommentResponseDTO>> updateComment(
-        @PathVariable long commentId,
+        @PathVariable(name = "commentId") long commentId,
         @Valid @RequestBody UpdateCommentRequestDTO updateCommentRequestDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글 내용을 성공적으로 수정했습니다.",
@@ -75,7 +76,7 @@ public class CommentRestController {
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ResponseDTO<CommentResponseDTO>> deleteComment(
-        @PathVariable long commentId) {
+        @PathVariable(name = "commentId") long commentId) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK, "댓글을 성공적으로 삭제했습니다.",
                 commentService.deleteComment(commentId, securityUtil.getCurrentMemberId())));
