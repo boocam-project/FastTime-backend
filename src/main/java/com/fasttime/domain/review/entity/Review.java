@@ -42,4 +42,7 @@ public class Review extends BaseTimeEntity {
     @ManyToOne
     private Member member;
 
+    public void setReviewTags(Set<ReviewTag> reviewTags) {
+        this.reviewTags = reviewTags;
+    }
 }

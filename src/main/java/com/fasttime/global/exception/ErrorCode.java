@@ -44,6 +44,9 @@ public enum ErrorCode {
     // REPORT
     ALREADY_REPORTED_THIS_POST(HttpStatus.BAD_REQUEST, "이미 신고한 게시글입니다."),
 
+    // REVIEW
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 태그입니다."),
+
     // 5xx
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러");
 
