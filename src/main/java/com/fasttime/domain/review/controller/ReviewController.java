@@ -9,6 +9,8 @@ import com.fasttime.global.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,12 @@ public class ReviewController {
             requestDTO.badtags(),
             reviewService.getTagRepository()
         );
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.CREATED, responseDTO));
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.CREATED,"리뷰작성이 완료되었습니다.", responseDTO));
+    }
+
+    @DeleteMapping("api/v2/reviews/{reviewId}")
+    public ResponseEntity<ResponseDTO<?>> deleteReview(@PathVariable Long reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "리뷰삭제가 완료되었습니다."));
     }
 }

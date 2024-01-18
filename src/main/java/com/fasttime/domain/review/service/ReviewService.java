@@ -7,6 +7,8 @@ import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
 import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
 import com.fasttime.domain.review.entity.Tag;
+import com.fasttime.domain.review.exception.ReviewAlreadyDeletedException;
+import com.fasttime.domain.review.exception.ReviewNotFoundException;
 import com.fasttime.domain.review.exception.TagNotFoundException;
 import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.TagRepository;
@@ -28,13 +30,23 @@ public class ReviewService {
 
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException("Member not found with ID: " + memberId));
+            .orElseThrow(() -> new MemberNotFoundException());
 
         Review review = requestDTO.createReview(member);
         Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
 
         review.setReviewTags(allReviewTags);
         return reviewRepository.save(review);
+    }
+
+    public void deleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new ReviewNotFoundException());
+        if (review.isDeleted()) {
+            throw new ReviewAlreadyDeletedException();
+        }
+        review.softDelete();
+        reviewRepository.save(review);
     }
 
     private Set<ReviewTag> processAllTags(ReviewRequestDTO requestDTO, Review review) {
