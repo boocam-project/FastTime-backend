@@ -10,6 +10,7 @@ import com.fasttime.domain.review.entity.Tag;
 import com.fasttime.domain.review.exception.ReviewAlreadyDeletedException;
 import com.fasttime.domain.review.exception.ReviewNotFoundException;
 import com.fasttime.domain.review.exception.TagNotFoundException;
+import com.fasttime.domain.review.exception.UnauthorizedAccessException;
 import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.TagRepository;
 import java.util.HashSet;
@@ -31,7 +32,9 @@ public class ReviewService {
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new MemberNotFoundException());
-
+        if (!member.isCampCrtfc()) {
+            throw new UnauthorizedAccessException();
+        }
         Review review = requestDTO.createReview(member);
         Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
 
@@ -39,9 +42,12 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public void deleteReview(Long reviewId) {
+    public void deleteReview(Long reviewId, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ReviewNotFoundException());
+        if (!review.getMember().getId().equals(memberId)) {
+            throw new UnauthorizedAccessException();
+        }
         if (review.isDeleted()) {
             throw new ReviewAlreadyDeletedException();
         }

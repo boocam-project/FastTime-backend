@@ -38,7 +38,8 @@ public class ReviewController {
 
     @DeleteMapping("api/v2/reviews/{reviewId}")
     public ResponseEntity<ResponseDTO<?>> deleteReview(@PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
+        Long memberId = securityUtil.getCurrentMemberId();
+        reviewService.deleteReview(reviewId, memberId);
         return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "리뷰삭제가 완료되었습니다."));
     }
 }
