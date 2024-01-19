@@ -5,7 +5,6 @@ import com.fasttime.domain.review.entity.Review;
 import java.util.Set;
 
 public record ReviewRequestDTO(
-    String bootcamp,
     String title,
     Set<Long> goodtags,
     Set<Long> badtags,
@@ -13,7 +12,7 @@ public record ReviewRequestDTO(
     String content) {
     public Review createReview(Member member) {
         return Review.builder()
-            .bootcamp(this.bootcamp)
+            .bootcamp(member.getBootcamp())
             .title(this.title)
             .rating(this.rating)
             .content(this.content)

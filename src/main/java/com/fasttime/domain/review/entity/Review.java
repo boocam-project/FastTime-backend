@@ -47,6 +47,12 @@ public class Review extends BaseTimeEntity {
         this.reviewTags = reviewTags;
     }
 
+    public void setupdate(String title, int rating, String content){
+        this.title = title;
+        this.rating = rating;
+        this.content = content;
+    }
+
     public void softDelete() {
         delete(LocalDateTime.now());
     }
