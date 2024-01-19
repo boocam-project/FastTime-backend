@@ -8,6 +8,7 @@ import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
 import com.fasttime.domain.review.entity.Tag;
 import com.fasttime.domain.review.exception.ReviewAlreadyDeletedException;
+import com.fasttime.domain.review.exception.ReviewAlreadyExistsException;
 import com.fasttime.domain.review.exception.ReviewNotFoundException;
 import com.fasttime.domain.review.exception.TagNotFoundException;
 import com.fasttime.domain.review.exception.UnauthorizedAccessException;
@@ -35,6 +36,9 @@ public class ReviewService {
         if (!member.isCampCrtfc()) {
             throw new UnauthorizedAccessException();
         }
+        if (reviewRepository.existsByMemberId(memberId)) {
+            throw new ReviewAlreadyExistsException();
+        }
         Review review = requestDTO.createReview(member);
         Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
 
@@ -53,6 +57,18 @@ public class ReviewService {
         }
         review.softDelete();
         reviewRepository.save(review);
+    }
+
+    public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new ReviewNotFoundException());
+
+        review.setupdate(requestDTO.title(),requestDTO.rating(),requestDTO.content());
+
+        Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
+        review.setReviewTags(allReviewTags);
+
+        return reviewRepository.save(review);
     }
 
     private Set<ReviewTag> processAllTags(ReviewRequestDTO requestDTO, Review review) {
