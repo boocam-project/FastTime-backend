@@ -36,6 +36,8 @@ public class Member extends BaseTimeEntity  {
 
     private String nickname;
 
+    private boolean campCrtfc = false;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('ROLE_USER', 'ROLE_ADMIN')")
     private Role role;
