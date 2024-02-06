@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,6 +34,7 @@ public class Member extends BaseTimeEntity {
 
     private String nickname;
 
+    @Default
     private boolean campCrtfc = false;
 
     private String bootcamp;
