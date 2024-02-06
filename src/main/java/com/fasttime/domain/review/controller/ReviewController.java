@@ -24,6 +24,8 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final SecurityUtil securityUtil;
 
+    private static final String REVIEW_SUCCESS_MESSAGE = "리뷰 요청이 완료되었습니다.";
+
     @PostMapping
     public ResponseEntity<ResponseDTO<ReviewResponseDTO>> createReview(
         @RequestBody ReviewRequestDTO requestDTO) {
@@ -32,14 +34,14 @@ public class ReviewController {
             memberId);
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(ResponseDTO.res(HttpStatus.CREATED, "리뷰작성이 완료되었습니다.", responseDTO));
+            .body(ResponseDTO.res(HttpStatus.CREATED, REVIEW_SUCCESS_MESSAGE, responseDTO));
     }
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ResponseDTO<?>> deleteReview(@PathVariable Long reviewId) {
         Long memberId = securityUtil.getCurrentMemberId();
         reviewService.deleteReview(reviewId, memberId);
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "리뷰삭제가 완료되었습니다."));
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE));
     }
 
     @PutMapping("/{reviewId}")
@@ -49,6 +51,7 @@ public class ReviewController {
         Long memberId = securityUtil.getCurrentMemberId();
         ReviewResponseDTO responseDTO = reviewService.updateAndReturnReviewResponse(reviewId,
             requestDTO, memberId);
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, "리뷰수정이 완료되었습니다.", responseDTO));
+        return ResponseEntity.ok(
+            ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, responseDTO));
     }
 }
