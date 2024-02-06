@@ -56,4 +56,9 @@ public class Review extends BaseTimeEntity {
     public void softDelete() {
         delete(LocalDateTime.now());
     }
+
+    @Override
+    public void restore() {
+        super.restore();
+    }
 }

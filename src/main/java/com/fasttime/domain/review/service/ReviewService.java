@@ -37,14 +37,30 @@ public class ReviewService {
         if (!member.isCampCrtfc()) {
             throw new UnauthorizedAccessException();
         }
-        if (reviewRepository.existsByMemberId(memberId)) {
-            throw new ReviewAlreadyExistsException();
-        }
-        Review review = requestDTO.createReview(member);
-        Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
 
-        review.setReviewTags(allReviewTags);
-        return reviewRepository.save(review);
+        Review existingReview = reviewRepository.findByMemberId(memberId);
+
+        if (existingReview != null) {
+            if (existingReview.isDeleted()) {
+                existingReview.restore();
+                existingReview.updateReviewDetails(
+                    requestDTO.title(),
+                    requestDTO.rating(),
+                    requestDTO.content()
+                );
+                Set<ReviewTag> allReviewTags = processAllTags(requestDTO, existingReview);
+                existingReview.setReviewTags(allReviewTags);
+                return reviewRepository.save(existingReview);
+            } else {
+                throw new ReviewAlreadyExistsException();
+            }
+        }
+
+        Review newReview = requestDTO.createReview(member);
+        Set<ReviewTag> allReviewTags = processAllTags(requestDTO, newReview);
+
+        newReview.setReviewTags(allReviewTags);
+        return reviewRepository.save(newReview);
     }
 
     public ReviewResponseDTO createAndReturnReviewResponse(ReviewRequestDTO requestDTO,
