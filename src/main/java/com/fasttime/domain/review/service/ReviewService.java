@@ -63,7 +63,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ReviewNotFoundException());
 
-        review.setupdate(requestDTO.title(),requestDTO.rating(),requestDTO.content());
+        review.updateReviewDetails(requestDTO.title(),requestDTO.rating(),requestDTO.content());
 
         Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
         review.setReviewTags(allReviewTags);
