@@ -4,6 +4,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
+import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
 import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
 import com.fasttime.domain.review.entity.Tag;
@@ -46,6 +47,24 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    public ReviewResponseDTO createAndReturnReviewResponse(ReviewRequestDTO requestDTO,
+        Long memberId) {
+        Review review = createReview(requestDTO, memberId);
+
+        Set<String> goodTagContents = getTagContents(requestDTO.goodtags());
+        Set<String> badTagContents = getTagContents(requestDTO.badtags());
+
+        return ReviewResponseDTO.of(review, goodTagContents, badTagContents);
+    }
+
+    private Set<String> getTagContents(Set<Long> tagIds) {
+        return tagIds.stream()
+            .map(tagId -> tagRepository.findById(tagId)
+                .map(Tag::getContent)
+                .orElseThrow(TagNotFoundException::new))
+            .collect(Collectors.toSet());
+    }
+
     public void deleteReview(Long reviewId, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ReviewNotFoundException());
@@ -59,16 +78,27 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
-    public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO) {
+    public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new ReviewNotFoundException());
+        if (!review.getMember().getId().equals(memberId)) {
+            throw new UnauthorizedAccessException();
+        }
 
-        review.updateReviewDetails(requestDTO.title(),requestDTO.rating(),requestDTO.content());
+        review.updateReviewDetails(requestDTO.title(), requestDTO.rating(), requestDTO.content());
 
         Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
         review.setReviewTags(allReviewTags);
 
         return reviewRepository.save(review);
+    }
+
+    public ReviewResponseDTO updateAndReturnReviewResponse(Long reviewId,
+        ReviewRequestDTO requestDTO, Long memberId) {
+        Review updatedReview = updateReview(reviewId, requestDTO, memberId);
+        Set<String> goodTagContents = getTagContents(requestDTO.goodtags());
+        Set<String> badTagContents = getTagContents(requestDTO.badtags());
+        return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
     }
 
     private Set<ReviewTag> processAllTags(ReviewRequestDTO requestDTO, Review review) {
@@ -93,9 +123,4 @@ public class ReviewService {
         }
         return reviewTags;
     }
-
-    public TagRepository getTagRepository() {
-        return this.tagRepository;
-    }
 }
-
