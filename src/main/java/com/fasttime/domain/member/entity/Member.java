@@ -14,17 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity
 @Builder
 @AllArgsConstructor
 @Table(name = "Member")
-public class Member extends BaseTimeEntity  {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +51,7 @@ public class Member extends BaseTimeEntity  {
         this.image = image;
 
     }
+
     @Override
     public void restore() {
         super.restore();
@@ -62,5 +60,18 @@ public class Member extends BaseTimeEntity  {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
+    public Member(String email, String nickname, String password, Role role) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.role = role;
+    }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

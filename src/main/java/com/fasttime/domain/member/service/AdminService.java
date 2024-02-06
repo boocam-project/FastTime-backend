@@ -46,11 +46,12 @@ public class AdminService {
             throw new AdminNotFoundException();
         }
 
-        Member member = new Member();
-        member.setEmail(dto.getEmail());
-        member.setNickname(dto.getNickname());
-        member.setPassword(passwordEncoder.encode(dto.getPassword()));
-        member.setRole(Role.ROLE_ADMIN);
+        Member member = new Member(
+            dto.getEmail(),
+            dto.getNickname(),
+            passwordEncoder.encode(dto.getPassword()),
+            Role.ROLE_ADMIN
+        );
         memberRepository.save(member);
     }
 

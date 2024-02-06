@@ -87,11 +87,12 @@ public class MemberService {
 
     public void saveNewMember(CreateMemberRequest createMemberRequest) {
 
-        Member member = new Member();
-        member.setEmail(createMemberRequest.getEmail());
-        member.setNickname(createMemberRequest.getNickname());
-        member.setPassword(passwordEncoder.encode(createMemberRequest.getPassword()));
-        member.setRole(Role.ROLE_USER);
+        Member member = new Member(
+            createMemberRequest.getEmail(),
+            createMemberRequest.getNickname(),
+            passwordEncoder.encode(createMemberRequest.getPassword()),
+            Role.ROLE_USER
+        );
         memberRepository.save(member);
     }
 
