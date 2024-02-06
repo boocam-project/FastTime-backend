@@ -26,7 +26,8 @@ public class ReviewController {
     private final SecurityUtil securityUtil;
 
     @PostMapping
-    public ResponseEntity<ResponseDTO<ReviewResponseDTO>> createReview(@RequestBody ReviewRequestDTO requestDTO) {
+    public ResponseEntity<ResponseDTO<ReviewResponseDTO>> createReview(
+        @RequestBody ReviewRequestDTO requestDTO) {
         Long memberId = securityUtil.getCurrentMemberId();
         Review review = reviewService.createReview(requestDTO, memberId);
 
@@ -36,7 +37,9 @@ public class ReviewController {
             requestDTO.badtags(),
             reviewService.getTagRepository()
         );
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.CREATED,"리뷰작성이 완료되었습니다.", responseDTO));
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(ResponseDTO.res(HttpStatus.CREATED, "리뷰작성이 완료되었습니다.", responseDTO));
     }
 
     @DeleteMapping("/{reviewId}")
