@@ -8,8 +8,10 @@
 .gradle
 **/build/
 !src/**/build/
+out/
 *.yml
 *.yaml
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
@@ -147,10 +149,17 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Config yaml
 src/main/resources/application.yaml
 **/application-*.yaml
 **/*-prod.yaml
+
+# Log
 log/
+
 # End of https://www.toptal.com/developers/gitignore/api/intellij,macos,windows,java
 bin/
 .env
+
+# Q Class
+src/main/generated/
