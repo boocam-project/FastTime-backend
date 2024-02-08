@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -42,4 +43,22 @@ public class Review extends BaseTimeEntity {
     @ManyToOne
     private Member member;
 
+    public void setReviewTags(Set<ReviewTag> reviewTags) {
+        this.reviewTags = reviewTags;
+    }
+
+    public void updateReviewDetails(String title, int rating, String content){
+        this.title = title;
+        this.rating = rating;
+        this.content = content;
+    }
+
+    public void softDelete() {
+        delete(LocalDateTime.now());
+    }
+
+    @Override
+    public void restore() {
+        super.restore();
+    }
 }

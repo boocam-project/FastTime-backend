@@ -135,8 +135,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
         void testDeleteMember() throws Exception {
             // Given
             Long expectedMemberId = 1L;
-            Member member = new Member();
-            member.setId(expectedMemberId);
+            Member member = Member.builder()
+                .id(expectedMemberId)
+                .build();
 
             when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
             when(memberService.getMember(expectedMemberId)).thenReturn(member);
@@ -160,29 +161,29 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             @DisplayName("성공한다: 프로필 수정")
             void updateMember_Success() throws Exception {
                 // Given
-                Member member = new Member();
-                member.setId(1L);
-                member.setEmail("test@example.com");
-                member.setPassword("password");
-                member.setNickname("oldNickname");
-                member.setImage("oldImage");
+                Long memberId = 1L;
+                Member member = Member.builder()
+                    .id(memberId)
+                    .email("test@example.com")
+                    .password("password")
+                    .nickname("oldNickname")
+                    .image("oldImage")
+                    .build();
 
-                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest();
-                updateMemberRequest.setNickname("newNickname");
-                updateMemberRequest.setImage("newImage");
+                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("newNickname", "newImage");
 
-                Member updatedMember = new Member();
-                updatedMember.setId(member.getId());
-                updatedMember.setEmail(member.getEmail());
-                updatedMember.setPassword(member.getPassword());
-                updatedMember.setNickname(updateMemberRequest.getNickname());
-                updatedMember.setImage(updateMemberRequest.getImage());
+                Member updatedMember = Member.builder()
+                    .id(member.getId())
+                    .email(member.getEmail())
+                    .password(member.getPassword())
+                    .nickname(updateMemberRequest.getNickname())
+                    .image(updateMemberRequest.getImage())
+                    .build();
 
                 MockHttpSession session = new MockHttpSession();
                 session.setAttribute("MEMBER", member.getId());
 
-                given(
-                    memberService.updateMemberInfo(any(UpdateMemberRequest.class), anyLong()))
+                given(memberService.updateMemberInfo(any(UpdateMemberRequest.class), anyLong()))
                     .willReturn(Optional.of(updatedMember));
 
                 // When & Then
@@ -191,8 +192,7 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                         .content(objectMapper.writeValueAsString(updateMemberRequest))
                         .session(session))
                     .andExpect(status().isOk())
-                    .andExpect(
-                        MockMvcResultMatchers.jsonPath("$.data.nickname").value("newNickname"))
+                    .andExpect(jsonPath("$.data.nickname").value("newNickname"))
                     .andDo(print());
             }
 
@@ -233,11 +233,12 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
         void testGetMyPageInfoWhenLoggedIn() throws Exception {
             // Given
             Long expectedMemberId = 1L;
-            Member loggedInMember = new Member();
-            loggedInMember.setId(expectedMemberId);
-            loggedInMember.setNickname("testuser");
-            loggedInMember.setEmail("test@example.com");
-            loggedInMember.setImage("testImage");
+            Member loggedInMember = Member.builder()
+                .id(expectedMemberId)
+                .nickname("testuser")
+                .email("test@example.com")
+                .image("testImage")
+                .build();
 
             MockHttpSession session = new MockHttpSession();
             session.setAttribute("MEMBER", loggedInMember.getId());
@@ -248,18 +249,16 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 loggedInMember.getEmail()
             );
 
-            given(memberService.getMyPageInfoById(any(Long.class))).willReturn(
-                getMyInfoResponse);
+            given(memberService.getMyPageInfoById(any(Long.class))).willReturn(getMyInfoResponse);
 
             // Then
             mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/members/me/page").session(session))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
-                .andExpect(
-                    MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.image").value("testImage"));
-
         }
+
 
 
         @DisplayName("loginMember()는")
