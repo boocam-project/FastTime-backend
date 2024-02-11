@@ -35,6 +35,7 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Default
+    @Column(columnDefinition = "boolean default false",name = "camp_crtfc")
     private boolean campCrtfc = false;
 
     private String bootcamp;
