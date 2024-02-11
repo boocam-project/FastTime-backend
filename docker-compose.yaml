@@ -20,7 +20,22 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     volumes:
       - mysql-data:/var/lib/mysql
+  grafana:
+    image: grafana/grafana:latest
+    container_name: my-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: my-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
 
 volumes:
   redis-data:
   mysql-data:
+  grafana-data:

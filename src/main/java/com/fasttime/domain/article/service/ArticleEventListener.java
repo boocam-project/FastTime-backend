@@ -9,6 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @Component
@@ -20,7 +21,7 @@ public class ArticleEventListener {
         this.articleRepository = articleRepository;
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void updateCommentCount(CommentCreateEvent event) {
         Article article = articleRepository.findById(event.articleId())
             .orElseThrow(() -> new ArticleNotFoundException(event.articleId()));
@@ -28,7 +29,7 @@ public class ArticleEventListener {
         article.increaseCommentCount();
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void updateCommentCount(CommentDeleteEvent event) {
         Article article = articleRepository.findById(event.articleId())
             .orElseThrow(() -> new ArticleNotFoundException(event.articleId()));

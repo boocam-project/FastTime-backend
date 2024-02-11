@@ -25,4 +25,12 @@ public class Tag {
 
     private String content;
 
+    public static Tag create(String content) {
+        return new Tag(content);
+    }
+
+    protected Tag(String content) {
+        this.content = content;
+    }
+
 }

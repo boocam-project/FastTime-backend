@@ -12,19 +12,17 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity
 @Builder
 @AllArgsConstructor
 @Table(name = "Member")
-public class Member extends BaseTimeEntity  {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +33,12 @@ public class Member extends BaseTimeEntity  {
     private String password;
 
     private String nickname;
+
+    @Default
+    @Column(columnDefinition = "boolean default false",name = "camp_crtfc")
+    private boolean campCrtfc = false;
+
+    private String bootcamp;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('ROLE_USER', 'ROLE_ADMIN')")
@@ -50,6 +54,7 @@ public class Member extends BaseTimeEntity  {
         this.image = image;
 
     }
+
     @Override
     public void restore() {
         super.restore();
@@ -58,5 +63,18 @@ public class Member extends BaseTimeEntity  {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
+    public Member(String email, String nickname, String password, Role role) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.role = role;
+    }
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

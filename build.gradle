@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.1'
     id 'io.spring.dependency-management' version '1.1.4'
     id "org.asciidoctor.jvm.convert" version "3.3.2"
+    id "com.gorylenko.gradle-git-properties" version "2.4.1"
 }
 
 group = 'com'
@@ -73,6 +74,11 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.projectlombok:lombok:1.18.28'
 
+    //ops
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // test
     //s3
     implementation platform('software.amazon.awssdk:bom:2.22.6')
     implementation 'software.amazon.awssdk:s3'
