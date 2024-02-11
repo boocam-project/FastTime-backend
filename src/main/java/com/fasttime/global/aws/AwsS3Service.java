@@ -3,6 +3,7 @@ package com.fasttime.global.aws;
 import java.net.URL;
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,5 +45,9 @@ public class AwsS3Service {
 
   public List<String> generateMultiplePresignedUrls(List<String> objectKeys) {
     return objectKeys.stream().map(this::buildPreSignedUrl).toList();
+  }
+
+  private String makeUUID(){
+    return UUID.randomUUID().toString();
   }
 }
