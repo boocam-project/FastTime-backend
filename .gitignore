@@ -163,3 +163,4 @@ bin/
 
 # Q Class
 src/main/generated/
+/.jpb/**
