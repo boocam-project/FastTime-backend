@@ -159,4 +159,12 @@ public class ReviewService {
             .map(Tag::getContent)
             .collect(Collectors.toSet());
     }
+
+    public List<ReviewResponseDTO> getReviewsByBootcamp(String bootcamp, String sortBy) {
+        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending() : Sort.by("createdAt").descending();
+        List<Review> reviews = reviewRepository.findByBootcamp(bootcamp, sort);
+        return reviews.stream()
+            .map(this::convertToReviewResponseDTO)
+            .collect(Collectors.toList());
+    }
 }
