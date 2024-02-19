@@ -17,9 +17,11 @@ import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.ReviewTagRepository;
 import com.fasttime.domain.review.repository.TagRepository;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -128,5 +130,33 @@ public class ReviewService {
         Set<String> goodTagContents = getTagContents(requestDTO.goodtags());
         Set<String> badTagContents = getTagContents(requestDTO.badtags());
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDTO> getSortedReviews(String sortBy) {
+        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
+            : Sort.by("createdAt").descending();
+        List<Review> reviews = reviewRepository.findAll(sort);
+
+        return reviews.stream()
+            .map(this::convertToReviewResponseDTO)
+            .collect(Collectors.toList());
+    }
+
+    private ReviewResponseDTO convertToReviewResponseDTO(Review review) {
+        Set<String> goodTagContents = extractTagContents(review, true);
+        Set<String> badTagContents = extractTagContents(review, false);
+        return new ReviewResponseDTO(
+            review.getId(), review.getBootcamp(), review.getTitle(),
+            goodTagContents, badTagContents, review.getRating(), review.getContent()
+        );
+    }
+
+    private Set<String> extractTagContents(Review review, boolean isGoodTag) {
+        return review.getReviewTags().stream()
+            .filter(reviewTag -> reviewTag.isGoodTag() == isGoodTag)
+            .map(ReviewTag::getTag)
+            .map(Tag::getContent)
+            .collect(Collectors.toSet());
     }
 }
