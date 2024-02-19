@@ -14,6 +14,7 @@ import com.fasttime.domain.review.exception.ReviewNotFoundException;
 import com.fasttime.domain.review.exception.TagNotFoundException;
 import com.fasttime.domain.review.exception.UnauthorizedAccessException;
 import com.fasttime.domain.review.repository.ReviewRepository;
+import com.fasttime.domain.review.repository.ReviewTagRepository;
 import com.fasttime.domain.review.repository.TagRepository;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,28 +29,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ReviewTagRepository reviewTagRepository;
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
 
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFoundException());
+            .orElseThrow(MemberNotFoundException::new);
         if (!member.isCampCrtfc()) {
             throw new UnauthorizedAccessException();
         }
 
         Review existingReview = reviewRepository.findByMemberId(memberId);
-
         if (existingReview != null) {
             if (existingReview.isDeleted()) {
+                reviewTagRepository.deleteByReview(existingReview);
+                updateReviewDetails(existingReview, requestDTO);
+                updateReviewTags(existingReview, requestDTO);
                 existingReview.restore();
-                existingReview.updateReviewDetails(
-                    requestDTO.title(),
-                    requestDTO.rating(),
-                    requestDTO.content()
-                );
-                Set<ReviewTag> allReviewTags = processAllTags(requestDTO, existingReview);
-                existingReview.setReviewTags(allReviewTags);
                 return reviewRepository.save(existingReview);
             } else {
                 throw new ReviewAlreadyExistsException();
@@ -57,9 +54,7 @@ public class ReviewService {
         }
 
         Review newReview = requestDTO.createReview(member);
-        Set<ReviewTag> allReviewTags = processAllTags(requestDTO, newReview);
-
-        newReview.setReviewTags(allReviewTags);
+        updateReviewTags(newReview, requestDTO);
         return reviewRepository.save(newReview);
     }
 
@@ -83,30 +78,48 @@ public class ReviewService {
 
     public void deleteReview(Long reviewId, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new ReviewNotFoundException());
+            .orElseThrow(ReviewNotFoundException::new);
         if (!review.getMember().getId().equals(memberId)) {
             throw new UnauthorizedAccessException();
         }
         if (review.isDeleted()) {
             throw new ReviewAlreadyDeletedException();
         }
+
         review.softDelete();
         reviewRepository.save(review);
     }
 
     public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new ReviewNotFoundException());
+            .orElseThrow(ReviewNotFoundException::new);
         if (!review.getMember().getId().equals(memberId)) {
             throw new UnauthorizedAccessException();
         }
+        reviewTagRepository.deleteByReview(review);
 
-        review.updateReviewDetails(requestDTO.title(), requestDTO.rating(), requestDTO.content());
-
-        Set<ReviewTag> allReviewTags = processAllTags(requestDTO, review);
-        review.setReviewTags(allReviewTags);
-
+        updateReviewDetails(review, requestDTO);
+        updateReviewTags(review, requestDTO);
         return reviewRepository.save(review);
+    }
+
+    private void updateReviewDetails(Review review, ReviewRequestDTO requestDTO) {
+        review.updateReviewDetails(requestDTO.title(), requestDTO.rating(), requestDTO.content());
+    }
+
+    private void updateReviewTags(Review review, ReviewRequestDTO requestDTO) {
+        Set<ReviewTag> newReviewTags = new HashSet<>();
+        newReviewTags.addAll(createReviewTags(requestDTO.goodtags(), review, true));
+        newReviewTags.addAll(createReviewTags(requestDTO.badtags(), review, false));
+        review.setReviewTags(newReviewTags);
+    }
+
+    private Set<ReviewTag> createReviewTags(Set<Long> tagIds, Review review, boolean isGoodTag) {
+        return tagIds.stream()
+            .map(tagId -> tagRepository.findById(tagId)
+                .orElseThrow(TagNotFoundException::new))
+            .map(tag -> new ReviewTag(null, review, tag, isGoodTag))
+            .collect(Collectors.toSet());
     }
 
     public ReviewResponseDTO updateAndReturnReviewResponse(Long reviewId,
@@ -115,28 +128,5 @@ public class ReviewService {
         Set<String> goodTagContents = getTagContents(requestDTO.goodtags());
         Set<String> badTagContents = getTagContents(requestDTO.badtags());
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
-    }
-
-    private Set<ReviewTag> processAllTags(ReviewRequestDTO requestDTO, Review review) {
-        Set<ReviewTag> goodReviewTags = processTags(requestDTO.goodtags(), review);
-        Set<ReviewTag> badReviewTags = processTags(requestDTO.badtags(), review);
-        Set<ReviewTag> allReviewTags = new HashSet<>();
-        allReviewTags.addAll(goodReviewTags);
-        allReviewTags.addAll(badReviewTags);
-        return allReviewTags;
-    }
-
-    private Set<ReviewTag> processTags(Set<Long> tagIds, Review review) {
-        Set<ReviewTag> reviewTags = new HashSet<>();
-        if (tagIds != null) {
-            reviewTags = tagIds.stream()
-                .map(tagId -> {
-                    Tag tag = tagRepository.findById(tagId)
-                        .orElseThrow(() -> new TagNotFoundException());
-                    return new ReviewTag(null, review, tag);
-                })
-                .collect(Collectors.toSet());
-        }
-        return reviewTags;
     }
 }

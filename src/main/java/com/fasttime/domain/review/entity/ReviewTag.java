@@ -28,4 +28,6 @@ public class ReviewTag {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
+    private boolean isGoodTag;
+
 }

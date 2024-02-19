@@ -2,6 +2,7 @@ package com.fasttime.domain.review.entity;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -36,7 +38,8 @@ public class Review extends BaseTimeEntity {
 
     private String content;
 
-    @OneToMany(mappedBy = "review")
+    @Builder.Default
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
     private Set<ReviewTag> reviewTags = new HashSet<>();
 
     @JoinColumn(name = "member_id")
@@ -47,7 +50,7 @@ public class Review extends BaseTimeEntity {
         this.reviewTags = reviewTags;
     }
 
-    public void updateReviewDetails(String title, int rating, String content){
+    public void updateReviewDetails(String title, int rating, String content) {
         this.title = title;
         this.rating = rating;
         this.content = content;
