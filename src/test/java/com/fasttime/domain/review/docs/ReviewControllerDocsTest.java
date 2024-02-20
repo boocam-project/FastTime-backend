@@ -18,10 +18,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.review.controller.ReviewController;
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
+import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.SecurityUtil;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -210,6 +212,41 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                         .description("나빠요 태그 목록"),
                     fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
                     fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용")
+                )
+            ));
+    }
+
+    @DisplayName("부트캠프별 리뷰 요약 조회 API 문서화")
+    @Test
+    void getBootcampReviewSummaries() throws Exception {
+        List<BootcampReviewSummaryDTO> summaries = List.of(
+            new BootcampReviewSummaryDTO("야놀자x패스트캠퍼스 부트캠프", 2.0, 1, 2, Map.of(1L, 1L, 3L, 1L)),
+            new BootcampReviewSummaryDTO("다른 부트캠프", 1.5, 2, 7,
+                Map.of(1L, 2L, 2L, 2L, 3L, 2L, 4L, 1L))
+        );
+
+        when(reviewService.getBootcampReviewSummaries()).thenReturn(summaries);
+
+        mockMvc.perform(get("/api/v2/reviews/by-bootcamp/summary")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(document("reviews-get-summary",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                    fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
+                        .description("부트캠프 이름"),
+                    fieldWithPath("data[].averageRating").type(JsonFieldType.NUMBER)
+                        .description("평균 평점"),
+                    fieldWithPath("data[].totalReviews").type(JsonFieldType.NUMBER)
+                        .description("총 리뷰 수"),
+                    fieldWithPath("data[].totalTags").type(JsonFieldType.NUMBER)
+                        .description("총 태그 수"),
+                    subsectionWithPath("data[].tagCounts").type(JsonFieldType.OBJECT)
+                        .description("태그별 사용 횟수")
+
                 )
             ));
     }
