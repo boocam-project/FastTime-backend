@@ -2,11 +2,13 @@ package com.fasttime.domain.review.docs;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -19,12 +21,12 @@ import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.SecurityUtil;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-
 
 class ReviewControllerDocsTest extends RestDocsSupport {
 
@@ -140,6 +142,35 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                         .description("나빠요 태그 목록"),
                     fieldWithPath("data.rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("리뷰 내용")
+                )
+            ));
+    }
+
+    @DisplayName("전체 리뷰 조회 API 문서화")
+    @Test
+    void getReviews() throws Exception {
+        List<ReviewResponseDTO> reviews = List.of(
+            new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"), Set.of("불친절해요"), 5, "리뷰 내용 1"),
+            new ReviewResponseDTO(2L, "다른 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"), Set.of("피드백이 느려요"), 4, "리뷰 내용 2")
+        );
+
+        when(reviewService.getSortedReviews(anyString())).thenReturn(reviews);
+
+        mockMvc.perform(get("/api/v2/reviews/all"))
+            .andExpect(status().isOk())
+            .andDo(document("reviews-get-all",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
+                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING).description("부트캠프 이름"),
+                    fieldWithPath("data[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
+                    fieldWithPath("data[].goodtags").type(JsonFieldType.ARRAY).description("좋아요 태그 목록"),
+                    fieldWithPath("data[].badtags").type(JsonFieldType.ARRAY).description("나빠요 태그 목록"),
+                    fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
+                    fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용")
                 )
             ));
     }
