@@ -4,6 +4,7 @@ import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
+import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
 import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
@@ -16,8 +17,11 @@ import com.fasttime.domain.review.exception.UnauthorizedAccessException;
 import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.ReviewTagRepository;
 import com.fasttime.domain.review.repository.TagRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -166,5 +170,27 @@ public class ReviewService {
         return reviews.stream()
             .map(this::convertToReviewResponseDTO)
             .collect(Collectors.toList());
+    }
+
+    public List<BootcampReviewSummaryDTO> getBootcampReviewSummaries() {
+        List<String> bootcamps = reviewRepository.findAllBootcamps();
+        List<BootcampReviewSummaryDTO> summaries = new ArrayList<>();
+
+        for (String bootcamp : bootcamps) {
+            double averageRating = reviewRepository.findAverageRatingByBootcamp(bootcamp);
+            int totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            int totalTags = reviewTagRepository.countByBootcamp(bootcamp);
+
+            List<Object[]> tagCountsArray = reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcamp);
+            Map<Long, Long> tagCounts = new HashMap<>();
+            for (Object[] count : tagCountsArray) {
+                Long tagId = (Long) count[0];
+                Long totalCount = (Long) count[1];
+                tagCounts.put(tagId, totalCount);
+            }
+
+            summaries.add(new BootcampReviewSummaryDTO(bootcamp, averageRating, totalReviews, totalTags, tagCounts));
+        }
+        return summaries;
     }
 }

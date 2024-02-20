@@ -1,6 +1,7 @@
 package com.fasttime.domain.review.controller;
 
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
+import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.ResponseDTO;
@@ -72,5 +73,11 @@ public class ReviewController {
 
         List<ReviewResponseDTO> reviews = reviewService.getReviewsByBootcamp(bootcamp, sortBy);
         return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
+    }
+
+    @GetMapping("/by-bootcamp/summary")
+    public ResponseEntity<ResponseDTO<List<BootcampReviewSummaryDTO>>> getBootcampReviewSummaries() {
+        List<BootcampReviewSummaryDTO> summaries = reviewService.getBootcampReviewSummaries();
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, summaries));
     }
 }
