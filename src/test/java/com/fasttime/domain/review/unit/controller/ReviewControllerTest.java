@@ -26,12 +26,12 @@ import org.springframework.http.MediaType;
 class ReviewControllerTest extends ControllerUnitTestSupporter {
 
     @Nested
-    @DisplayName("리뷰 작성은")
+    @DisplayName("createReview()는")
     class Describe_createReview {
 
         @Test
         @DisplayName("유효한 리뷰 요청이 주어지면 리뷰를 생성한다.")
-        void whenValidRequest_thenCreateReviewAndReturnStatus201() throws Exception {
+        void _willSuccess() throws Exception {
             // given
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("테스트 리뷰 제목", Set.of(1L, 2L),
                 Set.of(3L, 4L), 5, "테스트 리뷰 내용");
@@ -52,7 +52,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("권한이 없을 경우 실패한다.")
-        void whenUserIsUnauthorized_thenReturnStatus403() throws Exception {
+        void Unauthorized_willFail() throws Exception {
             // given
             OngoingStubbing<ReviewResponseDTO> requestDTO =
                 when(reviewService.createAndReturnReviewResponse(any(ReviewRequestDTO.class),
@@ -68,7 +68,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("존재하지 않는 사용자가 작성하면 실패한다.")
-        void whenUserDoesNotExist_thenReturnStatus404() throws Exception {
+        void NotFound_willFail() throws Exception {
             // given
             OngoingStubbing<ReviewResponseDTO> requestDTO =
                 when(reviewService.createAndReturnReviewResponse(any(ReviewRequestDTO.class),
@@ -84,7 +84,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("중복 작성시 실패한다.")
-        void whenReviewAlreadyExists_thenReturnStatus409() throws Exception {
+        void ConflictBadRequest_willFail() throws Exception {
             // given
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("테스트 리뷰 제목", Set.of(1L, 2L),
                 Set.of(3L, 4L), 5, "테스트 리뷰 내용");
@@ -101,7 +101,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("존재하지 않는 태그를 사용할 경우 실패한다.")
-        void whenTagNotFound_thenReturnStatus400() throws Exception {
+        void TagBadRequest_willFail() throws Exception {
             // given
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("테스트 리뷰 제목", Set.of(1L, 2L),
                 Set.of(3L, 4L), 5, "테스트 리뷰 내용");
@@ -118,12 +118,12 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
     }
 
     @Nested
-    @DisplayName("리뷰 삭제는")
+    @DisplayName("deleteReview()는")
     class Describe_deleteReview {
 
         @Test
         @DisplayName("성공한다.")
-        void whenValidUserDeletesReview_thenReturnStatus200AndSuccessMessage() throws Exception {
+        void _willSuccess() throws Exception {
             // given
             Long reviewId = 1L;
             doNothing().when(reviewService).deleteReview(eq(reviewId), anyLong());
@@ -136,7 +136,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("존재하지 않는 리뷰를 삭제할 경우 실패한다.")
-        void whenDeleteNonExistingReview_thenReturnStatus404() throws Exception {
+        void NotFound_willFail() throws Exception {
             // given
             Long reviewId = 1L;
             doThrow(new ReviewNotFoundException()).when(reviewService)
@@ -149,7 +149,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("권한이 없는 사용자는 실패한다.")
-        void whenUnauthorizedUserTriesToDeleteReview_thenReturnStatus403() throws Exception {
+        void Unauthorized_willFail() throws Exception {
             // given
             Long reviewId = 1L;
             doThrow(new UnauthorizedAccessException()).when(reviewService)
@@ -162,12 +162,12 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
     }
 
     @Nested
-    @DisplayName("리뷰 수정은")
+    @DisplayName("updateReview()는")
     class Describe_updateReview {
 
         @Test
         @DisplayName("성공한다.")
-        void whenValidUserUpdatesReview_thenReturnStatus200AndUpdatedReview() throws Exception {
+        void _willSuccess() throws Exception {
             // given
             Long reviewId = 1L;
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("수정된 리뷰 제목", Set.of(1L), Set.of(2L),
@@ -189,7 +189,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("존재하지 않는 리뷰를 수정할 경우 실패한다.")
-        void whenUpdateNonExistingReview_thenReturnStatus404() throws Exception {
+        void NotFound_willFail() throws Exception {
             // given
             Long reviewId = 1L;
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("수정된 리뷰 제목", Set.of(1L), Set.of(2L),
@@ -208,7 +208,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
 
         @Test
         @DisplayName("권한이 없는 사용자는 실패한다.")
-        void whenUnauthorizedUserTriesToUpdateReview_thenReturnStatus403() throws Exception {
+        void Unauthorized_willFail() throws Exception {
             // given
             Long reviewId = 1L;
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("수정된 리뷰 제목", Set.of(1L), Set.of(2L),
@@ -231,8 +231,8 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
     class Describe_get_all_Review {
 
         @Test
-        @DisplayName("전체조회를 성공한다.")
-        void whenGetAllReviews_thenReturnStatus200AndAllReviews() throws Exception {
+        @DisplayName("getReviews()를 성공한다.")
+        void all_willSuccess() throws Exception {
             // given
             List<ReviewResponseDTO> reviews = Arrays.asList(
                 new ReviewResponseDTO(1L, "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
@@ -260,8 +260,8 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
         }
 
         @Test
-        @DisplayName("부트캠프별 리뷰 조회를 성공한다.")
-        void whenGetReviewsByBootcamp_thenReturnStatus200AndReviews() throws Exception {
+        @DisplayName("getReviewsByBootcamp()를 성공한다.")
+        void bootcamp_willSuccess() throws Exception {
             // given
             String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
             List<ReviewResponseDTO> reviews = Arrays.asList(
@@ -292,8 +292,8 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
         }
 
         @Test
-        @DisplayName("부트캠프별 리뷰 요약 조회에 성공한다.")
-        void whenGetBootcampReviewSummaries_thenReturnStatus200AndSummaries() throws Exception {
+        @DisplayName("getBootcampReviewSummaries()를 성공한다.")
+        void bootcampSummary_willSuccess() throws Exception {
             // given
             List<BootcampReviewSummaryDTO> summaries = Arrays.asList(
                 new BootcampReviewSummaryDTO("패스트캠퍼스X야놀자 부트캠프", 4.5, 10, 20,
