@@ -3,16 +3,17 @@ package com.fasttime.domain.review.unit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.HashSet;
 import com.fasttime.domain.member.entity.Member;
@@ -191,18 +192,20 @@ public class ReviewServiceTest {
     class Context_updateReview {
 
         @Test
-        @DisplayName("성공한다.")
-        void _willSuccess() {
+        @DisplayName("리뷰 업데이트 성공한다.")
+        void updateReview_willSuccess() {
             // given
-            Review existingReview = Mockito.mock(Review.class);
-            given(reviewRepository.findById(anyLong())).willReturn(Optional.of(existingReview));
-            given(existingReview.getMember()).willReturn(member);
+            Review mockReview = Mockito.mock(Review.class);
+            given(reviewRepository.findById(anyLong())).willReturn(Optional.of(mockReview));
+            given(mockReview.getMember()).willReturn(member);
 
             // when
-            reviewService.updateReview(1L, reviewRequestDTO, member.getId());
+            reviewService.updateReview(mockReview.getId(), reviewRequestDTO, member.getId());
 
             // then
-            verify(reviewRepository, times(1)).save(existingReview);
+            verify(mockReview, times(1)).updateReviewDetails(anyString(), anyInt(), anyString());
+            verify(reviewTagRepository, times(1)).deleteByReview(any(Review.class));
+            verify(reviewRepository, times(1)).save(any(Review.class));
         }
 
         @Test
@@ -241,24 +244,28 @@ public class ReviewServiceTest {
         @DisplayName("모든 리뷰를 정렬 기준에 따라 조회한다.")
         void _willSuccess() {
             // given
-            List<Review> mockReviews = createMockReviews();
-            given(reviewRepository.findAll(any(Sort.class))).willReturn(mockReviews);
+            String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
+            List<Review> mockReviews = createMockReviewsForBootcamp(bootcampName);
+            given(reviewRepository.findByBootcamp(anyString(), any(Sort.class))).willReturn(
+                mockReviews);
 
             // when
-            List<ReviewResponseDTO> result = reviewService.getSortedReviews("createdAt");
+            List<ReviewResponseDTO> result = reviewService.getSortedReviews("createdAt",
+                bootcampName);
 
             // then
             assertThat(result).hasSize(mockReviews.size());
             assertThat(result.get(0).id()).isEqualTo(mockReviews.get(0).getId());
             assertThat(result.get(1).id()).isEqualTo(mockReviews.get(1).getId());
 
-            // Verify interactions
-            verify(reviewRepository, times(1)).findAll(any(Sort.class));
+            verify(reviewRepository, times(1)).findByBootcamp(anyString(), any(Sort.class));
         }
 
-        private List<Review> createMockReviews() {
-            Review review1 = new Review(1L, "리뷰 1", "부트캠프1", 5, "내용 1", new HashSet<>(), member);
-            Review review2 = new Review(2L, "리뷰 2", "부트캠프2", 4, "내용 2", new HashSet<>(), member);
+        private List<Review> createMockReviewsForBootcamp(String bootcampName) {
+            Review review1 = new Review(1L, "리뷰 1", bootcampName, 5, "내용 1", new HashSet<>(),
+                member);
+            Review review2 = new Review(2L, "리뷰 2", bootcampName, 4, "내용 2", new HashSet<>(),
+                member);
             return List.of(review1, review2);
         }
     }
@@ -304,54 +311,63 @@ public class ReviewServiceTest {
 
         @Test
         @DisplayName("부트캠프별 리뷰 요약 정보를 조회한다.")
-        void _willSuccess() {
+        void getBootcampReviewSummaries_willSuccess() {
             // given
             List<String> bootcamps = List.of("부트캠프1", "부트캠프2");
-            List<BootcampReviewSummaryDTO> summaries = createMockSummaries(bootcamps);
             given(reviewRepository.findAllBootcamps()).willReturn(bootcamps);
-            for (String bootcamp : bootcamps) {
-                given(reviewRepository.findAverageRatingByBootcamp(bootcamp)).willReturn(4.5);
-                given(reviewRepository.countByBootcamp(bootcamp)).willReturn(10);
-                given(reviewTagRepository.countByBootcamp(bootcamp)).willReturn(20);
-            }
+            given(reviewRepository.findAverageRatingByBootcamp(anyString())).willReturn(4.5);
+            given(reviewRepository.countByBootcamp(anyString())).willReturn(10);
 
             // when
             List<BootcampReviewSummaryDTO> result = reviewService.getBootcampReviewSummaries();
 
             // then
-            assertThat(result).hasSize(summaries.size());
-            assertThat(result.get(0).bootcamp()).isEqualTo(summaries.get(0).bootcamp());
-            assertThat(result.get(1).bootcamp()).isEqualTo(summaries.get(1).bootcamp());
+            assertThat(result).hasSize(bootcamps.size());
+            assertThat(result.get(0).bootcamp()).isEqualTo(bootcamps.get(0));
+            assertThat(result.get(0).averageRating()).isEqualTo(4.5);
+            assertThat(result.get(0).totalReviews()).isEqualTo(10);
 
             // Verify interactions
             verify(reviewRepository, times(1)).findAllBootcamps();
-            for (String bootcamp : bootcamps) {
-                verify(reviewRepository, times(1)).findAverageRatingByBootcamp(bootcamp);
-                verify(reviewRepository, times(1)).countByBootcamp(bootcamp);
-                verify(reviewTagRepository, times(1)).countByBootcamp(bootcamp);
-            }
+            verify(reviewRepository, times(2)).findAverageRatingByBootcamp(anyString());
+            verify(reviewRepository, times(2)).countByBootcamp(anyString());
         }
+    }
+
+    @Test
+    @DisplayName("부트캠프별 리뷰 요약 정보가 없을 경우 처리한다.")
+    void NoData_willHandle() {
+        // given
+        given(reviewRepository.findAllBootcamps()).willReturn(new ArrayList<>());
+
+        // when
+        List<BootcampReviewSummaryDTO> result = reviewService.getBootcampReviewSummaries();
+
+        // then
+        assertThat(result).isEmpty();
+    }
+
+    @Nested
+    @DisplayName("getBootcampTagData()는")
+    class Context_getBootcampTagData {
 
         @Test
-        @DisplayName("부트캠프별 리뷰 요약 정보가 없을 경우 처리한다.")
-        void NoData_willHandle() {
+        @DisplayName("부트캠프별 태그 데이터를 성공적으로 조회한다.")
+        void _willSuccess() {
             // given
-            given(reviewRepository.findAllBootcamps()).willReturn(new ArrayList<>());
+            String bootcampName = "부트캠프1";
+            given(reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
+                List.of(new Object[]{1L, 5L}, new Object[]{2L, 3L})
+            );
 
             // when
-            List<BootcampReviewSummaryDTO> result = reviewService.getBootcampReviewSummaries();
+            TagSummaryDTO result = reviewService.getBootcampTagData(bootcampName);
 
             // then
-            assertThat(result).isEmpty();
-        }
-
-        private List<BootcampReviewSummaryDTO> createMockSummaries(List<String> bootcamps) {
-            List<BootcampReviewSummaryDTO> summaries = new ArrayList<>();
-            for (String bootcamp : bootcamps) {
-                summaries.add(
-                    new BootcampReviewSummaryDTO(bootcamp, 4.5, 10, 20, Map.of(1L, 5L, 2L, 5L)));
-            }
-            return summaries;
+            assertThat(result.totalTags()).isEqualTo(8);
+            assertThat(result.tagCounts().size()).isEqualTo(2);
+            assertThat(result.tagCounts().get(1L)).isEqualTo(5L);
+            assertThat(result.tagCounts().get(2L)).isEqualTo(3L);
         }
     }
 }
