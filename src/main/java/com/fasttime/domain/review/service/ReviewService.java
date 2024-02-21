@@ -115,16 +115,16 @@ public class ReviewService {
 
     private void updateReviewTags(Review review, ReviewRequestDTO requestDTO) {
         Set<ReviewTag> newReviewTags = new HashSet<>();
-        newReviewTags.addAll(createReviewTags(requestDTO.goodtags(), review, true));
-        newReviewTags.addAll(createReviewTags(requestDTO.badtags(), review, false));
+        newReviewTags.addAll(createReviewTags(requestDTO.goodtags(), review));
+        newReviewTags.addAll(createReviewTags(requestDTO.badtags(), review));
         review.setReviewTags(newReviewTags);
     }
 
-    private Set<ReviewTag> createReviewTags(Set<Long> tagIds, Review review, boolean isGoodTag) {
+    private Set<ReviewTag> createReviewTags(Set<Long> tagIds, Review review) {
         return tagIds.stream()
             .map(tagId -> tagRepository.findById(tagId)
                 .orElseThrow(TagNotFoundException::new))
-            .map(tag -> new ReviewTag(null, review, tag, isGoodTag))
+            .map(tag -> new ReviewTag(null, review, tag))
             .collect(Collectors.toSet());
     }
 
@@ -158,14 +158,15 @@ public class ReviewService {
 
     private Set<String> extractTagContents(Review review, boolean isGoodTag) {
         return review.getReviewTags().stream()
-            .filter(reviewTag -> reviewTag.isGoodTag() == isGoodTag)
+            .filter(reviewTag -> reviewTag.getTag().isGoodTag() == isGoodTag)
             .map(ReviewTag::getTag)
             .map(Tag::getContent)
             .collect(Collectors.toSet());
     }
 
     public List<ReviewResponseDTO> getReviewsByBootcamp(String bootcamp, String sortBy) {
-        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending() : Sort.by("createdAt").descending();
+        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
+            : Sort.by("createdAt").descending();
         List<Review> reviews = reviewRepository.findByBootcamp(bootcamp, sort);
         return reviews.stream()
             .map(this::convertToReviewResponseDTO)
@@ -181,7 +182,8 @@ public class ReviewService {
             int totalReviews = reviewRepository.countByBootcamp(bootcamp);
             int totalTags = reviewTagRepository.countByBootcamp(bootcamp);
 
-            List<Object[]> tagCountsArray = reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcamp);
+            List<Object[]> tagCountsArray = reviewTagRepository.countTagsByBootcampGroupedByTagId(
+                bootcamp);
             Map<Long, Long> tagCounts = new HashMap<>();
             for (Object[] count : tagCountsArray) {
                 Long tagId = (Long) count[0];
@@ -189,7 +191,9 @@ public class ReviewService {
                 tagCounts.put(tagId, totalCount);
             }
 
-            summaries.add(new BootcampReviewSummaryDTO(bootcamp, averageRating, totalReviews, totalTags, tagCounts));
+            summaries.add(
+                new BootcampReviewSummaryDTO(bootcamp, averageRating, totalReviews, totalTags,
+                    tagCounts));
         }
         return summaries;
     }

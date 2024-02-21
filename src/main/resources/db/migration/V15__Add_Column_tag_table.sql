@@ -1,2 +1,2 @@
-ALTER TABLE review_tag
+ALTER TABLE tag
     ADD COLUMN isGoodTag BOOLEAN;
