@@ -30,7 +30,7 @@ public class Competition {
 
     private String participate;
 
-    private int awardScale;
+    private String  awardScale;
 
     private LocalDate startDate;
 
@@ -42,7 +42,7 @@ public class Competition {
 
     private String bonusBenefit;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",length = 1000)
     private String description;
 
     private String imageUrl;
@@ -57,7 +57,7 @@ public class Competition {
         String organization,
         String corporateType,
         String participate,
-        int awardScale,
+        String awardScale,
         LocalDate startDate,
         String endDate,
         String homepageUrl,
