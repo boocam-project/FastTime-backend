@@ -51,11 +51,22 @@ public class Competition {
     private RecruitmentStatus status;
 
     @Builder
-    private Competition(Long id, String title, String organization, String corporateType,
-        String participate, int awardScale, LocalDate startDate, LocalDate endDate,
+    private Competition(
+        Long id,
+        String title,
+        String organization,
+        String corporateType,
+        String participate,
+        int awardScale,
+        LocalDate startDate,
+        LocalDate endDate,
         String homepageUrl,
-        String activityBenefit, String bonusBenefit, String description, String imageUrl,
-        RecruitmentStatus status) {
+        String activityBenefit,
+        String bonusBenefit,
+        String description,
+        String imageUrl,
+        RecruitmentStatus status
+    ) {
         this.id = id;
         this.title = title;
         this.organization = organization;
