@@ -59,7 +59,7 @@ public class ReviewController {
             ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, responseDTO));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<ResponseDTO<List<ReviewResponseDTO>>> getReviews(
         @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
         List<ReviewResponseDTO> reviews = reviewService.getSortedReviews(sortBy);
