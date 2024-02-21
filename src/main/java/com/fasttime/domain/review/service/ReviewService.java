@@ -136,11 +136,16 @@ public class ReviewService {
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
     }
 
-    @Transactional(readOnly = true)
-    public List<ReviewResponseDTO> getSortedReviews(String sortBy) {
+    public List<ReviewResponseDTO> getSortedReviews(String sortBy, String bootcamp) {
         Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
             : Sort.by("createdAt").descending();
-        List<Review> reviews = reviewRepository.findAll(sort);
+
+        List<Review> reviews;
+        if (bootcamp != null && !bootcamp.isEmpty()) {
+            reviews = reviewRepository.findByBootcamp(bootcamp, sort);
+        } else {
+            reviews = reviewRepository.findAll(sort);
+        }
 
         return reviews.stream()
             .map(this::convertToReviewResponseDTO)

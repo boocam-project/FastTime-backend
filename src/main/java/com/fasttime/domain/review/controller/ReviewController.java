@@ -61,17 +61,11 @@ public class ReviewController {
 
     @GetMapping
     public ResponseEntity<ResponseDTO<List<ReviewResponseDTO>>> getReviews(
-        @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
-        List<ReviewResponseDTO> reviews = reviewService.getSortedReviews(sortBy);
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
-    }
-
-    @GetMapping("/by-bootcamp")
-    public ResponseEntity<ResponseDTO<List<ReviewResponseDTO>>> getReviewsByBootcamp(
-        @RequestParam String bootcamp,
+        @RequestParam(required = false) String bootcamp,
         @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
 
-        List<ReviewResponseDTO> reviews = reviewService.getReviewsByBootcamp(bootcamp, sortBy);
+        List<ReviewResponseDTO> reviews = reviewService.getSortedReviews(sortBy, bootcamp);
+
         return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
     }
 
