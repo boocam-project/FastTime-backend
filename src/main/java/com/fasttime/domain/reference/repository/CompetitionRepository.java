@@ -11,4 +11,6 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     List<Competition> findAllByStatus(RecruitmentStatus status);
 
     Optional<Competition> findByTitle(String title);
+
+    Boolean existsByTitle(String title);
 }
