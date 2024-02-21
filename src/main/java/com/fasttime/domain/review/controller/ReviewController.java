@@ -3,6 +3,7 @@ package com.fasttime.domain.review.controller;
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
 import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
+import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
@@ -69,9 +70,16 @@ public class ReviewController {
         return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
     }
 
-    @GetMapping("/by-bootcamp/summary")
+    @GetMapping("/summary")
     public ResponseEntity<ResponseDTO<List<BootcampReviewSummaryDTO>>> getBootcampReviewSummaries() {
         List<BootcampReviewSummaryDTO> summaries = reviewService.getBootcampReviewSummaries();
         return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, summaries));
+    }
+
+    @GetMapping("/tag-graph")
+    public ResponseEntity<ResponseDTO<TagSummaryDTO>> getTagCountsByBootcamp(
+        @RequestParam String bootcamp) {
+        TagSummaryDTO tagData = reviewService.getBootcampTagData(bootcamp);
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, tagData));
     }
 }
