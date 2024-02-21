@@ -51,8 +51,7 @@ public class ReviewService {
         if (existingReview != null) {
             if (existingReview.isDeleted()) {
                 reviewTagRepository.deleteByReview(existingReview);
-                updateReviewDetails(existingReview, requestDTO);
-                updateReviewTags(existingReview, requestDTO);
+                updateReview(existingReview, requestDTO);
                 existingReview.restore();
                 return reviewRepository.save(existingReview);
             } else {
@@ -105,9 +104,13 @@ public class ReviewService {
         }
         reviewTagRepository.deleteByReview(review);
 
+        updateReview(review, requestDTO);
+        return reviewRepository.save(review);
+    }
+
+    private void updateReview(Review review, ReviewRequestDTO requestDTO) {
         updateReviewDetails(review, requestDTO);
         updateReviewTags(review, requestDTO);
-        return reviewRepository.save(review);
     }
 
     private void updateReviewDetails(Review review, ReviewRequestDTO requestDTO) {
