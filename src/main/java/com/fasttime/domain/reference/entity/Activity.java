@@ -32,7 +32,7 @@ public class Activity {
 
     private LocalDate startDate;
 
-    private LocalDate endDate;
+    private String endDate;
 
     private String period;
 
@@ -66,7 +66,7 @@ public class Activity {
         String corporateType,
         String participate,
         LocalDate startDate,
-        LocalDate endDate,
+        String endDate,
         String period,
         int recruitment,
         String area,
@@ -96,6 +96,10 @@ public class Activity {
         this.bonusBenefit = bonusBenefit;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.status = status;
+    }
+
+    public void statusUpdate(RecruitmentStatus status){
         this.status = status;
     }
 }

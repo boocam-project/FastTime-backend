@@ -34,7 +34,7 @@ public class Competition {
 
     private LocalDate startDate;
 
-    private LocalDate endDate;
+    private String endDate;
 
     private String homepageUrl;
 
@@ -59,7 +59,7 @@ public class Competition {
         String participate,
         int awardScale,
         LocalDate startDate,
-        LocalDate endDate,
+        String endDate,
         String homepageUrl,
         String activityBenefit,
         String bonusBenefit,
@@ -80,6 +80,10 @@ public class Competition {
         this.bonusBenefit = bonusBenefit;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.status = status;
+    }
+
+    public void statusUpdate(RecruitmentStatus status){
         this.status = status;
     }
 }
