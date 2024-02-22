@@ -10,6 +10,7 @@ import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
 import com.fasttime.domain.review.entity.Tag;
+import com.fasttime.domain.review.exception.BootCampNotFoundException;
 import com.fasttime.domain.review.exception.ReviewAlreadyDeletedException;
 import com.fasttime.domain.review.exception.ReviewAlreadyExistsException;
 import com.fasttime.domain.review.exception.ReviewNotFoundException;
@@ -140,16 +141,19 @@ public class ReviewService {
         Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
             : Sort.by("createdAt").descending();
 
-        List<Review> reviews;
         if (bootcamp != null && !bootcamp.isEmpty()) {
-            reviews = reviewRepository.findByBootcamp(bootcamp, sort);
+            boolean exists = memberRepository.existsByBootcamp(bootcamp);
+            if (!exists) {
+                throw new BootCampNotFoundException();
+            }
+            List<Review> reviews = reviewRepository.findByBootcamp(bootcamp, sort);
+            return reviews.stream().map(this::convertToReviewResponseDTO)
+                .collect(Collectors.toList());
         } else {
-            reviews = reviewRepository.findAll(sort);
+            List<Review> reviews = reviewRepository.findAll(sort);
+            return reviews.stream().map(this::convertToReviewResponseDTO)
+                .collect(Collectors.toList());
         }
-
-        return reviews.stream()
-            .map(this::convertToReviewResponseDTO)
-            .collect(Collectors.toList());
     }
 
     private ReviewResponseDTO convertToReviewResponseDTO(Review review) {
@@ -183,6 +187,12 @@ public class ReviewService {
     }
 
     public TagSummaryDTO getBootcampTagData(String bootcamp) {
+
+        boolean exists = memberRepository.existsByBootcamp(bootcamp);
+        if (!exists) {
+            throw new BootCampNotFoundException();
+        }
+
         List<Object[]> tagCountsArray = reviewTagRepository.countTagsByBootcampGroupedByTagId(
             bootcamp);
         Map<Long, Long> tagCounts = new HashMap<>();
