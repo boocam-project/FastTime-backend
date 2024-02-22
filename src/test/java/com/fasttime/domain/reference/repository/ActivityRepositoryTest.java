@@ -20,6 +20,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 
 @DataJpaTest
 @Import({JpaTestConfig.class, QueryDslTestConfig.class})
@@ -104,12 +105,15 @@ public class ActivityRepositoryTest {
                 .build();
 
             // when
-            List<Activity> result = activityRepository.findAllBySearchConditions(request);
+            Page<Activity> result = activityRepository.findAllBySearchConditions(request);
 
             // then
-            assertThat(result.size()).isEqualTo(2);
-            assertThat(result.get(0).getId()).isEqualTo(1L);
-            assertThat(result.get(1).getId()).isEqualTo(1L);
+            assertThat(result.getTotalPages()).isEqualTo(1);
+            assertThat(result.isLast()).isEqualTo(true);
+            assertThat(result.getTotalElements()).isEqualTo(2);
+            assertThat(result.getContent().size()).isEqualTo(2);
+            assertThat(result.getContent().get(1).getId()).isEqualTo(1L);
+            assertThat(result.getContent().get(1).getId()).isEqualTo(1L);
         }
     }
 
