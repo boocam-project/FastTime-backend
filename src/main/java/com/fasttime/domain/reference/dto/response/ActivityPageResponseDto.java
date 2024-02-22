@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 public record ActivityPageResponseDto(
     int totalPages,
     Boolean isLastPage,
-    long totalActivity,
+    long totalActivities,
     List<ReferenceResponseDto> activities
 ) {
 
@@ -22,7 +22,7 @@ public record ActivityPageResponseDto(
         return ActivityPageResponseDto.builder()
             .totalPages(activityPage.getTotalPages())
             .isLastPage(activityPage.isLast())
-            .totalActivity(activityPage.getTotalElements())
+            .totalActivities(activityPage.getTotalElements())
             .activities(activities)
             .build();
     }

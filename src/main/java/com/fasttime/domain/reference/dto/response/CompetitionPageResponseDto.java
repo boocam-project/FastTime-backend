@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 public record CompetitionPageResponseDto(
     int totalPages,
     Boolean isLastPage,
-    long totalActivity,
+    long totalCompetitions,
     List<ReferenceResponseDto> competitions
 ) {
 
@@ -22,7 +22,7 @@ public record CompetitionPageResponseDto(
         return CompetitionPageResponseDto.builder()
             .totalPages(competitionPage.getTotalPages())
             .isLastPage(competitionPage.isLast())
-            .totalActivity(competitionPage.getTotalElements())
+            .totalCompetitions(competitionPage.getTotalElements())
             .competitions(competitions)
             .build();
     }
