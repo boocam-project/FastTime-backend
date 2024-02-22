@@ -242,9 +242,24 @@ public class ReviewServiceTest {
 
         @Test
         @DisplayName("모든 리뷰를 정렬 기준에 따라 조회한다.")
-        void _willSuccess() {
+        void withoutBootcampFilter_willSuccess() {
             // given
-            String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
+            List<Review> mockReviews = createMockReviews();
+            given(reviewRepository.findAll(any(Sort.class))).willReturn(mockReviews);
+
+            // when
+            List<ReviewResponseDTO> result = reviewService.getSortedReviews("createdAt", null);
+
+            // then
+            assertThat(result).hasSize(mockReviews.size());
+            verify(reviewRepository, times(1)).findAll(any(Sort.class));
+        }
+
+        @Test
+        @DisplayName("부트캠프별 리뷰를 정렬 기준에 따라 조회한다.")
+        void withBootcampFilter_willSuccess() {
+            // given
+            String bootcampName = "부트캠프1";
             List<Review> mockReviews = createMockReviewsForBootcamp(bootcampName);
             given(reviewRepository.findByBootcamp(anyString(), any(Sort.class))).willReturn(
                 mockReviews);
@@ -255,45 +270,16 @@ public class ReviewServiceTest {
 
             // then
             assertThat(result).hasSize(mockReviews.size());
-            assertThat(result.get(0).id()).isEqualTo(mockReviews.get(0).getId());
-            assertThat(result.get(1).id()).isEqualTo(mockReviews.get(1).getId());
-
-            verify(reviewRepository, times(1)).findByBootcamp(anyString(), any(Sort.class));
-        }
-
-        private List<Review> createMockReviewsForBootcamp(String bootcampName) {
-            Review review1 = new Review(1L, "리뷰 1", bootcampName, 5, "내용 1", new HashSet<>(),
-                member);
-            Review review2 = new Review(2L, "리뷰 2", bootcampName, 4, "내용 2", new HashSet<>(),
-                member);
-            return List.of(review1, review2);
-        }
-    }
-
-    @Nested
-    @DisplayName("getReviewsByBootcamp()는")
-    class Context_getReviewsByBootcamp {
-
-        @Test
-        @DisplayName("부트캠프별 리뷰를 정렬 기준에 따라 조회한다.")
-        void _willSuccess() {
-            // given
-            String bootcampName = "부트캠프1";
-            List<Review> mockReviews = createMockReviewsForBootcamp(bootcampName);
-            given(reviewRepository.findByBootcamp(anyString(), any(Sort.class))).willReturn(
-                mockReviews);
-
-            // when
-            List<ReviewResponseDTO> result = reviewService.getReviewsByBootcamp(bootcampName,
-                "createdAt");
-
-            // then
-            assertThat(result).hasSize(mockReviews.size());
             assertThat(result.get(0).bootcamp()).isEqualTo(bootcampName);
             assertThat(result.get(1).bootcamp()).isEqualTo(bootcampName);
 
-            // Verify interactions
             verify(reviewRepository, times(1)).findByBootcamp(anyString(), any(Sort.class));
+        }
+
+        private List<Review> createMockReviews() {
+            Review review1 = new Review(1L, "리뷰 1", "부트캠프1", 5, "내용 1", new HashSet<>(), member);
+            Review review2 = new Review(2L, "리뷰 2", "부트캠프2", 4, "내용 2", new HashSet<>(), member);
+            return List.of(review1, review2);
         }
 
         private List<Review> createMockReviewsForBootcamp(String bootcampName) {
@@ -356,7 +342,8 @@ public class ReviewServiceTest {
         void _willSuccess() {
             // given
             String bootcampName = "부트캠프1";
-            given(reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
+            given(
+                reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
                 List.of(new Object[]{1L, 5L}, new Object[]{2L, 3L})
             );
 
