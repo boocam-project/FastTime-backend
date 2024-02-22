@@ -9,8 +9,9 @@ import org.springframework.util.ObjectUtils;
 
 @Component
 public class WebDriverUtil {
-//    서버에 띄울 때, 변경해야 함
-    private static final String WEB_DRIVER_PATH= "C:/chromedriver/chromedriver.exe";
+//    로컬 환경 세팅
+//    private static final String WEB_DRIVER_PATH= "C:/chromedriver/chromedriver.exe";
+    private static final String WEB_DRIVER_PATH="/home/ubuntu/chromedriver-linux64/chromedriver.exe";
 
     public  WebDriver getChromeDriver(){
         if (ObjectUtils.isEmpty(System.getProperty("webdriver.chrome.driver"))) {
