@@ -22,7 +22,7 @@ public record ReferencePageRequestDto(
         this.pageSize = pageSize > MAX_SIZE ? DEFAULT_SIZE : pageSize;
     }
 
-    public PageRequest of() {
+    public PageRequest toPageable() {
         return PageRequest.of(page, pageSize);
     }
 }
