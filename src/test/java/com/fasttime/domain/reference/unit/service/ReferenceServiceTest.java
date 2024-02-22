@@ -7,9 +7,12 @@ import static org.mockito.BDDMockito.given;
 import com.fasttime.domain.reference.dto.request.ReferencePageRequestDto;
 import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
+import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
 import com.fasttime.domain.reference.entity.Activity;
+import com.fasttime.domain.reference.entity.Competition;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
 import com.fasttime.domain.reference.repository.ActivityRepository;
+import com.fasttime.domain.reference.repository.CompetitionRepository;
 import com.fasttime.domain.reference.service.ReferenceService;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +37,9 @@ public class ReferenceServiceTest {
 
     @Mock
     private ActivityRepository activityRepository;
+
+    @Mock
+    private CompetitionRepository competitionRepository;
 
     @Nested
     @DisplayName("searchActivities()은")
@@ -127,6 +133,84 @@ public class ReferenceServiceTest {
             assertThat(result.isLastPage()).isEqualTo(true);
             assertThat(result.totalActivity()).isEqualTo(2);
             assertThat(result.activities().size()).isEqualTo(2);
+        }
+    }
+
+    @Nested
+    @DisplayName("searchCompetitions()은")
+    class Context_searchCompetitions {
+
+        @Test
+        @DisplayName("공모전 목록을 조회할 수 있다.")
+        void _willSuccess() {
+            // given
+            ReferenceSearchRequestDto referenceSearchRequestDto = ReferenceSearchRequestDto.builder()
+                .keyword(null)
+                .before(true)
+                .during(true)
+                .closed(true)
+                .build();
+            ReferencePageRequestDto referencePageRequestDto = ReferencePageRequestDto.builder()
+                .orderBy(null)
+                .page(0)
+                .pageSize(10)
+                .build();
+
+            Page<Competition> competitionPage = new PageImpl<>(List.of(
+                Competition.builder()
+                    .id(1L)
+                    .title("핀테크 IT 공모전")
+                    .organization("공모전 협회")
+                    .corporateType("기타")
+                    .participate("대상 제한 없음")
+                    .awardScale("450만 원")
+                    .startDate(LocalDate.of(2024, 1, 1))
+                    .endDate("24.1.31")
+                    .homepageUrl("https://competitions/1")
+                    .activityBenefit("기타")
+                    .bonusBenefit("-")
+                    .description("""
+                        [공모개요] '핀테크 공모전'을 개최하오니 많은 관심과 참여 부탁드립니다.
+                        """)
+                    .imageUrl("https://competitions/1/images/1")
+                    .status(RecruitmentStatus.CLOSED)
+                    .build(),
+                Competition.builder()
+                    .id(2L)
+                    .title("풀스택 IT 공모전")
+                    .organization("공모전 협회")
+                    .corporateType("기타")
+                    .participate("대상 제한 없음")
+                    .awardScale("450만 원")
+                    .startDate(LocalDate.of(2024, 1, 1))
+                    .endDate("24.1.31")
+                    .homepageUrl("https://competitions/2")
+                    .activityBenefit("기타")
+                    .bonusBenefit("-")
+                    .description("""
+                        [공모개요] '풀스택 공모전'을 개최하오니 많은 관심과 참여 부탁드립니다.
+                        """)
+                    .imageUrl("https://competitions/2/images/2")
+                    .status(RecruitmentStatus.CLOSED)
+                    .build()
+            ));
+
+            given(competitionRepository.findAllBySearchConditions(
+                any(ReferenceSearchRequestDto.class),
+                any(Pageable.class)
+            )).willReturn(competitionPage);
+
+            // when
+            CompetitionPageResponseDto result = referenceService.searchCompetitions(
+                referenceSearchRequestDto,
+                referencePageRequestDto.toPageable()
+            );
+
+            // then
+            assertThat(result.totalPages()).isEqualTo(1);
+            assertThat(result.isLastPage()).isEqualTo(true);
+            assertThat(result.totalActivity()).isEqualTo(2);
+            assertThat(result.competitions().size()).isEqualTo(2);
         }
     }
 }
