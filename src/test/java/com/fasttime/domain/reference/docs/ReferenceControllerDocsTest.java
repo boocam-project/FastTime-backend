@@ -21,6 +21,7 @@ import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
 import com.fasttime.domain.reference.dto.response.ActivityResponseDto;
 import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
+import com.fasttime.domain.reference.dto.response.CompetitionResponseDto;
 import com.fasttime.domain.reference.dto.response.ReferenceResponseDto;
 import com.fasttime.domain.reference.service.usecase.ReferenceServiceUseCase;
 import java.time.LocalDate;
@@ -242,5 +243,70 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                         .description("대외활동 상세 내용"),
                     fieldWithPath("data.imageUrl").type(JsonFieldType.STRING)
                         .description("대외활동 이미지 URL"))));
+    }
+
+    @DisplayName("공모전 상세 조회 API 문서화")
+    @Test
+    void getCompetition() throws Exception {
+        // given
+        given(referenceServiceUseCase.getCompetition(any(Long.TYPE))).willReturn(
+            CompetitionResponseDto.builder()
+                .id(1L)
+                .title("한국 전력 공사 IT 대외활동")
+                .organization("한국전력공사")
+                .corporateType("중소기업")
+                .participate("대학생")
+                .awardScale("기타, 상장 수여")
+                .startDate(LocalDate.of(2023, 1, 2))
+                .endDate("2023-02-03")
+                .homepageUrl("https://blog.naver.com/gyeryongcity1/222972814128")
+                .activityBenefit("실무 교육, 수료증 및 인증서")
+                .bonusBenefit("훈련장려금 지급")
+                .description("""
+                    🔥전액 무료🔥 딱 한 달만에
+                    최신 '반도체 실무 스킬' 쌓는 법!
+                    <반도체 실무 온라인 실습과정 : 소자+핵심공정> 강의
+                    """)
+                .imageUrl("“https://images/urls/1”")
+                .build()
+        );
+
+        // when, then
+        mockMvc.perform(get("/api/v2/competitions/{competitionId}", 1L))
+            .andExpect(status().isOk())
+            .andDo(document("competition-get",
+                preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("competitionId").description("공모전 식별자").optional()),
+                responseFields(
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
+                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER)
+                        .description("공모전 식별자"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING)
+                        .description("공모전 제목"),
+                    fieldWithPath("data.organization").type(JsonFieldType.STRING)
+                        .description("공모전 주최"),
+                    fieldWithPath("data.corporateType").type(JsonFieldType.STRING)
+                        .description("공모전 주최 기업 형태"),
+                    fieldWithPath("data.participate").type(JsonFieldType.STRING)
+                        .description("공모전 참여 대상"),
+                    fieldWithPath("data.awardScale").type(JsonFieldType.STRING)
+                        .description("공모전 시상 규모"),
+                    fieldWithPath("data.startDate").type(JsonFieldType.STRING)
+                        .description("공모전 접수 시작일"),
+                    fieldWithPath("data.endDate").type(JsonFieldType.STRING)
+                        .description("공모전 접수 마감일"),
+                    fieldWithPath("data.homepageUrl").type(JsonFieldType.STRING)
+                        .description("공모전 홈페이지 URL"),
+                    fieldWithPath("data.activityBenefit").type(JsonFieldType.STRING)
+                        .description("공모전 활동 혜택"),
+                    fieldWithPath("data.bonusBenefit").type(JsonFieldType.STRING)
+                        .description("공모전 추가 혜택"),
+                    fieldWithPath("data.description").type(JsonFieldType.STRING)
+                        .description("공모전 상세 내용"),
+                    fieldWithPath("data.imageUrl").type(JsonFieldType.STRING)
+                        .description("공모전 이미지 URL"))));
     }
 }
