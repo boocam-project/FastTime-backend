@@ -2,7 +2,9 @@ package com.fasttime.domain.reference.service;
 
 import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
+import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
 import com.fasttime.domain.reference.repository.ActivityRepository;
+import com.fasttime.domain.reference.repository.CompetitionRepository;
 import com.fasttime.domain.reference.service.usecase.ReferenceServiceUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,8 @@ public class ReferenceService implements ReferenceServiceUseCase {
 
     private final ActivityRepository activityRepository;
 
+    private final CompetitionRepository competitionRepository;
+
     @Override
     @Transactional(readOnly = true)
     public ActivityPageResponseDto searchActivities(
@@ -22,6 +26,15 @@ public class ReferenceService implements ReferenceServiceUseCase {
         Pageable pageable
     ) {
         return ActivityPageResponseDto.of(activityRepository.findAllBySearchConditions(
+            searchRequestDto,
+            pageable
+        ));
+    }
+
+    @Override
+    public CompetitionPageResponseDto searchCompetitions(ReferenceSearchRequestDto searchRequestDto,
+        Pageable pageable) {
+        return CompetitionPageResponseDto.of(competitionRepository.findAllBySearchConditions(
             searchRequestDto,
             pageable
         ));
