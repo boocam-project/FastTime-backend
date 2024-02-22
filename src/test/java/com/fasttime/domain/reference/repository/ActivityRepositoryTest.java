@@ -2,6 +2,7 @@ package com.fasttime.domain.reference.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasttime.domain.reference.dto.request.ReferencePageRequestDto;
 import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.entity.Activity;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
@@ -10,7 +11,6 @@ import com.fasttime.global.config.QueryDslTestConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -94,18 +94,23 @@ public class ActivityRepositoryTest {
                 .imageUrl("https://activities/2/images/2")
                 .status(RecruitmentStatus.DURING)
                 .build());
-            ReferenceSearchRequestDto request = ReferenceSearchRequestDto.builder()
+            ReferenceSearchRequestDto referenceSearchRequestDto = ReferenceSearchRequestDto.builder()
                 .keyword(null)
                 .before(true)
                 .during(true)
                 .closed(true)
+                .build();
+            ReferencePageRequestDto referencePageRequestDto = ReferencePageRequestDto.builder()
                 .orderBy(null)
                 .page(0)
                 .pageSize(10)
                 .build();
 
             // when
-            Page<Activity> result = activityRepository.findAllBySearchConditions(request);
+            Page<Activity> result = activityRepository.findAllBySearchConditions(
+                referenceSearchRequestDto,
+                referencePageRequestDto.toPageable()
+            );
 
             // then
             assertThat(result.getTotalPages()).isEqualTo(1);
