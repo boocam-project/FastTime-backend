@@ -8,6 +8,7 @@ import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
 import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
+import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.exception.ReviewAlreadyExistsException;
 import com.fasttime.domain.review.exception.ReviewNotFoundException;
 import com.fasttime.domain.review.exception.TagNotFoundException;
@@ -227,12 +228,12 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
     }
 
     @Nested
-    @DisplayName("리뷰 조회는")
-    class Describe_get_all_Review {
+    @DisplayName("getReviews()는")
+    class Describe_getReview {
 
         @Test
-        @DisplayName("getReviews()를 성공한다.")
-        void all_willSuccess() throws Exception {
+        @DisplayName("부트캠프 필터링 없이 모든 리뷰를 조회한다.")
+        void withoutBootcampFilter_willSuccess() throws Exception {
             // given
             List<ReviewResponseDTO> reviews = Arrays.asList(
                 new ReviewResponseDTO(1L, "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
@@ -241,10 +242,10 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
                     "리뷰 내용2")
             );
 
-            when(reviewService.getSortedReviews(anyString())).thenReturn(reviews);
+            when(reviewService.getSortedReviews(anyString(), isNull())).thenReturn(reviews);
 
             // when, then
-            mockMvc.perform(get("/api/v2/reviews/all"))
+            mockMvc.perform(get("/api/v2/reviews"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].id").value(reviews.get(0).id()))
@@ -260,22 +261,24 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
         }
 
         @Test
-        @DisplayName("getReviewsByBootcamp()를 성공한다.")
-        void bootcamp_willSuccess() throws Exception {
+        @DisplayName("부트캠프 필터링으로 특정 부트캠프의 리뷰를 조회한다.")
+        void withBootcampFilter_willSuccess() throws Exception {
             // given
-            String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
             List<ReviewResponseDTO> reviews = Arrays.asList(
-                new ReviewResponseDTO(1L, bootcampName, "리뷰1", Set.of("긍정적 태그1"), Set.of("부정적 태그1"),
-                    5, "리뷰 내용1"),
-                new ReviewResponseDTO(2L, bootcampName, "리뷰2", Set.of("긍정적 태그2"), Set.of("부정적 태그2"),
-                    4, "리뷰 내용2")
+                new ReviewResponseDTO(1L, "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
+                    "리뷰 내용1"),
+                new ReviewResponseDTO(2L, "부트캠프1", "리뷰2", Set.of("긍정 태그2"), Set.of("부정 태그2"), 4,
+                    "리뷰 내용2")
             );
 
-            when(reviewService.getReviewsByBootcamp(eq(bootcampName), anyString())).thenReturn(
-                reviews);
+            String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
+
+            when(reviewService.getSortedReviews(eq("rating"), eq(bootcampName)))
+                .thenReturn(reviews);
 
             // when, then
-            mockMvc.perform(get("/api/v2/reviews/by-bootcamp")
+            mockMvc.perform(get("/api/v2/reviews")
+                    .param("sortBy", "rating")
                     .param("bootcamp", bootcampName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
@@ -290,35 +293,51 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
                 .andExpect(jsonPath("$.data[1].rating").value(reviews.get(1).rating()))
                 .andExpect(jsonPath("$.data[1].content").value(reviews.get(1).content()));
         }
+    }
 
-        @Test
-        @DisplayName("getBootcampReviewSummaries()를 성공한다.")
-        void bootcampSummary_willSuccess() throws Exception {
-            // given
-            List<BootcampReviewSummaryDTO> summaries = Arrays.asList(
-                new BootcampReviewSummaryDTO("패스트캠퍼스X야놀자 부트캠프", 4.5, 10, 20,
-                    Map.of(1L, 5L, 2L, 5L)),
-                new BootcampReviewSummaryDTO("다른 부트캠프", 3.5, 8, 15, Map.of(3L, 4L, 4L, 4L))
-            );
+    @Test
+    @DisplayName("getBootcampReviewSummaries()를 성공한다.")
+    void bootcampSummary_willSuccess() throws Exception {
+        // given
+        List<BootcampReviewSummaryDTO> summaries = Arrays.asList(
+            new BootcampReviewSummaryDTO("패스트캠퍼스X야놀자 부트캠프", 4.5, 10),
+            new BootcampReviewSummaryDTO("다른 부트캠프", 3.5, 8
+            ));
 
-            when(reviewService.getBootcampReviewSummaries()).thenReturn(summaries);
+        when(reviewService.getBootcampReviewSummaries()).thenReturn(summaries);
 
-            // when, then
-            mockMvc.perform(get("/api/v2/reviews/by-bootcamp/summary"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].bootcamp").value(summaries.get(0).bootcamp()))
-                .andExpect(
-                    jsonPath("$.data[0].averageRating").value(summaries.get(0).averageRating()))
-                .andExpect(
-                    jsonPath("$.data[0].totalReviews").value(summaries.get(0).totalReviews()))
-                .andExpect(jsonPath("$.data[0].totalTags").value(summaries.get(0).totalTags()))
-                .andExpect(jsonPath("$.data[1].bootcamp").value(summaries.get(1).bootcamp()))
-                .andExpect(
-                    jsonPath("$.data[1].averageRating").value(summaries.get(1).averageRating()))
-                .andExpect(
-                    jsonPath("$.data[1].totalReviews").value(summaries.get(1).totalReviews()))
-                .andExpect(jsonPath("$.data[1].totalTags").value(summaries.get(1).totalTags()));
-        }
+        // when, then
+        mockMvc.perform(get("/api/v2/reviews/summary"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data[0].bootcamp").value(summaries.get(0).bootcamp()))
+            .andExpect(
+                jsonPath("$.data[0].averageRating").value(summaries.get(0).averageRating()))
+            .andExpect(
+                jsonPath("$.data[0].totalReviews").value(summaries.get(0).totalReviews()))
+            .andExpect(jsonPath("$.data[1].bootcamp").value(summaries.get(1).bootcamp()))
+            .andExpect(
+                jsonPath("$.data[1].averageRating").value(summaries.get(1).averageRating()))
+            .andExpect(
+                jsonPath("$.data[1].totalReviews").value(summaries.get(1).totalReviews()));
+
+    }
+
+    @Test
+    @DisplayName("getTagCountsByBootcamp()를 성공한다.")
+    void TagCounts_willSuccess() throws Exception {
+        // given
+        TagSummaryDTO tagSummary = new TagSummaryDTO(10, Map.of(1L, 5L, 2L, 5L));
+        String bootcampName = "패스트캠퍼스X야놀자 부트캠프";
+
+        when(reviewService.getBootcampTagData(eq(bootcampName))).thenReturn(tagSummary);
+
+        // when, then
+        mockMvc.perform(get("/api/v2/reviews/tag-graph")
+                .queryParam("bootcamp", bootcampName))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.totalTags").value(tagSummary.totalTags()))
+            .andExpect(jsonPath("$.data.tagCounts['1']").value(5))
+            .andExpect(jsonPath("$.data.tagCounts['2']").value(5));
     }
 }
