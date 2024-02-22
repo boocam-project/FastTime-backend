@@ -5,6 +5,7 @@ import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
 import com.fasttime.domain.reference.dto.response.ActivityResponseDto;
 import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
+import com.fasttime.domain.reference.dto.response.CompetitionResponseDto;
 import com.fasttime.domain.reference.service.usecase.ReferenceServiceUseCase;
 import com.fasttime.global.util.ResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -82,12 +83,23 @@ public class ReferenceController {
     }
 
     @GetMapping("/activities/{activityId}")
-    public ResponseEntity<ResponseDTO<ActivityResponseDto>> searchActivities(
-        @PathVariable(name = "activityId") int activityId) {
+    public ResponseEntity<ResponseDTO<ActivityResponseDto>> getActivity(
+        @PathVariable(name = "activityId") long activityId) {
         return ResponseEntity.status(HttpStatus.OK).body(
             ResponseDTO.res(HttpStatus.OK,
                 "대외활동 상세 정보를 성공적으로 조회했습니다.",
                 referenceServiceUseCase.getActivity(activityId)
+            )
+        );
+    }
+
+    @GetMapping("/competitions/{competitionId}")
+    public ResponseEntity<ResponseDTO<CompetitionResponseDto>> getCompetition(
+        @PathVariable(name = "competitionId") long competitionId) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+            ResponseDTO.res(HttpStatus.OK,
+                "공모전 상세 정보를 성공적으로 조회했습니다.",
+                referenceServiceUseCase.getCompetition(competitionId)
             )
         );
     }
