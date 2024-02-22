@@ -4,7 +4,7 @@ CREATE TABLE competition
     title            VARCHAR(255) NOT NULL,
     organization     VARCHAR(255) NOT NULL,
     corporate_type   VARCHAR(255) NOT NULL,
-    participate      INT          NOT NULL,
+    participate      VARCHAR(255) NOT NULL,
     award_scale      VARCHAR(255) NOT NULL,
     start_date       VARCHAR(255) NOT NULL,
     end_date         VARCHAR(255) NOT NULL,
@@ -14,5 +14,6 @@ CREATE TABLE competition
     bonus_benefit    VARCHAR(255) NOT NULL,
     description      TEXT(1000) NOT NULL,
     image_url        VARCHAR(255) NOT NULL,
-    status           VARCHAR(255) NOT NULL
+    status           VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_competition PRIMARY KEY (id)
 );
