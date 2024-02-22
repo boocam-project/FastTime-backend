@@ -1,0 +1,58 @@
+= Reference(Activity/Competition) REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+[[Activities-Search]]
+== 대외활동 목록 조회
+
+=== HttpRequest
+
+include::{snippets}/activities-search/http-request.adoc[]
+include::{snippets}/activities-search/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/activities-search/http-response.adoc[]
+include::{snippets}/activities-search/response-fields.adoc[]
+
+[[Competitions-Search]]
+== 공모전 목록 조회
+
+=== HttpRequest
+
+include::{snippets}/competitions-search/http-request.adoc[]
+include::{snippets}/competitions-search/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/competitions-search/http-response.adoc[]
+include::{snippets}/competitions-search/response-fields.adoc[]
+
+[[Activity-Get]]
+== 대외활동 상세 조회
+
+=== HttpRequest
+
+include::{snippets}/activity-get/http-request.adoc[]
+include::{snippets}/activity-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/activity-get/http-response.adoc[]
+include::{snippets}/activity-get/response-fields.adoc[]
+
+[[Competition-Get]]
+== 공모전 상세 조회
+
+=== HttpRequest
+
+include::{snippets}/competition-get/http-request.adoc[]
+include::{snippets}/competition-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/competition-get/http-response.adoc[]
+include::{snippets}/competition-get/response-fields.adoc[]
