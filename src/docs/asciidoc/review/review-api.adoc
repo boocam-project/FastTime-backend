@@ -31,6 +31,7 @@ include::{snippets}/review-create/response-fields.adoc[]
 === HttpRequest
 
 include::{snippets}/review-delete/http-request.adoc[]
+include::{snippets}/review-delete/path-parameters.adoc[]
 
 === HttpResponse
 
@@ -47,6 +48,7 @@ include::{snippets}/review-delete/response-fields.adoc[]
 
 include::{snippets}/review-update/http-request.adoc[]
 include::{snippets}/review-update/request-fields.adoc[]
+include::{snippets}/review-update/path-parameters.adoc[]
 
 === HttpResponse
 
@@ -54,15 +56,16 @@ include::{snippets}/review-update/http-response.adoc[]
 include::{snippets}/review-update/response-fields.adoc[]
 
 [[Review-Get-All]]
-== 전체 리뷰 조회
+== 리뷰 전체 조회
 
 전체 리뷰를 조회하는 API 입니다.
 
-* sortBy로 최신순, 별점순 정렬 가능 (createdAt  /  rating)
+* sortBy 값이 없으면 createdAt(최신순) 기준으로 정렬됩니다.
 
 === HttpRequest
 
 include::{snippets}/reviews-get-all/http-request.adoc[]
+include::{snippets}/reviews-get-all/query-parameters.adoc[]
 
 === HttpResponse
 
@@ -74,11 +77,12 @@ include::{snippets}/reviews-get-all/response-fields.adoc[]
 
 부트캠프별 리뷰를 조회하는 API 입니다.
 
-* sortBy로 최신순, 별점순 정렬 가능 (createdAt  /  rating)
+* sortBy 값이 없으면 createdAt(최신순) 기준으로 정렬됩니다.
 
 === HttpRequest
 
 include::{snippets}/reviews-get-bootcamp/http-request.adoc[]
+include::{snippets}/reviews-get-bootcamp/query-parameters.adoc[]
 
 === HttpResponse
 
@@ -88,7 +92,7 @@ include::{snippets}/reviews-get-bootcamp/response-fields.adoc[]
 [[Review-Get-Summary]]
 == 부트캠프별 리뷰 요약
 
-부트캠프별 리뷰를 요악하는 API 입니다.
+부트캠프별 요악을 조회하는 API 입니다.
 
 === HttpRequest
 
@@ -99,6 +103,20 @@ include::{snippets}/reviews-get-summary/http-request.adoc[]
 include::{snippets}/reviews-get-summary/http-response.adoc[]
 include::{snippets}/reviews-get-summary/response-fields.adoc[]
 
+[[Review-Get-TagGraph]]
+== 부트캠프별 태그 그래프
+
+부트캠프별 태그 그래프를 조회하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/reviews-get-tag-graph/http-request.adoc[]
+include::{snippets}/reviews-get-tag-graph/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/reviews-get-tag-graph/http-response.adoc[]
+include::{snippets}/reviews-get-tag-graph/response-fields.adoc[]
 
 
 
