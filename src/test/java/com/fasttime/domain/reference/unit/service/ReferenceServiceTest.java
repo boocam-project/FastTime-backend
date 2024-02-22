@@ -1,4 +1,4 @@
-package com.fasttime.domain.reference.service;
+package com.fasttime.domain.reference.unit.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +10,7 @@ import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
 import com.fasttime.domain.reference.entity.Activity;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
 import com.fasttime.domain.reference.repository.ActivityRepository;
+import com.fasttime.domain.reference.service.ReferenceService;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

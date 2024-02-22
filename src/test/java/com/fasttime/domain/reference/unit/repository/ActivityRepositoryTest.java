@@ -1,4 +1,4 @@
-package com.fasttime.domain.reference.repository;
+package com.fasttime.domain.reference.unit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,7 @@ import com.fasttime.domain.reference.dto.request.ReferencePageRequestDto;
 import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.entity.Activity;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
+import com.fasttime.domain.reference.repository.ActivityRepository;
 import com.fasttime.global.config.JpaTestConfig;
 import com.fasttime.global.config.QueryDslTestConfig;
 import jakarta.persistence.EntityManager;
