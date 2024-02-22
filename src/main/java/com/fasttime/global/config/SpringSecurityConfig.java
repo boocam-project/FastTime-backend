@@ -61,7 +61,7 @@ public class SpringSecurityConfig {
             .authorizeHttpRequests(requests -> requests
                 .requestMatchers(PERMIT_URL_ARRAY).permitAll()
                 .requestMatchers(GRAFANA_WHITE_LIST).permitAll()
-                .requestMatchers(HttpMethod.GET, "api/v1/article", "api/v2/articles").permitAll()
+                .requestMatchers(HttpMethod.GET, "api/v1/article", "api/v2/articles", "api/v2/reviews/**").permitAll()
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .anyRequest().authenticated())

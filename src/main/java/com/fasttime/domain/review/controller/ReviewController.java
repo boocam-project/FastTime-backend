@@ -1,19 +1,24 @@
 package com.fasttime.domain.review.controller;
 
 import com.fasttime.domain.review.dto.request.ReviewRequestDTO;
+import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.dto.response.ReviewResponseDTO;
+import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -53,5 +58,28 @@ public class ReviewController {
             requestDTO, memberId);
         return ResponseEntity.ok(
             ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, responseDTO));
+    }
+
+    @GetMapping
+    public ResponseEntity<ResponseDTO<List<ReviewResponseDTO>>> getReviews(
+        @RequestParam(required = false) String bootcamp,
+        @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
+
+        List<ReviewResponseDTO> reviews = reviewService.getSortedReviews(sortBy, bootcamp);
+
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<ResponseDTO<List<BootcampReviewSummaryDTO>>> getBootcampReviewSummaries() {
+        List<BootcampReviewSummaryDTO> summaries = reviewService.getBootcampReviewSummaries();
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, summaries));
+    }
+
+    @GetMapping("/tag-graph")
+    public ResponseEntity<ResponseDTO<TagSummaryDTO>> getTagCountsByBootcamp(
+        @RequestParam String bootcamp) {
+        TagSummaryDTO tagData = reviewService.getBootcampTagData(bootcamp);
+        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, tagData));
     }
 }

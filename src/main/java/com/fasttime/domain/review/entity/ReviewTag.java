@@ -27,5 +27,4 @@ public class ReviewTag {
     @ManyToOne
     @JoinColumn(name = "tag_id")
     private Tag tag;
-
 }
