@@ -11,4 +11,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long>, Activ
     List<Activity> findAllByStatus(RecruitmentStatus status);
 
     Optional<Activity> findByTitle(String title);
+
+    Boolean existsByTitle(String title);
 }

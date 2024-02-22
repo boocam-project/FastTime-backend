@@ -50,7 +50,7 @@ public class Activity {
 
     private String bonusBenefit;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT",length = 1000)
     private String description;
 
     private String imageUrl;
