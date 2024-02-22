@@ -131,7 +131,7 @@ public class ReferenceServiceTest {
             // then
             assertThat(result.totalPages()).isEqualTo(1);
             assertThat(result.isLastPage()).isEqualTo(true);
-            assertThat(result.totalActivity()).isEqualTo(2);
+            assertThat(result.totalActivities()).isEqualTo(2);
             assertThat(result.activities().size()).isEqualTo(2);
         }
     }
@@ -209,7 +209,7 @@ public class ReferenceServiceTest {
             // then
             assertThat(result.totalPages()).isEqualTo(1);
             assertThat(result.isLastPage()).isEqualTo(true);
-            assertThat(result.totalActivity()).isEqualTo(2);
+            assertThat(result.totalCompetitions()).isEqualTo(2);
             assertThat(result.competitions().size()).isEqualTo(2);
         }
     }
