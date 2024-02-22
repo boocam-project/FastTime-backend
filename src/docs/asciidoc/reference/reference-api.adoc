@@ -43,3 +43,16 @@ include::{snippets}/activity-get/path-parameters.adoc[]
 
 include::{snippets}/activity-get/http-response.adoc[]
 include::{snippets}/activity-get/response-fields.adoc[]
+
+[[Competition-Get]]
+== 공모전 상세 조회
+
+=== HttpRequest
+
+include::{snippets}/competition-get/http-request.adoc[]
+include::{snippets}/competition-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/competition-get/http-response.adoc[]
+include::{snippets}/competition-get/response-fields.adoc[]
