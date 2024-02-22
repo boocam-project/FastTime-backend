@@ -1,7 +1,7 @@
 ifndef::snippets[]
 :snippets: ../../build/generated-snippets
 endif::[]
-= FastTime API 문서
+= Boocam API 문서
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -17,6 +17,7 @@ endif::[]
 === link:admin/admin-api.html[어드민 API, window=blank]
 === link:report/report-api.html[신고 API, window=blank]
 === link:member_article_like/memberArticleLike-api.html[좋아요/싫어요 API, window=blank]
+=== link:review/review-api.html[리뷰 API, window=blank]
 === link:reference/reference-api.html[대외활동/공모전 API, window=blank]
 
 == API Common Response

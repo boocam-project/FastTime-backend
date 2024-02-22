@@ -1,0 +1,124 @@
+= Review REST API Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+
+[[Review-Create]]
+== 리뷰 작성
+
+리뷰 작성 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/review-create/http-request.adoc[]
+include::{snippets}/review-create/request-fields.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/review-create/http-response.adoc[]
+include::{snippets}/review-create/response-fields.adoc[]
+
+[[Review-Delete]]
+== 리뷰 삭제
+
+리뷰 삭제 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/review-delete/http-request.adoc[]
+include::{snippets}/review-delete/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/review-delete/http-response.adoc[]
+include::{snippets}/review-delete/response-fields.adoc[]
+
+[[Review-Update]]
+== 리뷰 수정
+
+리뷰 수정 API 입니다.
+
+
+=== HttpRequest
+
+include::{snippets}/review-update/http-request.adoc[]
+include::{snippets}/review-update/request-fields.adoc[]
+include::{snippets}/review-update/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/review-update/http-response.adoc[]
+include::{snippets}/review-update/response-fields.adoc[]
+
+[[Review-Get-All]]
+== 리뷰 전체 조회
+
+전체 리뷰를 조회하는 API 입니다.
+
+* sortBy 값이 없으면 createdAt(최신순) 기준으로 정렬됩니다.
+
+=== HttpRequest
+
+include::{snippets}/reviews-get-all/http-request.adoc[]
+include::{snippets}/reviews-get-all/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/reviews-get-all/http-response.adoc[]
+include::{snippets}/reviews-get-all/response-fields.adoc[]
+
+[[Review-Get-BootCamp]]
+== 부트캠프별 리뷰 조회
+
+부트캠프별 리뷰를 조회하는 API 입니다.
+
+* sortBy 값이 없으면 createdAt(최신순) 기준으로 정렬됩니다.
+
+=== HttpRequest
+
+include::{snippets}/reviews-get-bootcamp/http-request.adoc[]
+include::{snippets}/reviews-get-bootcamp/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/reviews-get-bootcamp/http-response.adoc[]
+include::{snippets}/reviews-get-bootcamp/response-fields.adoc[]
+
+[[Review-Get-Summary]]
+== 부트캠프별 리뷰 요약
+
+부트캠프별 요악을 조회하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/reviews-get-summary/http-request.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/reviews-get-summary/http-response.adoc[]
+include::{snippets}/reviews-get-summary/response-fields.adoc[]
+
+[[Review-Get-TagGraph]]
+== 부트캠프별 태그 그래프
+
+부트캠프별 태그 그래프를 조회하는 API 입니다.
+
+=== HttpRequest
+
+include::{snippets}/reviews-get-tag-graph/http-request.adoc[]
+include::{snippets}/reviews-get-tag-graph/query-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/reviews-get-tag-graph/http-response.adoc[]
+include::{snippets}/reviews-get-tag-graph/response-fields.adoc[]
+
+
+
+
+

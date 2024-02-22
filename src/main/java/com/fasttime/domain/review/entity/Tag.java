@@ -25,6 +25,8 @@ public class Tag {
 
     private String content;
 
+    private boolean isGoodTag;
+
     public static Tag create(String content) {
         return new Tag(content);
     }
