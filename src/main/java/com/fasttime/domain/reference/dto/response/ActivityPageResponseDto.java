@@ -1,6 +1,7 @@
 package com.fasttime.domain.reference.dto.response;
 
 import com.fasttime.domain.reference.entity.Activity;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import org.springframework.data.domain.Page;
@@ -10,15 +11,19 @@ public record ActivityPageResponseDto(
     int totalPages,
     Boolean isLastPage,
     long totalActivity,
-    List<Activity> activities
+    List<ReferenceResponseDto> activities
 ) {
 
     public static ActivityPageResponseDto of(Page<Activity> activityPage) {
+        List<ReferenceResponseDto> activities = new ArrayList<>();
+        for(Activity activity : activityPage.getContent()) {
+            activities.add(ReferenceResponseDto.of(activity));
+        }
         return ActivityPageResponseDto.builder()
             .totalPages(activityPage.getTotalPages())
             .isLastPage(activityPage.isLast())
             .totalActivity(activityPage.getTotalElements())
-            .activities(activityPage.getContent())
+            .activities(activities)
             .build();
     }
 }
