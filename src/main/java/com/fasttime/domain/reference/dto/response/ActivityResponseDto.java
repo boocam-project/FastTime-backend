@@ -18,6 +18,7 @@ public record ActivityResponseDto(
     String area,
     String preferredSkill,
     String homepageUrl,
+    String field,
     String activityBenefit,
     String bonusBenefit,
     String description,
@@ -38,6 +39,7 @@ public record ActivityResponseDto(
             .area(activity.getArea())
             .preferredSkill(activity.getPreferredSkill())
             .homepageUrl(activity.getHomepageUrl())
+            .field(activity.getField())
             .activityBenefit(activity.getActivityBenefit())
             .bonusBenefit(activity.getBonusBenefit())
             .description(activity.getDescription())
