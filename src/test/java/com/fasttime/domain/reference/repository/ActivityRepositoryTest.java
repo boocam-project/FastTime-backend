@@ -68,7 +68,7 @@ public class ActivityRepositoryTest {
                 .status(RecruitmentStatus.CLOSED)
                 .build());
             activityRepository.save(Activity.builder()
-                .id(1L)
+                .id(2L)
                 .title("풀스택 IT 대외활동")
                 .organization("대외활동 협회")
                 .corporateType("기타")
@@ -117,8 +117,8 @@ public class ActivityRepositoryTest {
             assertThat(result.isLast()).isEqualTo(true);
             assertThat(result.getTotalElements()).isEqualTo(2);
             assertThat(result.getContent().size()).isEqualTo(2);
-            assertThat(result.getContent().get(1).getId()).isEqualTo(1L);
-            assertThat(result.getContent().get(1).getId()).isEqualTo(1L);
+            assertThat(result.getContent().get(0).getId()).isEqualTo(1L);
+            assertThat(result.getContent().get(1).getId()).isEqualTo(2L);
         }
     }
 
