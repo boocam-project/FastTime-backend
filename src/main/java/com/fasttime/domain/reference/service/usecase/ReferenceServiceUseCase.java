@@ -2,6 +2,7 @@ package com.fasttime.domain.reference.service.usecase;
 
 import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
+import com.fasttime.domain.reference.dto.response.ActivityResponseDto;
 import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,6 @@ public interface ReferenceServiceUseCase {
         ReferenceSearchRequestDto searchRequestDto,
         Pageable pageable
     );
+
+    ActivityResponseDto getActivity(long activityId);
 }
