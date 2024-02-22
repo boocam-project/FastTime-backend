@@ -5,7 +5,7 @@ CREATE TABLE activity
     organization     VARCHAR(255) NOT NULL,
     corporate_type   VARCHAR(255) NOT NULL,
     participate      VARCHAR(255) NOT NULL,
-    start_date       VARCHAR(255) NOT NULL,
+    start_date       DATE         NOT NULL,
     end_date         VARCHAR(255) NOT NULL,
     `period`         VARCHAR(255) NOT NULL,
     recruitment      INT          NOT NULL,
@@ -17,6 +17,6 @@ CREATE TABLE activity
     bonus_benefit    VARCHAR(255) NOT NULL,
     description      TEXT(1000) NOT NULL,
     image_url        VARCHAR(255) NOT NULL,
-    status           VARCHAR(255) NOT NULL,
+    status           enum ('before','during','closed') NOT NULL,
     CONSTRAINT pk_activity PRIMARY KEY (id)
 );

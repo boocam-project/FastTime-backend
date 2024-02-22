@@ -6,7 +6,7 @@ CREATE TABLE competition
     corporate_type   VARCHAR(255) NOT NULL,
     participate      VARCHAR(255) NOT NULL,
     award_scale      VARCHAR(255) NOT NULL,
-    start_date       VARCHAR(255) NOT NULL,
+    start_date       DATE         NOT NULL,
     end_date         VARCHAR(255) NOT NULL,
     homepage_url     VARCHAR(255) NOT NULL,
     field            VARCHAR(255) NOT NULL,
@@ -14,6 +14,6 @@ CREATE TABLE competition
     bonus_benefit    VARCHAR(255) NOT NULL,
     description      TEXT(1000) NOT NULL,
     image_url        VARCHAR(255) NOT NULL,
-    status           VARCHAR(255) NOT NULL,
+    status           enum ('before','during','closed') NOT NULL,
     CONSTRAINT pk_competition PRIMARY KEY (id)
 );
