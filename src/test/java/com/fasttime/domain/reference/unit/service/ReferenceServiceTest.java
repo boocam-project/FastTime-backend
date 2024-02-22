@@ -9,6 +9,7 @@ import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.dto.response.ActivityPageResponseDto;
 import com.fasttime.domain.reference.dto.response.ActivityResponseDto;
 import com.fasttime.domain.reference.dto.response.CompetitionPageResponseDto;
+import com.fasttime.domain.reference.dto.response.CompetitionResponseDto;
 import com.fasttime.domain.reference.entity.Activity;
 import com.fasttime.domain.reference.entity.Competition;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
@@ -225,36 +226,74 @@ public class ReferenceServiceTest {
         void _willSuccess() {
             // given
             Activity activity = Activity.builder()
-                    .id(1L)
-                    .title("핀테크 IT 대외활동")
-                    .organization("대외활동 협회")
-                    .corporateType("기타")
-                    .participate("대상 제한 없음")
-                    .startDate(LocalDate.of(2024, 1, 1))
-                    .endDate("24.1.31")
-                    .period("24.2.7 ~ 24.8.4")
-                    .recruitment(20)
-                    .area("지역 제한없음")
-                    .preferredSkill("기타")
-                    .homepageUrl("https://activities/1")
-                    .field("기타, 멘토링")
-                    .activityBenefit("활동비, 실무 교육")
-                    .bonusBenefit("취업연계기회 제공")
-                    .description("""
-                        [채용연계형] 핀테크 개발자 양성과정 훈련생 모집 中
-                                                
-                        ▣ 채용연계형_K-Digital Training 훈련생 모집
-                        ▣ 고용노동부 인증 우수 교육기관
-                        ▣ K-DIGITAL TRAINING▣ 비전공자 맞춤 커리큘럼
-                        ▣ 취업연계를 통한 성공적인 24년 취업 지원""")
-                    .imageUrl("https://activities/1/images/1")
-                    .status(RecruitmentStatus.CLOSED)
-                    .build();
+                .id(1L)
+                .title("핀테크 IT 대외활동")
+                .organization("대외활동 협회")
+                .corporateType("기타")
+                .participate("대상 제한 없음")
+                .startDate(LocalDate.of(2024, 1, 1))
+                .endDate("24.1.31")
+                .period("24.2.7 ~ 24.8.4")
+                .recruitment(20)
+                .area("지역 제한없음")
+                .preferredSkill("기타")
+                .homepageUrl("https://activities/1")
+                .field("기타, 멘토링")
+                .activityBenefit("활동비, 실무 교육")
+                .bonusBenefit("취업연계기회 제공")
+                .description("""
+                    [채용연계형] 핀테크 개발자 양성과정 훈련생 모집 中
+                                            
+                    ▣ 채용연계형_K-Digital Training 훈련생 모집
+                    ▣ 고용노동부 인증 우수 교육기관
+                    ▣ K-DIGITAL TRAINING▣ 비전공자 맞춤 커리큘럼
+                    ▣ 취업연계를 통한 성공적인 24년 취업 지원""")
+                .imageUrl("https://activities/1/images/1")
+                .status(RecruitmentStatus.CLOSED)
+                .build();
 
             given(activityRepository.findById(any(Long.TYPE))).willReturn(Optional.of(activity));
 
             // when
             ActivityResponseDto result = referenceService.getActivity(1L);
+
+            // then
+            assertThat(result.id()).isEqualTo(1L);
+        }
+    }
+
+    @Nested
+    @DisplayName("getCompetition()은")
+    class Context_getCompetition {
+
+        @Test
+        @DisplayName("공모전 상세 정보를 조회할 수 있다.")
+        void _willSuccess() {
+            // given
+            Competition competition = Competition.builder()
+                .id(1L)
+                .title("핀테크 IT 공모전")
+                .organization("공모전 협회")
+                .corporateType("기타")
+                .participate("대상 제한 없음")
+                .awardScale("450만 원")
+                .startDate(LocalDate.of(2024, 1, 1))
+                .endDate("24.1.31")
+                .homepageUrl("https://competitions/1")
+                .activityBenefit("기타")
+                .bonusBenefit("-")
+                .description("""
+                    [공모개요] '핀테크 공모전'을 개최하오니 많은 관심과 참여 부탁드립니다.
+                    """)
+                .imageUrl("https://competitions/1/images/1")
+                .status(RecruitmentStatus.CLOSED)
+                .build();
+
+            given(competitionRepository.findById(any(Long.TYPE)))
+                .willReturn(Optional.of(competition));
+
+            // when
+            CompetitionResponseDto result = referenceService.getCompetition(1L);
 
             // then
             assertThat(result.id()).isEqualTo(1L);
