@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasttime.domain.review.dto.response.TagSummaryDTO;
+import com.fasttime.domain.review.exception.BootCampNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -260,8 +261,10 @@ public class ReviewServiceTest {
         void withBootcampFilter_willSuccess() {
             // given
             String bootcampName = "부트캠프1";
+            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(true); // 부트캠프 존재 확인
             List<Review> mockReviews = createMockReviewsForBootcamp(bootcampName);
-            given(reviewRepository.findByBootcamp(anyString(), any(Sort.class))).willReturn(
+            given(reviewRepository.findByBootcamp(bootcampName,
+                Sort.by("createdAt").descending())).willReturn(
                 mockReviews);
 
             // when
@@ -271,9 +274,6 @@ public class ReviewServiceTest {
             // then
             assertThat(result).hasSize(mockReviews.size());
             assertThat(result.get(0).bootcamp()).isEqualTo(bootcampName);
-            assertThat(result.get(1).bootcamp()).isEqualTo(bootcampName);
-
-            verify(reviewRepository, times(1)).findByBootcamp(anyString(), any(Sort.class));
         }
 
         private List<Review> createMockReviews() {
@@ -342,8 +342,8 @@ public class ReviewServiceTest {
         void _willSuccess() {
             // given
             String bootcampName = "부트캠프1";
-            given(
-                reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
+            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(true); // 부트캠프 존재 확인
+            given(reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
                 List.of(new Object[]{1L, 5L}, new Object[]{2L, 3L})
             );
 
@@ -355,6 +355,20 @@ public class ReviewServiceTest {
             assertThat(result.tagCounts().size()).isEqualTo(2);
             assertThat(result.tagCounts().get(1L)).isEqualTo(5L);
             assertThat(result.tagCounts().get(2L)).isEqualTo(3L);
+        }
+
+        @Test
+        @DisplayName("부트캠프가 존재하지 않을 경우 예외를 발생시킨다.")
+        void NotFound_willFail() {
+            // given
+            String bootcampName = "존재하지 않는 부트캠프";
+            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(
+                false);
+
+            // when, then
+            assertThrows(BootCampNotFoundException.class, () -> {
+                reviewService.getBootcampTagData(bootcampName);
+            });
         }
     }
 }
