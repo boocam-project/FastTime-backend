@@ -48,7 +48,7 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
         )).willReturn(ActivityPageResponseDto.builder()
             .totalPages(1)
             .isLastPage(true)
-            .totalActivity(2)
+            .totalActivities(2)
             .activities(List.of(
                     ReferenceResponseDto.builder()
                         .id(1L)
@@ -111,7 +111,7 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
         )).willReturn(CompetitionPageResponseDto.builder()
             .totalPages(1)
             .isLastPage(true)
-            .totalActivity(2)
+            .totalCompetitions(2)
             .competitions(List.of(
                     ReferenceResponseDto.builder()
                         .id(1L)
