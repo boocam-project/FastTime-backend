@@ -30,3 +30,16 @@ include::{snippets}/competitions-search/query-parameters.adoc[]
 
 include::{snippets}/competitions-search/http-response.adoc[]
 include::{snippets}/competitions-search/response-fields.adoc[]
+
+[[Activity-Get]]
+== 대외활동 상세 조회
+
+=== HttpRequest
+
+include::{snippets}/activity-get/http-request.adoc[]
+include::{snippets}/activity-get/path-parameters.adoc[]
+
+=== HttpResponse
+
+include::{snippets}/activity-get/http-response.adoc[]
+include::{snippets}/activity-get/response-fields.adoc[]
