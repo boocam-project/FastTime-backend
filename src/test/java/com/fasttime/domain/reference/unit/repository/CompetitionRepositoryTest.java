@@ -40,7 +40,7 @@ public class CompetitionRepositoryTest {
     class Context_findAllBySearchConditions {
 
         @Test
-        @DisplayName("공모전을 조회할 수 있다.")
+        @DisplayName("공모전 목록을 조회할 수 있다.")
         void _willSuccess() {
             // given
             competitionRepository.save(Competition.builder()
@@ -92,7 +92,7 @@ public class CompetitionRepositoryTest {
                 .build();
 
             // when
-            Page<Activity> result = competitionRepository.findAllBySearchConditions(
+            Page<Competition> result = competitionRepository.findAllBySearchConditions(
                 referenceSearchRequestDto,
                 referencePageRequestDto.toPageable()
             );
