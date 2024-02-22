@@ -43,7 +43,7 @@ public class ReferenceServiceTest {
             // when
             ActivityPageResponseDto result = referenceService.searchActivities(
                 referenceSearchRequestDto,
-                referencePageRequestDto
+                referencePageRequestDto.toPageable()
             );
 
             // then
