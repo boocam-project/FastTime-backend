@@ -16,7 +16,7 @@ public record ReviewResponseDTO(
         Set<String> badTagContents) {
         return new ReviewResponseDTO(
             review.getId(),
-            review.getBootcamp(),
+            review.getBootCamp().getName(),
             review.getTitle(),
             goodTagContents,
             badTagContents,
