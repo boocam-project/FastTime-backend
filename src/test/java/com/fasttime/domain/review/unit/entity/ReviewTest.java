@@ -3,6 +3,7 @@ package com.fasttime.domain.review.unit.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasttime.domain.bootcamp.entity.BootCamp;
 import com.fasttime.domain.review.entity.Review;
 import com.fasttime.domain.review.entity.ReviewTag;
 import com.fasttime.domain.member.entity.Member;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class ReviewTest {
 
@@ -19,21 +21,21 @@ public class ReviewTest {
         // given
         String title = "제목";
         String content = "내용";
-        String bootcamp = "부트캠프";
+        BootCamp bootCamp = Mockito.mock(BootCamp.class);
         int rating = 5;
 
         // when
         Review review = Review.builder()
             .title(title)
             .content(content)
-            .bootcamp(bootcamp)
+            .bootCamp(bootCamp)
             .rating(rating)
             .member(new Member())
             .build();
 
         // then
-        assertThat(review).extracting("title", "content", "bootcamp", "rating")
-            .containsExactly(title, content, bootcamp, rating);
+        assertThat(review).extracting("title", "content", "bootCamp", "rating")
+            .containsExactly(title, content, bootCamp, rating);
     }
 
     @DisplayName("리뷰 내용을 수정할 수 있다.")
@@ -43,7 +45,6 @@ public class ReviewTest {
         Review review = Review.builder()
             .title("원래 제목")
             .content("원래 내용")
-            .bootcamp("부트캠프")
             .rating(5)
             .build();
         String updatedTitle = "수정된 제목";
