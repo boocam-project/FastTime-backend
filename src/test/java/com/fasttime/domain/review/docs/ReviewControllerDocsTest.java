@@ -55,7 +55,7 @@ class ReviewControllerDocsTest extends RestDocsSupport {
             Set.of(8L, 9L), 3, "전체적으로 아쉬웠습니다.");
 
         when(reviewService.createAndReturnReviewResponse(any(ReviewRequestDTO.class), anyLong()))
-            .thenReturn(new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프", "패스트캠퍼스X야놀자 솔직후기",
+            .thenReturn(new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프", "패스트캠퍼스X야놀자 솔직후기",
                 Set.of("체계적인 커리큘럼", "퀄리티 있는 강의"), Set.of("부족한 혜택", "오프라인"), 3, "전체적으로 아쉬웠습니다."));
 
         mockMvc.perform(post("/api/v2/reviews")
@@ -76,6 +76,7 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                     fieldWithPath("data.bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("리뷰 제목"),
@@ -117,7 +118,7 @@ class ReviewControllerDocsTest extends RestDocsSupport {
         ReviewRequestDTO requestDto = new ReviewRequestDTO("수정된 리뷰 제목", Set.of(2L),
             Set.of(8L, 9L), 5, "수정된 리뷰 내용");
 
-        ReviewResponseDTO responseDTO = new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프",
+        ReviewResponseDTO responseDTO = new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프",
             "수정된 리뷰 제목", Set.of("강의가 좋아요"), Set.of("부족한 혜택", "오프라인"), 5, "수정된 리뷰 내용");
 
         when(reviewService.updateAndReturnReviewResponse(eq(1L), any(ReviewRequestDTO.class),
@@ -146,6 +147,8 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                     fieldWithPath("data.bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("리뷰 제목"),
@@ -163,9 +166,11 @@ class ReviewControllerDocsTest extends RestDocsSupport {
     @Test
     void getReviews() throws Exception {
         List<ReviewResponseDTO> reviews = List.of(
-            new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"), Set.of("불친절해요"),
+            new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"),
+                Set.of("불친절해요"),
                 5, "리뷰 내용 1"),
-            new ReviewResponseDTO(2L, "다른 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"), Set.of("피드백이 느려요"),
+            new ReviewResponseDTO(2L, "말하는 고구마", "다른 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"),
+                Set.of("피드백이 느려요"),
                 4, "리뷰 내용 2")
         );
 
@@ -185,6 +190,7 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                     fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
@@ -202,9 +208,10 @@ class ReviewControllerDocsTest extends RestDocsSupport {
     @Test
     void getReviewsByBootcamp() throws Exception {
         List<ReviewResponseDTO> reviews = List.of(
-            new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"), Set.of("불친절해요"),
+            new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"),
+                Set.of("불친절해요"),
                 5, "리뷰 내용 1"),
-            new ReviewResponseDTO(2L, "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"),
+            new ReviewResponseDTO(2L, "말하는 고구마", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"),
                 Set.of("피드백이 느려요"), 4, "리뷰 내용 2")
         );
 
@@ -229,6 +236,7 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
                     fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
