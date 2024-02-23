@@ -162,8 +162,9 @@ public class ReviewService {
         String bootcampName = review.getBootCamp().getName();
         Set<String> goodTagContents = extractTagContents(review, true);
         Set<String> badTagContents = extractTagContents(review, false);
+        String authorNickname = review.getMember().getNickname();
         return new ReviewResponseDTO(
-            review.getId(), bootcampName, review.getTitle(),
+            review.getId(), authorNickname, bootcampName, review.getTitle(),
             goodTagContents, badTagContents, review.getRating(), review.getContent()
         );
     }
