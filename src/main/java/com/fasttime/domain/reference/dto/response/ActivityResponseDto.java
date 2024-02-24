@@ -12,7 +12,7 @@ public record ActivityResponseDto(
     String corporateType,
     String participate,
     LocalDate startDate,
-    String endDate,
+    LocalDate endDate,
     String period,
     int recruitment,
     String area,

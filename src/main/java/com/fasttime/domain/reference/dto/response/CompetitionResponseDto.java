@@ -14,7 +14,7 @@ public record CompetitionResponseDto(
     String participate,
     String awardScale,
     LocalDate startDate,
-    String endDate,
+    LocalDate endDate,
     String homepageUrl,
     String activityBenefit,
     String bonusBenefit,
