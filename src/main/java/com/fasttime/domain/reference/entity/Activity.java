@@ -32,7 +32,7 @@ public class Activity {
 
     private LocalDate startDate;
 
-    private String endDate;
+    private LocalDate endDate;
 
     private String period;
 
@@ -66,7 +66,7 @@ public class Activity {
         String corporateType,
         String participate,
         LocalDate startDate,
-        String endDate,
+        LocalDate endDate,
         String period,
         int recruitment,
         String area,

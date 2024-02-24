@@ -34,7 +34,7 @@ public class Competition {
 
     private LocalDate startDate;
 
-    private String endDate;
+    private LocalDate endDate;
 
     private String homepageUrl;
 
@@ -59,7 +59,7 @@ public class Competition {
         String participate,
         String awardScale,
         LocalDate startDate,
-        String endDate,
+        LocalDate endDate,
         String homepageUrl,
         String activityBenefit,
         String bonusBenefit,
