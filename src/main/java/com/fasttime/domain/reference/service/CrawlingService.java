@@ -174,8 +174,8 @@ public class CrawlingService {
         String corporateType = activityFields[1];
         String participate = activityFields[3];
         String[] registerPeriod = activityFields[5].split(" ~ ");
-        LocalDate startDate = stringToLocalDate(registerPeriod[0]);
-        String endDate = registerPeriod[1];
+        LocalDate startDate = dateFormatter(registerPeriod[0]);
+        LocalDate endDate = dateFormatter(registerPeriod[1]);
         String period = activityFields[7];
         int recruitment = Integer.parseInt
             (activityFields[9].substring(0, activityFields[9].length() - 1));
@@ -222,8 +222,8 @@ public class CrawlingService {
         String participate = competitionFields[3];
         String awardScale = competitionFields[5];
         String[] registerPeriod = competitionFields[7].split(" ~ ");
-        LocalDate startDate = stringToLocalDate(registerPeriod[0]);
-        String endDate = registerPeriod[1];
+        LocalDate startDate = dateFormatter(registerPeriod[0]);
+        LocalDate endDate = dateFormatter(registerPeriod[1]);
         String homepageUrl = competitionFields[9];
         String activityBenefit = competitionFields[11];
         String bonusBenefit = competitionFields[15];
@@ -267,8 +267,11 @@ public class CrawlingService {
         return competitionBaseUrl;
     }
 
-    private LocalDate stringToLocalDate(String startDate) {
+    private LocalDate dateFormatter(String startDate) {
         String[] tempStartDate = startDate.split("\\.");
+        if (tempStartDate.length < 3){
+            return LocalDate.now().plusDays(90);
+        }
         StringBuilder temp = new StringBuilder("20");
         for (String s : tempStartDate) {
             if (s.length() == 1) {
@@ -279,6 +282,7 @@ public class CrawlingService {
         }
         return LocalDate.parse(temp.substring(0, temp.length() - 1));
     }
+
 
     private RecruitmentStatus setStatus(LocalDate startDate) {
         LocalDate now = LocalDate.now();
