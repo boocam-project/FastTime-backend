@@ -7,7 +7,7 @@ CREATE TABLE competition
     participate      VARCHAR(255) NOT NULL,
     award_scale      VARCHAR(255) NOT NULL,
     start_date       DATE         NOT NULL,
-    end_date         VARCHAR(255) NOT NULL,
+    end_date         DATE         NOT NULL,
     homepage_url     VARCHAR(255) NOT NULL,
     field            VARCHAR(255) NOT NULL,
     activity_benefit VARCHAR(255) NOT NULL,

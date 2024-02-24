@@ -6,7 +6,7 @@ CREATE TABLE activity
     corporate_type   VARCHAR(255) NOT NULL,
     participate      VARCHAR(255) NOT NULL,
     start_date       DATE         NOT NULL,
-    end_date         VARCHAR(255) NOT NULL,
+    end_date         DATE         NOT NULL,
     `period`         VARCHAR(255) NOT NULL,
     recruitment      INT          NOT NULL,
     area             VARCHAR(255) NOT NULL,
