@@ -10,8 +10,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetMyInfoResponse {
+
     private String nickname;
     private String image;
     private String email;
-
+    private boolean campCrtfc;
+    private String bootcampName;
 }

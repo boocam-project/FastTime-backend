@@ -116,10 +116,17 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(MemberNotFoundException::new);
 
+        String bootcampName = null;
+        if (member.isCampCrtfc() && member.getBootCamp() != null) {
+            bootcampName = member.getBootCamp().getName();
+        }
+
         return new GetMyInfoResponse(
             member.getNickname(),
             member.getImage(),
-            member.getEmail()
+            member.getEmail(),
+            member.isCampCrtfc(),
+            bootcampName
         );
     }
 
