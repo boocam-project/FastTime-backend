@@ -10,9 +10,10 @@ public record ReviewRequestDTO(
     Set<Long> badtags,
     int rating,
     String content) {
+
     public Review createReview(Member member) {
         return Review.builder()
-            .bootcamp(member.getBootcamp())
+            .bootCamp(member.getBootCamp())
             .title(this.title)
             .rating(this.rating)
             .content(this.content)

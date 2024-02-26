@@ -36,7 +36,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
             // given
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("테스트 리뷰 제목", Set.of(1L, 2L),
                 Set.of(3L, 4L), 5, "테스트 리뷰 내용");
-            ReviewResponseDTO responseDTO = new ReviewResponseDTO(1L, "패스트캠퍼스X야놀자 부트캠프",
+            ReviewResponseDTO responseDTO = new ReviewResponseDTO(1L,"닉네임", "패스트캠퍼스X야놀자 부트캠프",
                 "테스트 리뷰 제목", Set.of("긍정 태그"), Set.of("부정 태그"), 5, "테스트 리뷰 내용");
 
             when(reviewService.createAndReturnReviewResponse(any(ReviewRequestDTO.class),
@@ -173,7 +173,7 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
             Long reviewId = 1L;
             ReviewRequestDTO requestDTO = new ReviewRequestDTO("수정된 리뷰 제목", Set.of(1L), Set.of(2L),
                 4, "수정된 리뷰 내용");
-            ReviewResponseDTO responseDTO = new ReviewResponseDTO(reviewId, "패스트캠퍼스X야놀자 부트캠프",
+            ReviewResponseDTO responseDTO = new ReviewResponseDTO(reviewId,"닉네임", "패스트캠퍼스X야놀자 부트캠프",
                 "수정된 리뷰 제목", Set.of("긍정 태그"), Set.of("부정 태그"), 4, "수정된 리뷰 내용");
 
             when(reviewService.updateAndReturnReviewResponse(eq(reviewId),
@@ -236,9 +236,9 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
         void withoutBootcampFilter_willSuccess() throws Exception {
             // given
             List<ReviewResponseDTO> reviews = Arrays.asList(
-                new ReviewResponseDTO(1L, "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
+                new ReviewResponseDTO(1L,"닉네임1", "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
                     "리뷰 내용1"),
-                new ReviewResponseDTO(2L, "부트캠프2", "리뷰2", Set.of("긍정 태그2"), Set.of("부정 태그2"), 4,
+                new ReviewResponseDTO(2L,"닉네임2", "부트캠프2", "리뷰2", Set.of("긍정 태그2"), Set.of("부정 태그2"), 4,
                     "리뷰 내용2")
             );
 
@@ -249,11 +249,13 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].id").value(reviews.get(0).id()))
+                .andExpect(jsonPath("$.data[0].authorNickname").value(reviews.get(0).authorNickname()))
                 .andExpect(jsonPath("$.data[0].bootcamp").value(reviews.get(0).bootcamp()))
                 .andExpect(jsonPath("$.data[0].title").value(reviews.get(0).title()))
                 .andExpect(jsonPath("$.data[0].rating").value(reviews.get(0).rating()))
                 .andExpect(jsonPath("$.data[0].content").value(reviews.get(0).content()))
                 .andExpect(jsonPath("$.data[1].id").value(reviews.get(1).id()))
+                .andExpect(jsonPath("$.data[1].authorNickname").value(reviews.get(1).authorNickname()))
                 .andExpect(jsonPath("$.data[1].bootcamp").value(reviews.get(1).bootcamp()))
                 .andExpect(jsonPath("$.data[1].title").value(reviews.get(1).title()))
                 .andExpect(jsonPath("$.data[1].rating").value(reviews.get(1).rating()))
@@ -265,9 +267,9 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
         void withBootcampFilter_willSuccess() throws Exception {
             // given
             List<ReviewResponseDTO> reviews = Arrays.asList(
-                new ReviewResponseDTO(1L, "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
+                new ReviewResponseDTO(1L,"닉네임1", "부트캠프1", "리뷰1", Set.of("긍정 태그1"), Set.of("부정 태그1"), 5,
                     "리뷰 내용1"),
-                new ReviewResponseDTO(2L, "부트캠프1", "리뷰2", Set.of("긍정 태그2"), Set.of("부정 태그2"), 4,
+                new ReviewResponseDTO(2L,"닉네임2", "부트캠프1", "리뷰2", Set.of("긍정 태그2"), Set.of("부정 태그2"), 4,
                     "리뷰 내용2")
             );
 
@@ -283,11 +285,13 @@ class ReviewControllerTest extends ControllerUnitTestSupporter {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data[0].id").value(reviews.get(0).id()))
+                .andExpect(jsonPath("$.data[0].authorNickname").value(reviews.get(0).authorNickname()))
                 .andExpect(jsonPath("$.data[0].bootcamp").value(reviews.get(0).bootcamp()))
                 .andExpect(jsonPath("$.data[0].title").value(reviews.get(0).title()))
                 .andExpect(jsonPath("$.data[0].rating").value(reviews.get(0).rating()))
                 .andExpect(jsonPath("$.data[0].content").value(reviews.get(0).content()))
                 .andExpect(jsonPath("$.data[1].id").value(reviews.get(1).id()))
+                .andExpect(jsonPath("$.data[1].authorNickname").value(reviews.get(1).authorNickname()))
                 .andExpect(jsonPath("$.data[1].bootcamp").value(reviews.get(1).bootcamp()))
                 .andExpect(jsonPath("$.data[1].title").value(reviews.get(1).title()))
                 .andExpect(jsonPath("$.data[1].rating").value(reviews.get(1).rating()))

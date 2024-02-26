@@ -1,5 +1,6 @@
 package com.fasttime.domain.review.service;
 
+import com.fasttime.domain.bootcamp.repository.BootCampRepository;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.exception.MemberNotFoundException;
 import com.fasttime.domain.member.repository.MemberRepository;
@@ -40,6 +41,7 @@ public class ReviewService {
     private final ReviewTagRepository reviewTagRepository;
     private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
+    private final BootCampRepository bootCampRepository;
 
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
@@ -142,11 +144,11 @@ public class ReviewService {
             : Sort.by("createdAt").descending();
 
         if (bootcamp != null && !bootcamp.isEmpty()) {
-            boolean exists = memberRepository.existsByBootcamp(bootcamp);
+            boolean exists = bootCampRepository.existsByName(bootcamp);
             if (!exists) {
                 throw new BootCampNotFoundException();
             }
-            List<Review> reviews = reviewRepository.findByBootcamp(bootcamp, sort);
+            List<Review> reviews = reviewRepository.findByBootcampName(bootcamp, sort);
             return reviews.stream().map(this::convertToReviewResponseDTO)
                 .collect(Collectors.toList());
         } else {
@@ -157,10 +159,12 @@ public class ReviewService {
     }
 
     private ReviewResponseDTO convertToReviewResponseDTO(Review review) {
+        String bootcampName = review.getBootCamp().getName();
         Set<String> goodTagContents = extractTagContents(review, true);
         Set<String> badTagContents = extractTagContents(review, false);
+        String authorNickname = review.getMember().getNickname();
         return new ReviewResponseDTO(
-            review.getId(), review.getBootcamp(), review.getTitle(),
+            review.getId(), authorNickname, bootcampName, review.getTitle(),
             goodTagContents, badTagContents, review.getRating(), review.getContent()
         );
     }
@@ -188,7 +192,7 @@ public class ReviewService {
 
     public TagSummaryDTO getBootcampTagData(String bootcamp) {
 
-        boolean exists = memberRepository.existsByBootcamp(bootcamp);
+        boolean exists = bootCampRepository.existsByName(bootcamp);
         if (!exists) {
             throw new BootCampNotFoundException();
         }
