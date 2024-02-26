@@ -50,20 +50,14 @@ public class ReviewService {
             throw new UnauthorizedAccessException();
         }
 
-        Review existingReview = reviewRepository.findByMemberId(memberId);
-        if (existingReview != null) {
-            if (existingReview.isDeleted()) {
-                reviewTagRepository.deleteByReview(existingReview);
-                updateReview(existingReview, requestDTO);
-                existingReview.restore();
-                return reviewRepository.save(existingReview);
-            } else {
-                throw new ReviewAlreadyExistsException();
-            }
+        List<Review> existingReviews = reviewRepository.findByMemberId(memberId);
+        if (existingReviews.stream().anyMatch(review -> !review.isDeleted())) {
+            throw new ReviewAlreadyExistsException();
         }
 
         Review newReview = requestDTO.createReview(member);
         updateReviewTags(newReview, requestDTO);
+
         return reviewRepository.save(newReview);
     }
 

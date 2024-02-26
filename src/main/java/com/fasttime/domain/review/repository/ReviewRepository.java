@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Review findByMemberId(Long memberId);
+    List<Review> findByMemberId(Long memberId);
 
     @Query("SELECT DISTINCT r.bootCamp.name FROM Review r")
     List<String> findAllBootcamps();
