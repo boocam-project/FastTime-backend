@@ -93,6 +93,8 @@ include::{snippets}/member-delete/http-response.adoc[]
 
 로그인된 사용자의 이메일,닉네임,프로필 이미지url을 조회하는 API 입니다.
 
++ 인증하지 않은 사용자는 bootcampName가 null로 반환됩니다.
+
 
 === HttpRequest
 
