@@ -1,5 +1,6 @@
 package com.fasttime.domain.review.entity;
 
+import com.fasttime.domain.bootcamp.entity.BootCamp;
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
@@ -32,8 +33,6 @@ public class Review extends BaseTimeEntity {
 
     private String title;
 
-    private String bootcamp;
-
     private int rating;
 
     private String content;
@@ -45,6 +44,10 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     @ManyToOne
     private Member member;
+
+    @JoinColumn(name = "bootcamp_id")
+    @ManyToOne
+    private BootCamp bootCamp;
 
     public void setReviewTags(Set<ReviewTag> reviewTags) {
         this.reviewTags = reviewTags;

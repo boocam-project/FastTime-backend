@@ -10,6 +10,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.fasttime.domain.bootcamp.entity.BootCamp;
+import com.fasttime.domain.bootcamp.repository.BootCampRepository;
 import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.exception.BootCampNotFoundException;
 import jakarta.transaction.Transactional;
@@ -57,19 +59,23 @@ public class ReviewServiceTest {
     @Mock
     private ReviewTagRepository reviewTagRepository;
 
+    @Mock
+    private BootCampRepository bootCampRepository;
+
     private Member member;
 
     private ReviewRequestDTO reviewRequestDTO;
 
     @BeforeEach
     void setUp() {
+        BootCamp mockBootCamp = Mockito.mock(BootCamp.class);
         member = Member.builder()
             .id(1L)
             .email("test@example.com")
             .password("password")
             .nickname("nickname")
             .campCrtfc(true)
-            .bootcamp("패스트캠퍼스X야놀자 부트캠프")
+            .bootCamp(mockBootCamp)
             .role(Role.ROLE_USER)
             .build();
         reviewRequestDTO = new ReviewRequestDTO(
@@ -110,13 +116,14 @@ public class ReviewServiceTest {
         @DisplayName("권한이 없을 경우 실패한다.")
         void Unauthorized_willFail() {
             // given
+            BootCamp mockBootCamp = Mockito.mock(BootCamp.class);
             Member unauthorizedMember = Member.builder()
                 .id(member.getId())
                 .email(member.getEmail())
                 .password(member.getPassword())
                 .nickname(member.getNickname())
                 .campCrtfc(false)
-                .bootcamp(member.getBootcamp())
+                .bootCamp(mockBootCamp)
                 .role(member.getRole())
                 .build();
 
@@ -245,7 +252,7 @@ public class ReviewServiceTest {
         @DisplayName("모든 리뷰를 정렬 기준에 따라 조회한다.")
         void withoutBootcampFilter_willSuccess() {
             // given
-            List<Review> mockReviews = createMockReviews();
+            List<Review> mockReviews = createMockReviews("부트캠프1", "부트캠프2");
             given(reviewRepository.findAll(any(Sort.class))).willReturn(mockReviews);
 
             // when
@@ -261,32 +268,45 @@ public class ReviewServiceTest {
         void withBootcampFilter_willSuccess() {
             // given
             String bootcampName = "부트캠프1";
-            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(true); // 부트캠프 존재 확인
-            List<Review> mockReviews = createMockReviewsForBootcamp(bootcampName);
-            given(reviewRepository.findByBootcamp(bootcampName,
-                Sort.by("createdAt").descending())).willReturn(
-                mockReviews);
+            given(bootCampRepository.existsByName(bootcampName)).willReturn(true);
+            List<Review> mockReviews = createMockReviews(bootcampName, bootcampName);
+            given(reviewRepository.findByBootcampName(bootcampName,
+                Sort.by("createdAt").descending())).willReturn(mockReviews);
 
             // when
-            List<ReviewResponseDTO> result = reviewService.getSortedReviews("createdAt",
-                bootcampName);
+            List<ReviewResponseDTO> result = reviewService.getSortedReviews("createdAt", bootcampName);
 
             // then
             assertThat(result).hasSize(mockReviews.size());
             assertThat(result.get(0).bootcamp()).isEqualTo(bootcampName);
         }
 
-        private List<Review> createMockReviews() {
-            Review review1 = new Review(1L, "리뷰 1", "부트캠프1", 5, "내용 1", new HashSet<>(), member);
-            Review review2 = new Review(2L, "리뷰 2", "부트캠프2", 4, "내용 2", new HashSet<>(), member);
-            return List.of(review1, review2);
-        }
+        private List<Review> createMockReviews(String bootcampName1, String bootcampName2) {
+            BootCamp bootCamp1 = Mockito.mock(BootCamp.class);
+            BootCamp bootCamp2 = Mockito.mock(BootCamp.class);
 
-        private List<Review> createMockReviewsForBootcamp(String bootcampName) {
-            Review review1 = new Review(1L, "리뷰 1", bootcampName, 5, "내용 1", new HashSet<>(),
-                member);
-            Review review2 = new Review(2L, "리뷰 2", bootcampName, 4, "내용 2", new HashSet<>(),
-                member);
+            given(bootCamp1.getName()).willReturn(bootcampName1);
+            given(bootCamp2.getName()).willReturn(bootcampName2);
+
+            Review review1 = Review.builder()
+                .id(1L)
+                .title("리뷰 1")
+                .bootCamp(bootCamp1)
+                .rating(5)
+                .content("내용 1")
+                .reviewTags(new HashSet<>())
+                .member(member)
+                .build();
+            Review review2 = Review.builder()
+                .id(2L)
+                .title("리뷰 2")
+                .bootCamp(bootCamp2)
+                .rating(4)
+                .content("내용 2")
+                .reviewTags(new HashSet<>())
+                .member(member)
+                .build();
+
             return List.of(review1, review2);
         }
     }
@@ -342,7 +362,7 @@ public class ReviewServiceTest {
         void _willSuccess() {
             // given
             String bootcampName = "부트캠프1";
-            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(true); // 부트캠프 존재 확인
+            given(bootCampRepository.existsByName(bootcampName)).willReturn(true); // 부트캠프 존재 확인
             given(reviewTagRepository.countTagsByBootcampGroupedByTagId(bootcampName)).willReturn(
                 List.of(new Object[]{1L, 5L}, new Object[]{2L, 3L})
             );
@@ -362,8 +382,7 @@ public class ReviewServiceTest {
         void NotFound_willFail() {
             // given
             String bootcampName = "존재하지 않는 부트캠프";
-            given(memberRepository.existsByBootcamp(bootcampName)).willReturn(
-                false);
+            given(bootCampRepository.existsByName(bootcampName)).willReturn(false);
 
             // when, then
             assertThrows(BootCampNotFoundException.class, () -> {

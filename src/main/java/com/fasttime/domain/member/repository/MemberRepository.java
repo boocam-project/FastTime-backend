@@ -17,8 +17,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     void deleteByDeletedAtBefore(LocalDateTime dateTime);
 
-    boolean existsByBootcamp(String bootcamp);
-
     @Query("SELECT m FROM Member m WHERE m.email = :email AND m.deletedAt > :dateTime")
     Optional<Member> findSoftDeletedByEmail(@Param("email") String email,
         @Param("dateTime") LocalDateTime dateTime);

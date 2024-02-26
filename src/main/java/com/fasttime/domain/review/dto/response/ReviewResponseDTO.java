@@ -5,6 +5,7 @@ import java.util.Set;
 
 public record ReviewResponseDTO(
     Long id,
+    String authorNickname,
     String bootcamp,
     String title,
     Set<String> goodtags,
@@ -16,7 +17,8 @@ public record ReviewResponseDTO(
         Set<String> badTagContents) {
         return new ReviewResponseDTO(
             review.getId(),
-            review.getBootcamp(),
+            review.getMember().getNickname(),
+            review.getBootCamp().getName(),
             review.getTitle(),
             goodTagContents,
             badTagContents,

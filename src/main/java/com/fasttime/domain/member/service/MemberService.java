@@ -116,11 +116,18 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(MemberNotFoundException::new);
 
-        return new GetMyInfoResponse(
-            member.getNickname(),
-            member.getImage(),
-            member.getEmail()
-        );
+        String bootcampName = null;
+        if (member.isCampCrtfc() && member.getBootCamp() != null) {
+            bootcampName = member.getBootCamp().getName();
+        }
+
+        return GetMyInfoResponse.builder()
+            .nickname(member.getNickname())
+            .image(member.getImage())
+            .email(member.getEmail())
+            .campCrtfc(member.isCampCrtfc())
+            .bootcampName(bootcampName)
+            .build();
     }
 
     public boolean checkDuplicateNickname(String nickname) {
