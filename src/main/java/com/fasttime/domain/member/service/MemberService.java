@@ -121,13 +121,13 @@ public class MemberService {
             bootcampName = member.getBootCamp().getName();
         }
 
-        return new GetMyInfoResponse(
-            member.getNickname(),
-            member.getImage(),
-            member.getEmail(),
-            member.isCampCrtfc(),
-            bootcampName
-        );
+        return GetMyInfoResponse.builder()
+            .nickname(member.getNickname())
+            .image(member.getImage())
+            .email(member.getEmail())
+            .campCrtfc(member.isCampCrtfc())
+            .bootcampName(bootcampName)
+            .build();
     }
 
     public boolean checkDuplicateNickname(String nickname) {
