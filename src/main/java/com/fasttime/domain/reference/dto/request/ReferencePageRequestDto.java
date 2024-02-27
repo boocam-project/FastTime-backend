@@ -2,6 +2,8 @@ package com.fasttime.domain.reference.dto.request;
 
 import lombok.Builder;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 public record ReferencePageRequestDto(
     String orderBy,
@@ -23,6 +25,10 @@ public record ReferencePageRequestDto(
     }
 
     public PageRequest toPageable() {
-        return PageRequest.of(page, pageSize);
+        return switch (orderBy) {
+            case "d-day" -> PageRequest.of(page, pageSize, Sort.by(Direction.ASC, "endDate"));
+            case "latest" -> PageRequest.of(page, pageSize, Sort.by(Direction.DESC, "id"));
+            default -> PageRequest.of(page, pageSize);
+        };
     }
 }

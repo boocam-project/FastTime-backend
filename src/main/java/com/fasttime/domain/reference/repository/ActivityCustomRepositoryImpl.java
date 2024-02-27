@@ -4,13 +4,18 @@ import com.fasttime.domain.reference.dto.request.ReferenceSearchRequestDto;
 import com.fasttime.domain.reference.entity.Activity;
 import com.fasttime.domain.reference.entity.QActivity;
 import com.fasttime.domain.reference.entity.RecruitmentStatus;
+import com.fasttime.global.util.QueryDslUtil;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -27,12 +32,12 @@ public class ActivityCustomRepositoryImpl implements ActivityCustomRepository {
         ReferenceSearchRequestDto referenceSearchRequestDto,
         Pageable pageable
     ) {
-        // TODO 정렬 기능 추가
         List<Activity> content = queryFactory
             .selectFrom(qActivity)
             .where(createSearchConditionsBuilder(referenceSearchRequestDto))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
+            .orderBy(getAllOrderSpecifiers(pageable).toArray(OrderSpecifier[]::new))
             .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
@@ -65,5 +70,24 @@ public class ActivityCustomRepositoryImpl implements ActivityCustomRepository {
         }
 
         return booleanBuilder;
+    }
+
+    private List<OrderSpecifier<?>> getAllOrderSpecifiers(Pageable pageable) {
+        List<OrderSpecifier<?>> orders = new LinkedList<>();
+        if (!pageable.getSort().isEmpty()) {
+            for (Sort.Order order : pageable.getSort()) {
+                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+                switch (order.getProperty()) {
+                    case "endDate":
+                        orders.add(QueryDslUtil.getSortedColumn(direction, qActivity, "endDate"));
+                    case "id":
+                        orders.add(QueryDslUtil.getSortedColumn(direction, qActivity, "id"));
+                    default:
+                        orders.add(QueryDslUtil.getSortedColumn(Order.ASC, qActivity, "endDate"));
+                }
+            }
+        }
+
+        return orders;
     }
 }

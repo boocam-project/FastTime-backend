@@ -32,7 +32,7 @@ public class ReferenceController {
         @RequestParam(required = false, defaultValue = "true", name = "before") boolean before,
         @RequestParam(required = false, defaultValue = "true", name = "during") boolean during,
         @RequestParam(required = false, defaultValue = "false", name = "closed") boolean closed,
-        @RequestParam(required = false, name = "orderBy") String orderBy,
+        @RequestParam(required = false, defaultValue = "endDate", name = "orderBy") String orderBy,
         @RequestParam(defaultValue = "0", name = "page") int page,
         @RequestParam(defaultValue = "10", name = "pageSize") int pageSize) {
         log.info("[GET] api/v2/activities");
@@ -62,7 +62,7 @@ public class ReferenceController {
         @RequestParam(required = false, defaultValue = "true", name = "before") boolean before,
         @RequestParam(required = false, defaultValue = "true", name = "during") boolean during,
         @RequestParam(required = false, defaultValue = "false", name = "closed") boolean closed,
-        @RequestParam(required = false, name = "orderBy") String orderBy,
+        @RequestParam(required = false, defaultValue = "endDate", name = "orderBy") String orderBy,
         @RequestParam(defaultValue = "0", name = "page") int page,
         @RequestParam(defaultValue = "10", name = "pageSize") int pageSize) {
         log.info("[GET] api/v2/competitions");
