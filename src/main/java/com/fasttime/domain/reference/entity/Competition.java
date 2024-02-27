@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class Competition {
 
     private String participate;
 
-    private String  awardScale;
+    private String awardScale;
 
     private LocalDate startDate;
 
@@ -42,12 +43,13 @@ public class Competition {
 
     private String bonusBenefit;
 
-    @Column(columnDefinition = "TEXT",length = 1000)
+    @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('BEFORE', 'DURING', 'CLOSED')")
     private RecruitmentStatus status;
 
     @Builder
@@ -83,7 +85,11 @@ public class Competition {
         this.status = status;
     }
 
-    public void statusUpdate(RecruitmentStatus status){
+    public void statusUpdate(RecruitmentStatus status) {
         this.status = status;
+    }
+
+    public long getDDay() {
+        return ChronoUnit.DAYS.between(LocalDate.now(), this.getEndDate());
     }
 }
