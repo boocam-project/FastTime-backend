@@ -59,7 +59,7 @@ public class ReferenceServiceTest {
                 .closed(true)
                 .build();
             ReferencePageRequestDto referencePageRequestDto = ReferencePageRequestDto.builder()
-                .orderBy(null)
+                .orderBy("d-day")
                 .page(0)
                 .pageSize(10)
                 .build();
@@ -154,7 +154,7 @@ public class ReferenceServiceTest {
                 .closed(true)
                 .build();
             ReferencePageRequestDto referencePageRequestDto = ReferencePageRequestDto.builder()
-                .orderBy(null)
+                .orderBy("d-day")
                 .page(0)
                 .pageSize(10)
                 .build();

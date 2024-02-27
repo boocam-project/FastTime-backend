@@ -59,12 +59,14 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                         .title("핀테크 IT 대외활동")
                         .organization("대외활동 협회")
                         .imageUrl("https://activities/1")
+                        .dDay(1)
                         .build(),
                     ReferenceResponseDto.builder()
                         .id(2L)
                         .title("풀스택 IT 대외활동")
                         .organization("대외활동 협회")
                         .imageUrl("https://activities/2")
+                        .dDay(2)
                         .build()
                 )
             )
@@ -102,7 +104,11 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.activities[].organization").type(JsonFieldType.STRING)
                         .description("대외활동 주최"),
                     fieldWithPath("data.activities[].imageUrl").type(JsonFieldType.STRING)
-                        .description("대외활동 이미지 URL"))));
+                        .description("대외활동 이미지 URL"),
+                    fieldWithPath("data.activities[].dDay").type(JsonFieldType.NUMBER)
+                        .description("접수 마감까지 남은 일수 (접수 마감 이후라면 지난 일수를 음수로 나타냄)")
+                )
+            ));
     }
 
     @DisplayName("공모전 목록 조회 API 문서화")
@@ -122,12 +128,14 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                         .title("핀테크 IT 공모전")
                         .organization("공모전 협회")
                         .imageUrl("https://competitions/1")
+                        .dDay(1)
                         .build(),
                     ReferenceResponseDto.builder()
                         .id(2L)
                         .title("풀스택 IT 공모전")
                         .organization("공모전 협회")
                         .imageUrl("https://competitions/2")
+                        .dDay(2)
                         .build()
                 )
             )
@@ -165,7 +173,11 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("data.competitions[].organization").type(JsonFieldType.STRING)
                         .description("공모전 주최"),
                     fieldWithPath("data.competitions[].imageUrl").type(JsonFieldType.STRING)
-                        .description("공모전 이미지 URL"))));
+                        .description("공모전 이미지 URL"),
+                    fieldWithPath("data.competitions[].dDay").type(JsonFieldType.NUMBER)
+                        .description("접수 마감까지 남은 일수 (접수 마감 이후라면 지난 일수를 음수로 나타냄)")
+                )
+            ));
     }
 
     @DisplayName("대외활동 상세 조회 API 문서화")
