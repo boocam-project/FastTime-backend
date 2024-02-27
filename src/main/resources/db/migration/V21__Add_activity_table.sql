@@ -17,6 +17,6 @@ CREATE TABLE activity
     bonus_benefit    VARCHAR(255) NOT NULL,
     description      TEXT(1000) NOT NULL,
     image_url        VARCHAR(255) NOT NULL,
-    status           enum ('before','during','closed') NOT NULL,
+    status           enum ('BEFORE','DURING','CLOSED') NOT NULL,
     CONSTRAINT pk_activity PRIMARY KEY (id)
 );
