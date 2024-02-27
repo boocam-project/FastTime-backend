@@ -9,7 +9,8 @@ public record ReferenceResponseDto(
     long id,
     String title,
     String organization,
-    String imageUrl
+    String imageUrl,
+    long dDay
 ) {
 
     public static ReferenceResponseDto of(Activity activity) {
@@ -18,6 +19,7 @@ public record ReferenceResponseDto(
             .title(activity.getTitle())
             .organization(activity.getOrganization())
             .imageUrl(activity.getImageUrl())
+            .dDay(activity.getDDay())
             .build();
     }
 
@@ -27,6 +29,7 @@ public record ReferenceResponseDto(
             .title(competition.getTitle())
             .organization(competition.getOrganization())
             .imageUrl(competition.getImageUrl())
+            .dDay(competition.getDDay())
             .build();
     }
 }
