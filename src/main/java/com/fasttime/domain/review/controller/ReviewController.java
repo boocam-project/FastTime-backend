@@ -81,8 +81,4 @@ public class ReviewController {
     return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, tagData));
   }
 
-  @GetMapping("/ttt")
-  public ResponseEntity<ResponseDTO<TagSummaryDTO>> getTagCountsByBootcamp2() {
-    throw new BootCampNotFoundException();
-  }
 }
