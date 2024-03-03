@@ -7,6 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
@@ -23,31 +26,45 @@ public class Competition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String title;
 
+    @NotNull
     private String organization;
 
+    @NotNull
     private String corporateType;
 
+    @NotNull
     private String participate;
 
+    @NotNull
     private String awardScale;
 
+    @NotNull
     private LocalDate startDate;
 
+    @NotNull
     private LocalDate endDate;
 
+    @NotNull
     private String homepageUrl;
 
+    @NotNull
     private String activityBenefit;
 
+    @NotNull
     private String bonusBenefit;
 
+    @NotNull
+    @Size(max = 1000)
     @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
+    @NotNull
     private String imageUrl;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('BEFORE', 'DURING', 'CLOSED')")
     private RecruitmentStatus status;

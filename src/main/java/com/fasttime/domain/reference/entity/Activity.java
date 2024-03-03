@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
@@ -23,39 +25,56 @@ public class Activity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String title;
 
+    @NotNull
     private String organization;
 
+    @NotNull
     private String corporateType;
 
+    @NotNull
     private String participate;
 
+    @NotNull
     private LocalDate startDate;
 
+    @NotNull
     private LocalDate endDate;
 
+    @NotNull
     private String period;
 
+    @NotNull
     private int recruitment;
 
+    @NotNull
     private String area;
 
+    @NotNull
     private String preferredSkill;
 
+    @NotNull
     private String homepageUrl;
 
+    @NotNull
     private String field;
 
+    @NotNull
     private String activityBenefit;
 
+    @NotNull
     private String bonusBenefit;
 
+    @NotNull
     @Column(columnDefinition = "TEXT", length = 1000)
     private String description;
 
+    @NotNull
     private String imageUrl;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('BEFORE', 'DURING', 'CLOSED')")
     private RecruitmentStatus status;
