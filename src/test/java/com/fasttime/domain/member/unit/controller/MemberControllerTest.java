@@ -1,6 +1,5 @@
 package com.fasttime.domain.member.unit.controller;
 
-
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -13,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasttime.domain.bootcamp.entity.BootCamp;
 import com.fasttime.domain.member.dto.request.CreateMemberRequest;
 import com.fasttime.domain.member.dto.request.UpdateMemberRequest;
 import com.fasttime.domain.member.dto.request.LoginRequest;
@@ -43,9 +43,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-
 class MemberControllerTest extends ControllerUnitTestSupporter {
-
 
     @Nested
     @DisplayName("회원가입은")
@@ -170,7 +168,8 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                     .image("oldImage")
                     .build();
 
-                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("newNickname", "newImage");
+                UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("newNickname",
+                    "newImage");
 
                 Member updatedMember = Member.builder()
                     .id(member.getId())
@@ -238,6 +237,10 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 .nickname("testuser")
                 .email("test@example.com")
                 .image("testImage")
+                .campCrtfc(true)
+                .bootCamp(
+                    new BootCamp(1L, "BootcampName", "Description", "Image", true, "Organizer",
+                        "Website", "Course"))
                 .build();
 
             MockHttpSession session = new MockHttpSession();
@@ -246,7 +249,9 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
             GetMyInfoResponse getMyInfoResponse = new GetMyInfoResponse(
                 loggedInMember.getNickname(),
                 loggedInMember.getImage(),
-                loggedInMember.getEmail()
+                loggedInMember.getEmail(),
+                loggedInMember.isCampCrtfc(),
+                loggedInMember.getBootCamp() != null ? loggedInMember.getBootCamp().getName() : null
             );
 
             given(memberService.getMyPageInfoById(any(Long.class))).willReturn(getMyInfoResponse);
@@ -256,10 +261,11 @@ class MemberControllerTest extends ControllerUnitTestSupporter {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickname").value("testuser"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("test@example.com"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.image").value("testImage"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.image").value("testImage"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.campCrtfc").value(true))
+                .andExpect(
+                    MockMvcResultMatchers.jsonPath("$.data.bootcampName").value("BootcampName"));
         }
-
-
 
         @DisplayName("loginMember()는")
         @Nested
