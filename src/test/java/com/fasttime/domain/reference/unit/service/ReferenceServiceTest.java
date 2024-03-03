@@ -258,7 +258,7 @@ public class ReferenceServiceTest {
             ActivityResponseDto result = referenceService.getActivity(1L);
 
             // then
-            assertThat(result.id()).isEqualTo(1L);
+            assertThat(result.title()).isEqualTo("핀테크 IT 대외활동");
         }
     }
 
@@ -296,7 +296,7 @@ public class ReferenceServiceTest {
             CompetitionResponseDto result = referenceService.getCompetition(1L);
 
             // then
-            assertThat(result.id()).isEqualTo(1L);
+            assertThat(result.title()).isEqualTo("핀테크 IT 공모전");
         }
     }
 }

@@ -7,7 +7,6 @@ import lombok.Builder;
 
 @Builder
 public record CompetitionResponseDto(
-    long id,
     String title,
     String organization,
     String corporateType,
@@ -24,7 +23,6 @@ public record CompetitionResponseDto(
 
     public static CompetitionResponseDto of(Competition competition) {
         return CompetitionResponseDto.builder()
-            .id(competition.getId())
             .title(competition.getTitle())
             .organization(competition.getOrganization())
             .corporateType(competition.getCorporateType())

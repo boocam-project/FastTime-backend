@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record ActivityResponseDto(
-    long id,
     String title,
     String organization,
     String corporateType,
@@ -27,7 +26,6 @@ public record ActivityResponseDto(
 
     public static ActivityResponseDto of(Activity activity) {
         return ActivityResponseDto.builder()
-            .id(activity.getId())
             .title(activity.getTitle())
             .organization(activity.getOrganization())
             .corporateType(activity.getCorporateType())

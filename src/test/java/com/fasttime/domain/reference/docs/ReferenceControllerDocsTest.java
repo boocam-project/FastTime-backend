@@ -186,7 +186,6 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
         // given
         given(referenceServiceUseCase.getActivity(any(Long.TYPE))).willReturn(
             ActivityResponseDto.builder()
-                .id(1L)
                 .title("한국 전력 공사 IT 대외활동")
                 .organization("한국전력공사")
                 .corporateType("중소기업")
@@ -221,8 +220,6 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                    fieldWithPath("data.id").type(JsonFieldType.NUMBER)
-                        .description("대외활동 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING)
                         .description("대외활동 제목"),
                     fieldWithPath("data.organization").type(JsonFieldType.STRING)
@@ -263,7 +260,6 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
         // given
         given(referenceServiceUseCase.getCompetition(any(Long.TYPE))).willReturn(
             CompetitionResponseDto.builder()
-                .id(1L)
                 .title("한국 전력 공사 IT 대외활동")
                 .organization("한국전력공사")
                 .corporateType("중소기업")
@@ -294,8 +290,6 @@ public class ReferenceControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("메시지"),
                     fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                    fieldWithPath("data.id").type(JsonFieldType.NUMBER)
-                        .description("공모전 식별자"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING)
                         .description("공모전 제목"),
                     fieldWithPath("data.organization").type(JsonFieldType.STRING)
