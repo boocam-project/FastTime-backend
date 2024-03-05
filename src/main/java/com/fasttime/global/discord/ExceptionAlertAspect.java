@@ -1,7 +1,6 @@
 package com.fasttime.global.discord;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,13 +15,13 @@ public class ExceptionAlertAspect {
 
   @Value("${spring.profiles.active}")
   private String serverType;
+
   public void sendAlert(String message) {
     discordFeignClient.sendMessage(DiscordMessage.createErrorDiscordMessage(message));
   }
 
   @AfterThrowing(
-      pointcut =
-          "within(@org.springframework.web.bind.annotation.RestController *)",
+      pointcut = "within(@org.springframework.web.bind.annotation.RestController *)",
       throwing = "e")
   public void sendExceptionAlert(JoinPoint joinPoint, Exception e) {
     String alertMessage =
