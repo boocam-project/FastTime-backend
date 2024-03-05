@@ -6,17 +6,12 @@ import com.fasttime.domain.article.entity.Article;
 import com.fasttime.domain.article.repository.ArticleQueryResponse;
 import com.fasttime.domain.article.repository.ArticleRepository;
 import com.fasttime.domain.article.service.usecase.ArticleQueryUseCase.ArticlesSearchRequestServiceDto;
-import com.fasttime.domain.comment.entity.Comment;
-import com.fasttime.domain.comment.repository.CommentRepository;
 import com.fasttime.domain.member.entity.Member;
-import com.fasttime.domain.member.entity.Role;
 import com.fasttime.domain.member.repository.MemberRepository;
-import com.fasttime.util.fixture.ArticleFixture;
 import java.util.List;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-@SpringBootTest
+@SpringBootTest(properties = "spring.profiles.active=test")
 class ArticleRepositoryTest {
 
     @Autowired
