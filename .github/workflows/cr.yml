@@ -18,4 +18,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           # optional
           LANGUAGE: Korean
-          PROMPT: gpt-4-0125-preview
+          PROMPT: gpt-4
