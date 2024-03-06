@@ -20,6 +20,7 @@ import com.fasttime.domain.review.exception.UnauthorizedAccessException;
 import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.ReviewTagRepository;
 import com.fasttime.domain.review.repository.TagRepository;
+import com.fasttime.global.util.PaginationResponseDTO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,23 +137,19 @@ public class ReviewService {
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
     }
 
-    public List<ReviewResponseDTO> getSortedReviews(String sortBy, String bootcamp) {
-        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
-            : Sort.by("createdAt").descending();
-
+    public Page<ReviewResponseDTO> getSortedReviews(String bootcamp, Pageable pageable) {
+        Page<Review> reviewPage;
         if (bootcamp != null && !bootcamp.isEmpty()) {
             boolean exists = bootCampRepository.existsByName(bootcamp);
             if (!exists) {
                 throw new BootCampNotFoundException();
             }
-            List<Review> reviews = reviewRepository.findByBootcampName(bootcamp, sort);
-            return reviews.stream().map(this::convertToReviewResponseDTO)
-                .collect(Collectors.toList());
+            reviewPage = reviewRepository.findByBootcampName(bootcamp, pageable);
         } else {
-            List<Review> reviews = reviewRepository.findAll(sort);
-            return reviews.stream().map(this::convertToReviewResponseDTO)
-                .collect(Collectors.toList());
+            reviewPage = reviewRepository.findAll(pageable);
         }
+
+        return reviewPage.map(this::convertToReviewResponseDTO);
     }
 
     private ReviewResponseDTO convertToReviewResponseDTO(Review review) {
@@ -204,5 +204,20 @@ public class ReviewService {
         }
 
         return new TagSummaryDTO(totalTags, tagCounts);
+    }
+
+    public Map<String, Object> convertToCustomPaginationResponse(Page<ReviewResponseDTO> page) {
+        PaginationResponseDTO pageInfo = new PaginationResponseDTO(
+            page.getNumber() + 1,
+            page.getTotalPages(),
+            page.getNumberOfElements(),
+            page.getTotalElements()
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", page.getContent());
+        response.put("page", pageInfo);
+
+        return response;
     }
 }

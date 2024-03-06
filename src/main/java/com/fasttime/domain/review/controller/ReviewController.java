@@ -8,7 +8,12 @@ import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,13 +66,19 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<ReviewResponseDTO>>> getReviews(
+    public ResponseEntity<ResponseDTO<Map<String, Object>>> getReviews(
         @RequestParam(required = false) String bootcamp,
+        @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false, defaultValue = "createdAt") String sortBy) {
 
-        List<ReviewResponseDTO> reviews = reviewService.getSortedReviews(sortBy, bootcamp);
+        Pageable pageable = PageRequest.of(page, 6, Sort.by(sortBy).descending());
+        Page<ReviewResponseDTO> reviews = reviewService.getSortedReviews(bootcamp, pageable);
 
-        return ResponseEntity.ok(ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, reviews));
+        Map<String, Object> paginationResponse = reviewService.convertToCustomPaginationResponse(
+            reviews);
+
+        return ResponseEntity.ok(
+            ResponseDTO.res(HttpStatus.OK, REVIEW_SUCCESS_MESSAGE, paginationResponse));
     }
 
     @GetMapping("/summary")
