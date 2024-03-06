@@ -1,0 +1,2 @@
+ALTER TABLE member
+CHANGE campCrtfc camp_crtfc BOOLEAN DEFAULT FALSE;
