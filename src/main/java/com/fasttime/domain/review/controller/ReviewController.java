@@ -7,6 +7,7 @@ import com.fasttime.domain.review.dto.response.TagSummaryDTO;
 import com.fasttime.domain.review.service.ReviewService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ResponseDTO<ReviewResponseDTO>> createReview(
-        @RequestBody ReviewRequestDTO requestDTO) {
+        @Valid @RequestBody ReviewRequestDTO requestDTO) {
         Long memberId = securityUtil.getCurrentMemberId();
         ReviewResponseDTO responseDTO = reviewService.createAndReturnReviewResponse(requestDTO,
             memberId);

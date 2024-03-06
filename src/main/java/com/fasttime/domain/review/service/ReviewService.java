@@ -177,9 +177,10 @@ public class ReviewService {
 
         for (String bootcamp : bootcamps) {
             double averageRating = reviewRepository.findAverageRatingByBootcamp(bootcamp);
-            int totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            double roundedAverageRating = Math.round(averageRating * 10) / 10.0; // 소수점 한 자리까지 반올림
 
-            summaries.add(new BootcampReviewSummaryDTO(bootcamp, averageRating, totalReviews));
+            int totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            summaries.add(new BootcampReviewSummaryDTO(bootcamp, roundedAverageRating, totalReviews));
         }
         return summaries;
     }
