@@ -1,5 +1,6 @@
 package com.fasttime.domain.review.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,8 @@ public class Tag {
     private Set<ReviewTag> reviewTags = new HashSet<>();
 
     private String content;
+    @Column(name = "is_good_tag")
+    private boolean isGoodTag;
 
     public static Tag create(String content) {
         return new Tag(content);

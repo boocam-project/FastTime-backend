@@ -1,5 +1,6 @@
 package com.fasttime.domain.member.entity;
 
+import com.fasttime.domain.bootcamp.entity.BootCamp;
 import com.fasttime.global.common.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +9,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,10 +38,12 @@ public class Member extends BaseTimeEntity {
     private String nickname;
 
     @Default
-    @Column(columnDefinition = "boolean default false",name = "camp_crtfc")
+    @Column(columnDefinition = "boolean default false", name = "camp_crtfc")
     private boolean campCrtfc = false;
 
-    private String bootcamp;
+    @ManyToOne
+    @JoinColumn(name = "bootcamp_id")
+    private BootCamp bootCamp;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum('ROLE_USER', 'ROLE_ADMIN')")

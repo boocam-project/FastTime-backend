@@ -1,12 +1,10 @@
 package com.fasttime.domain.member.docs;
 
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -49,7 +47,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
-
 
 class MemberControllerDocsTest extends RestDocsSupport {
 
@@ -215,46 +212,47 @@ class MemberControllerDocsTest extends RestDocsSupport {
             repasswordResponse);
         String data = new ObjectMapper().writeValueAsString(dto);
 
-    // when then
-    mockMvc
-        .perform(
-            post("/api/v1/members/me/password")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(data)
-                .session(session))
-        .andExpect(status().isOk())
-        .andDo(
-            document(
-                "member-rePassword",
-                preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint()),
-                requestFields(
-                    fieldWithPath("password")
-                        .type(JsonFieldType.STRING)
-                        .description("비밀번호")
-                        .attributes(key("constraints").value("Not Blank")),
-                    fieldWithPath("rePassword")
-                        .type(JsonFieldType.STRING)
-                        .description("비밀번호 재확인")
-                        .attributes(key("constraints").value("Not Blank"))),
-                responseFields(
-                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
-                    fieldWithPath("message")
-                        .type(JsonFieldType.STRING)
-                        .optional()
-                        .description("메시지"),
-                    fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
-                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
-                    fieldWithPath("data.nickname")
-                        .type(JsonFieldType.STRING)
-                        .description("사용자 닉네임"))));
+        // when then
+        mockMvc
+            .perform(
+                post("/api/v1/members/me/password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(data)
+                    .session(session))
+            .andExpect(status().isOk())
+            .andDo(
+                document(
+                    "member-rePassword",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestFields(
+                        fieldWithPath("password")
+                            .type(JsonFieldType.STRING)
+                            .description("비밀번호")
+                            .attributes(key("constraints").value("Not Blank")),
+                        fieldWithPath("rePassword")
+                            .type(JsonFieldType.STRING)
+                            .description("비밀번호 재확인")
+                            .attributes(key("constraints").value("Not Blank"))),
+                    responseFields(
+                        fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 상태코드"),
+                        fieldWithPath("message")
+                            .type(JsonFieldType.STRING)
+                            .optional()
+                            .description("메시지"),
+                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답데이터"),
+                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("사용자 ID"),
+                        fieldWithPath("data.nickname")
+                            .type(JsonFieldType.STRING)
+                            .description("사용자 닉네임"))));
     }
 
     @DisplayName("회원 가입 API 문서화")
     @Test
     void join() throws Exception {
         //given
-        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com",
+            "testPassword",
             "testNickname");
 
         //when
@@ -264,7 +262,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
-        mockMvc.perform(post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
+        mockMvc.perform(
+                post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.message").value("가입 성공!"))
@@ -289,7 +288,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
     @Test
     void recover() throws Exception {
         //given
-        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com", "testPassword",
+        CreateMemberRequest createMemberRequest = new CreateMemberRequest("test@gmail.com",
+            "testPassword",
             "testNickname");
 
         //when
@@ -299,7 +299,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
         String data = new ObjectMapper().writeValueAsString(createMemberRequest);
 
         //then
-        mockMvc.perform(post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
+        mockMvc.perform(
+                post("/api/v1/members").contentType(MediaType.APPLICATION_JSON).content(data))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.message").value("계정이 성공적으로 복구되었습니다!"))
@@ -344,7 +345,7 @@ class MemberControllerDocsTest extends RestDocsSupport {
         // Given
         Long expectedMemberId = 1L;
         GetMyInfoResponse getMyInfoResponse = new GetMyInfoResponse("NewNickname", "newimageURL",
-            "test@example.com");
+            "test@example.com", true, "패스트캠퍼스x야놀자 부트캠프");
 
         when(securityUtil.getCurrentMemberId()).thenReturn(expectedMemberId);
         when(memberService.getMyPageInfoById(expectedMemberId)).thenReturn(getMyInfoResponse);
@@ -360,6 +361,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
             .andExpect(jsonPath("$.data.nickname").value("NewNickname"))
             .andExpect(jsonPath("$.data.image").value("newimageURL"))
             .andExpect(jsonPath("$.data.email").value("test@example.com"))
+            .andExpect(jsonPath("$.data.campCrtfc").value(true))
+            .andExpect(jsonPath("$.data.bootcampName").value("패스트캠퍼스x야놀자 부트캠프"))
             .andDo(document("member-getMyPageInfo",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
@@ -368,7 +371,9 @@ class MemberControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("message").description("응답 메시지"),
                     fieldWithPath("data.nickname").description("사용자 닉네임"),
                     fieldWithPath("data.image").description("프로필 이미지 URL"),
-                    fieldWithPath("data.email").description("사용자 이메일")
+                    fieldWithPath("data.email").description("사용자 이메일"),
+                    fieldWithPath("data.campCrtfc").description("부트캠프 인증여부"),
+                    fieldWithPath("data.bootcampName").description("부트캠프 이름")
                 )
             ));
     }
@@ -379,7 +384,8 @@ class MemberControllerDocsTest extends RestDocsSupport {
     void updateMember() throws Exception {
         // Given
         Long expectedMemberId = 1L;
-        UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("NewNickname", "new-image-url");
+        UpdateMemberRequest updateMemberRequest = new UpdateMemberRequest("NewNickname",
+            "new-image-url");
         Member updatedMember = Member.builder()
             .id(expectedMemberId)
             .nickname("NewNickname")

@@ -47,9 +47,14 @@ public enum ErrorCode {
     // REVIEW
     TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 태그입니다."),
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
+    BOOTCAMP_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 부트캠프입니다."),
     ALREADY_DELETED_THIS_REVIEW(HttpStatus.BAD_REQUEST, "이미 삭제한 리뷰입니다."),
     HAS_NO_PERMISSION_WITH_THIS_REVIEW(HttpStatus.UNAUTHORIZED, "리뷰 작성/삭제 권한이 없습니다."),
     REVIEW_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 리뷰를 작성했습니다."),
+
+    // REFERENCE
+    ACTIVITY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 대외활동입니다."),
+    COMPETITION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 공모전입니다."),
 
     // 5xx
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러");

@@ -1,0 +1,2 @@
+ALTER TABLE tag
+    ADD COLUMN isGoodTag BOOLEAN;
