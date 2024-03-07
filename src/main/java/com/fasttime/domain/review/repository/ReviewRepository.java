@@ -1,5 +1,6 @@
 package com.fasttime.domain.review.repository;
 
+import com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO;
 import com.fasttime.domain.review.entity.Review;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +17,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT DISTINCT r.bootCamp.name FROM Review r")
     List<String> findAllBootcamps();
+
+    @Query("SELECT new com.fasttime.domain.review.dto.response.BootcampReviewSummaryDTO(r.bootCamp.name, AVG(r.rating), COUNT(r)) FROM Review r WHERE r.deletedAt IS NULL GROUP BY r.bootCamp.name")
+    Page<BootcampReviewSummaryDTO> findBootcampReviewSummaries(Pageable pageable);
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.bootCamp.name = :bootcampName")
     int countByBootcamp(@Param("bootcampName") String bootcampName);

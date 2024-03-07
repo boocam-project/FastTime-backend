@@ -30,9 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -171,18 +169,19 @@ public class ReviewService {
             .collect(Collectors.toSet());
     }
 
-    public List<BootcampReviewSummaryDTO> getBootcampReviewSummaries() {
+    public Page<BootcampReviewSummaryDTO> getBootcampReviewSummaries(Pageable pageable) {
         List<String> bootcamps = reviewRepository.findAllBootcamps();
         List<BootcampReviewSummaryDTO> summaries = new ArrayList<>();
 
         for (String bootcamp : bootcamps) {
             double averageRating = reviewRepository.findAverageRatingByBootcamp(bootcamp);
-            double roundedAverageRating = Math.round(averageRating * 10) / 10.0; // 소수점 한 자리까지 반올림
+            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
 
-            int totalReviews = reviewRepository.countByBootcamp(bootcamp);
-            summaries.add(new BootcampReviewSummaryDTO(bootcamp, roundedAverageRating, totalReviews));
+            long totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            summaries.add(
+                new BootcampReviewSummaryDTO(bootcamp, roundedAverageRating, totalReviews));
         }
-        return summaries;
+        return reviewRepository.findBootcampReviewSummaries(pageable);
     }
 
     public TagSummaryDTO getBootcampTagData(String bootcamp) {
@@ -207,7 +206,7 @@ public class ReviewService {
         return new TagSummaryDTO(totalTags, tagCounts);
     }
 
-    public Map<String, Object> convertToCustomPaginationResponse(Page<ReviewResponseDTO> page) {
+    public Map<String, Object> convertToCustomPaginationResponse(Page<?> page) {
         PaginationResponseDTO pageInfo = new PaginationResponseDTO(
             page.getNumber() + 1,
             page.getTotalPages(),
