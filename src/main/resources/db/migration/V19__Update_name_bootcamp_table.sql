@@ -1,0 +1,1 @@
+RENAME TABLE boocam_dev.BootCamp TO boocam_dev.bootcamp;

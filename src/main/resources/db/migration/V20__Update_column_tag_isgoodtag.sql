@@ -1,0 +1,1 @@
+alter table boocam_dev.tag change isGoodTag is_good_tag tinyint(1) default 0;
