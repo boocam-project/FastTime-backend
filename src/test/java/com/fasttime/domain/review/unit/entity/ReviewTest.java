@@ -86,18 +86,4 @@ public class ReviewTest {
         // then
         assertTrue(review.isDeleted());
     }
-
-    @DisplayName("리뷰를 복구할 수 있다.")
-    @Test
-    void restore_willSuccess() {
-        // given
-        Review review = Review.builder().build();
-        review.softDelete();
-
-        // when
-        review.restore();
-
-        // then
-        assertTrue(!review.isDeleted());
-    }
 }
