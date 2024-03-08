@@ -23,3 +23,7 @@ spring:
 cors:
   allowed-origins:
     - http://localhost:3000
+
+discord:
+  hook-name: spring-hook-dev
+  url: test

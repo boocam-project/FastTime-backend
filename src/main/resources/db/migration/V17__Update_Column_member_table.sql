@@ -1,7 +1,7 @@
-ALTER TABLE Member
+ALTER TABLE member
 DROP
 COLUMN bootcamp;
 
-ALTER TABLE Member
+ALTER TABLE member
     ADD COLUMN bootcamp_id BIGINT,
 ADD FOREIGN KEY (bootcamp_id) REFERENCES BootCamp(id);
