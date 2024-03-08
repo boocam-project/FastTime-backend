@@ -1,4 +1,4 @@
-package com.fasttime.domain.review.service;
+package com.fasttime.global.batch.tasklet;
 
 import com.fasttime.domain.review.repository.ReviewRepository;
 import java.time.LocalDateTime;
