@@ -51,6 +51,10 @@ public enum ErrorCode {
     HAS_NO_PERMISSION_WITH_THIS_REVIEW(HttpStatus.UNAUTHORIZED, "리뷰 작성/삭제 권한이 없습니다."),
     REVIEW_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 리뷰를 작성했습니다."),
 
+    // RESUME
+    RESUME_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 자기소개서입니다."),
+    HAS_NO_PERMISSION_WITH_THIS_RESUME(HttpStatus.UNAUTHORIZED, "해당 자기소게서에 대한 권한이 없습니다."),
+
     // 5xx
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 에러");
 

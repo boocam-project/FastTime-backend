@@ -87,6 +87,27 @@ class ResumeServiceTest {
         }
     }
 
+    @DisplayName("deleteResume()는")
+    @Nested
+    class Context_deleteResume {
+
+    }
+
+    @DisplayName("getResume()는")
+    @Nested
+    class Context_getResume {
+
+        @DisplayName("자기소개서를 성공적으로 불러온다.")
+        @Test
+        void _willSuccess() {
+            // given
+            Member member = Member.builder().id(1L).nickname("testName").build();
+            Resume resumeInDb = createMockResume(member);
+            // when
+            // then
+        }
+    }
+
     private static Resume createMockResume(Member member) {
         return Resume.builder()
                 .id(MOCK_RESUME_ID)
