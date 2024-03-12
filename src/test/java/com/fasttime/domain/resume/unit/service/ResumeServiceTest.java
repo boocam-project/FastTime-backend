@@ -24,6 +24,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ResumeServiceTest {
 
+    public static final String MOCK_RESUME_TITLE = "Resume test1";
+    public static final String MOCK_RESUME_CONTENT = "# This is Resume";
+    public static final long MOCK_RESUME_ID = 1L;
     @Mock
     private MemberService memberService;
     @InjectMocks
@@ -31,6 +34,7 @@ class ResumeServiceTest {
     @Mock
     private ResumeRepository resumeRepository;
 
+    @DisplayName("createResume()는")
     @Nested
     class Context_createResume {
 
@@ -39,14 +43,9 @@ class ResumeServiceTest {
         void _willSuccess() {
             // given
             Member member = Member.builder().id(1L).nickname("testName").build();
-            ResumeRequestDto requestDto = new ResumeRequestDto("Resume test1", "# This is Resume");
-            Resume mockResume = Resume.builder()
-                    .id(1L)
-                    .title("Resume test1")
-                    .content("# This is Resume")
-                    .writer(member)
-                    .rating(0)
-                    .build();
+            ResumeRequestDto requestDto = new ResumeRequestDto(MOCK_RESUME_TITLE,
+                    MOCK_RESUME_CONTENT);
+            Resume mockResume = createMockResume(member);
 
             given(memberService.getMember(1L)).willReturn(member);
             given(resumeRepository.save(any(Resume.class))).willReturn(mockResume);
@@ -56,7 +55,16 @@ class ResumeServiceTest {
 
             // then
             assertThat(response).extracting("id", "title", "content", "writer", "rating")
-                    .containsExactly(1L, "Resume test1", "# This is Resume", "testName", 0);
+                    .containsExactly(1L, MOCK_RESUME_TITLE, MOCK_RESUME_CONTENT, "testName", 0);
         }
+    }
+    private static Resume createMockResume(Member member) {
+        return Resume.builder()
+                .id(MOCK_RESUME_ID)
+                .title(MOCK_RESUME_TITLE)
+                .content(MOCK_RESUME_CONTENT)
+                .writer(member)
+                .rating(0)
+                .build();
     }
 }
