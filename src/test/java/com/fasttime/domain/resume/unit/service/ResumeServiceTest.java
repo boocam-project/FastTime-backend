@@ -57,7 +57,36 @@ class ResumeServiceTest {
             assertThat(response).extracting("id", "title", "content", "writer", "rating")
                     .containsExactly(1L, MOCK_RESUME_TITLE, MOCK_RESUME_CONTENT, "testName", 0);
         }
+
     }
+
+    @DisplayName("updateResume()는")
+    @Nested
+    class Context_updateResume{
+
+        @DisplayName("자기소개서를 성공적으로 편집한다.")
+        @Test
+        void _willSuccess(){
+            // given
+            Member member = Member.builder().id(1L).nickname("testName").build();
+            Resume mockResume = createMockResume(member);
+
+            String updatedTitle = "updated title";
+            String updatedContent = "updated content";
+            ResumeUpdateServiceRequest updateRequest = new ResumeUpdateServiceRequest(MOCK_RESUME_ID, 1L,
+                    updatedTitle, updatedContent);
+
+            given(memberService.getMember(1L)).willReturn(member);
+            given(resumeRepository.findById(MOCK_RESUME_ID)).willReturn(Optional.of(mockResume));
+
+            // when
+            ResumeResponseDto response = resumeService.updateResume(updateRequest);
+            // then
+            assertThat(response).extracting("id", "title", "content", "writer", "rating")
+                    .containsExactly(1L, updatedTitle, updatedContent, "testName", 0);
+        }
+    }
+
     private static Resume createMockResume(Member member) {
         return Resume.builder()
                 .id(MOCK_RESUME_ID)
