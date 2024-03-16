@@ -139,11 +139,24 @@ class ResumeServiceTest {
         @DisplayName("자기소개서를 성공적으로 불러온다.")
         @Test
         void _willSuccess() {
-            // given
             Member member = Member.builder().id(1L).nickname("testName").build();
             Resume resumeInDb = createMockResume(member);
-            // when
-            // then
+
+            given(resumeRepository.findById(anyLong())).willReturn(Optional.of(resumeInDb));
+
+            ResumeResponseDto response = resumeService.getResume(1L);
+
+            assertThat(response).extracting("id", "title", "content", "writer", "rating")
+                    .containsExactly(1L, MOCK_RESUME_TITLE, MOCK_RESUME_CONTENT, "testName", 0);
+        }
+
+        @DisplayName("존재하지 않는 resumeId로 불러오면 ResumeNotFoundException을 반환한다.")
+        @Test
+        void resume_idNotExist_throwIllegalException() {
+            given(resumeRepository.findById(anyLong())).willReturn(Optional.empty());
+
+            assertThatThrownBy(() -> resumeService.getResume(5L)).isInstanceOf(
+                    ResumeNotFoundException.class);
         }
     }
 
