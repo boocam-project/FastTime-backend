@@ -21,6 +21,19 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final MemberService memberService;
 
+    public ResumeResponseDto getResume(Long id) {
+        Resume resume = resumeRepository.findById(id)
+                .orElseThrow(() -> new ResumeNotFoundException(id));
+
+        return ResumeResponseDto.builder()
+                .id(resume.getId())
+                .title(resume.getTitle())
+                .content(resume.getContent())
+                .writer(resume.getWriter().getNickname())
+                .rating(resume.getRating())
+                .build();
+    }
+
     public ResumeResponseDto createResume(ResumeRequestDto requestDto, Long memberId) {
         Member member = memberService.getMember(memberId);
 

@@ -3,8 +3,8 @@ package com.fasttime.domain.resume.controller;
 import com.fasttime.domain.resume.dto.ResumeRequestDto;
 import com.fasttime.domain.resume.dto.ResumeResponseDto;
 import com.fasttime.domain.resume.dto.ResumeUpdateRequest;
-import com.fasttime.domain.resume.service.ResumeService;
 import com.fasttime.domain.resume.dto.ResumeUpdateServiceRequest;
+import com.fasttime.domain.resume.service.ResumeService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -63,5 +64,13 @@ public class ResumeController {
     }
 
     // Resume get
+    @GetMapping("/{resumeId}")
+    public ResponseEntity<ResponseDTO<ResumeResponseDto>> getResume(
+            @PathVariable Long resumeId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResponseDTO.res(HttpStatus.OK,
+                        resumeService.getResume(resumeId)));
+    }
     // Resume list get
 }

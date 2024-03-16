@@ -47,7 +47,8 @@ public class Resume extends BaseTimeEntity {
         this.content = content;
     }
 
-    public void softDelete() {
-        delete(LocalDateTime.now());
+    @Override
+    public void delete(LocalDateTime currentTime) {
+        super.delete(currentTime);
     }
 }
