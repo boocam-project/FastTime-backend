@@ -1,5 +1,6 @@
 package com.fasttime.domain.resume.controller;
 
+import com.fasttime.domain.resume.dto.ResumeDeleteServiceRequest;
 import com.fasttime.domain.resume.dto.ResumeRequestDto;
 import com.fasttime.domain.resume.dto.ResumeResponseDto;
 import com.fasttime.domain.resume.dto.ResumeUpdateRequest;
@@ -8,6 +9,7 @@ import com.fasttime.domain.resume.service.ResumeService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +44,11 @@ public class ResumeController {
     // Resume delete
     @DeleteMapping("/{resumeId}")
     public ResponseEntity<ResponseDTO<Void>> deleteResume(@PathVariable Long resumeId) {
-
+        resumeService.delete(new ResumeDeleteServiceRequest(
+                resumeId,
+                securityUtil.getCurrentMemberId(),
+                LocalDateTime.now()
+        ));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDTO.res(HttpStatus.OK, null, null));
     }

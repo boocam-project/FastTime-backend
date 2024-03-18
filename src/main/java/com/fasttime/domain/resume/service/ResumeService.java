@@ -2,6 +2,7 @@ package com.fasttime.domain.resume.service;
 
 import com.fasttime.domain.member.entity.Member;
 import com.fasttime.domain.member.service.MemberService;
+import com.fasttime.domain.resume.dto.ResumeDeleteServiceRequest;
 import com.fasttime.domain.resume.dto.ResumeRequestDto;
 import com.fasttime.domain.resume.dto.ResumeResponseDto;
 import com.fasttime.domain.resume.dto.ResumeUpdateServiceRequest;
@@ -30,7 +31,8 @@ public class ResumeService {
                 .title(resume.getTitle())
                 .content(resume.getContent())
                 .writer(resume.getWriter().getNickname())
-                .rating(resume.getRating())
+                .likeCount(resume.getLikeCount())
+                .viewCount(resume.getViewCount())
                 .build();
     }
 
@@ -46,7 +48,8 @@ public class ResumeService {
                 .title(createdResume.getTitle())
                 .content(createdResume.getContent())
                 .writer(createdResume.getWriter().getNickname())
-                .rating(createdResume.getRating())
+                .likeCount(createdResume.getLikeCount())
+                .viewCount(createdResume.getViewCount())
                 .build();
     }
 
@@ -65,8 +68,18 @@ public class ResumeService {
                 .title(resume.getTitle())
                 .content(resume.getContent())
                 .writer(resume.getWriter().getNickname())
-                .rating(resume.getRating())
+                .likeCount(resume.getLikeCount())
+                .viewCount(resume.getViewCount())
                 .build();
+    }
+
+    public void delete(ResumeDeleteServiceRequest deleteRequest) {
+        final Member deleteRequestMember = memberService.getMember(
+                deleteRequest.requestUserId());
+        final Resume resume = findResumeById(deleteRequest.resumeId());
+        isWriter(deleteRequestMember, resume);
+        resume.delete(deleteRequest.deleteAt());
+        resumeRepository.save(resume);
     }
 
     private void isWriter(Member requestMember, Resume resume) {

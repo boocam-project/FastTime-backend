@@ -8,8 +8,8 @@ public record ResumeResponseDto(
         String title,
         String content,
         String writer,
-        int rating
+        int likeCount,
 
-) {
+        int viewCount) {
 
 }

@@ -29,7 +29,10 @@ public class Resume extends BaseTimeEntity {
     private String title;
     private String content;
     @ColumnDefault("0")
-    private int rating;
+    private int likeCount;
+
+    @ColumnDefault("0")
+    private int viewCount;
 
     @ManyToOne
     private Member writer;
@@ -50,5 +53,13 @@ public class Resume extends BaseTimeEntity {
     @Override
     public void delete(LocalDateTime currentTime) {
         super.delete(currentTime);
+    }
+
+    public void like(){
+        this.likeCount += 1;
+    }
+
+    public void view(){
+        this.viewCount += 1;
     }
 }
