@@ -1,6 +1,6 @@
 package com.fasttime.domain.review.unit.service;
 
-import com.fasttime.domain.review.service.BatchScheduler;
+import com.fasttime.global.batch.scheduler.BatchScheduler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

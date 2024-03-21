@@ -12,6 +12,7 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,14 @@ public class CompetitionCustomRepositoryImpl implements CompetitionCustomReposit
             .where(createSearchConditionsBuilder(referenceSearchRequestDto));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public List<Competition> findAllByRecruitmentStart(LocalDate now) {
+        return queryFactory.selectFrom(qCompetition)
+            .where(qCompetition.status.eq(RecruitmentStatus.BEFORE)
+                .and(qCompetition.startDate.goe(now)))
+            .fetch();
     }
 
     private BooleanBuilder createSearchConditionsBuilder(
