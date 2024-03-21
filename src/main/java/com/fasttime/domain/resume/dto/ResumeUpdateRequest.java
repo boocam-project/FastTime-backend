@@ -1,7 +1,9 @@
 package com.fasttime.domain.resume.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record ResumeUpdateRequest(
-        String title,
-        String content
+        @NotBlank String title,
+        @NotBlank String content
 ) {
 }
