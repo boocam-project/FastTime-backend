@@ -33,7 +33,7 @@ public class ResumeController {
     // Resume create
     @PostMapping("/create")
     public ResponseEntity<ResponseDTO<ResumeResponseDto>> creatResume(
-            @RequestBody ResumeRequestDto requestDto) {
+            @RequestBody @Valid ResumeRequestDto requestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ResponseDTO.res(HttpStatus.CREATED, "자기소개서가 등록되었습니다.",
