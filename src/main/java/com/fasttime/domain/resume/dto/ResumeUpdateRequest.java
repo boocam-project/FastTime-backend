@@ -6,4 +6,5 @@ public record ResumeUpdateRequest(
         @NotBlank String title,
         @NotBlank String content
 ) {
+
 }

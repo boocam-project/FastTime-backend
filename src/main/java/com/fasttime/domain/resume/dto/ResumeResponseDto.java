@@ -9,7 +9,7 @@ public record ResumeResponseDto(
         String content,
         String writer,
         int likeCount,
-
-        int viewCount) {
+        int viewCount
+) {
 
 }

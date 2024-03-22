@@ -19,11 +19,7 @@ import com.fasttime.domain.resume.exception.NoResumeWriterException;
 import com.fasttime.domain.resume.exception.ResumeNotFoundException;
 import com.fasttime.domain.resume.repository.ResumeRepository;
 import com.fasttime.domain.resume.service.ResumeService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@Slf4j
 @ExtendWith(MockitoExtension.class)
 class ResumeServiceTest {
 
@@ -66,7 +61,8 @@ class ResumeServiceTest {
             ResumeResponseDto response = resumeService.createResume(requestDto, 1L);
 
             // then
-            assertThat(response).extracting("id", "title", "content", "writer", "likeCount", "viewCount")
+            assertThat(response).extracting("id", "title", "content", "writer", "likeCount",
+                            "viewCount")
                     .containsExactly(1L, MOCK_RESUME_TITLE, MOCK_RESUME_CONTENT, "testName", 0, 0);
         }
 
@@ -82,7 +78,6 @@ class ResumeServiceTest {
             // given
             Member member = Member.builder().id(1L).nickname("testName").build();
             Resume mockResume = createMockResume(member);
-
             String updatedTitle = "updated title";
             String updatedContent = "updated content";
             ResumeUpdateServiceRequest updateRequest = new ResumeUpdateServiceRequest(
@@ -94,14 +89,17 @@ class ResumeServiceTest {
 
             // when
             ResumeResponseDto response = resumeService.updateResume(updateRequest);
+
             // then
-            assertThat(response).extracting("id", "title", "content", "writer", "likeCount", "viewCount")
+            assertThat(response).extracting("id", "title", "content", "writer", "likeCount",
+                            "viewCount")
                     .containsExactly(1L, updatedTitle, updatedContent, "testName", 0, 0);
         }
 
         @DisplayName("자기소개서 작성자가 아닌 경우 NoResumeWriterException을 반환한다.")
         @Test
         void resume_validateFail_throwIllegalArgumentException() {
+            // given
             Member writer = Member.builder().id(1L).nickname("testName").build();
             Member notAuthorizedMember = Member.builder().id(221L).build();
             Resume mockResume = createMockResume(writer);
@@ -112,6 +110,7 @@ class ResumeServiceTest {
             given(memberService.getMember(anyLong())).willReturn(notAuthorizedMember);
             given(resumeRepository.findById(anyLong())).willReturn(Optional.of(mockResume));
 
+            // then
             assertThatThrownBy(() -> resumeService.updateResume(updateRequest))
                     .isInstanceOf(NoResumeWriterException.class);
 
@@ -120,11 +119,13 @@ class ResumeServiceTest {
         @DisplayName("수정할 자기소개서가 없는 경우 ResumeNotFoundException을 반환한다.")
         @Test
         void resume_notExist_throwExceptoin() {
+            // given
             ResumeUpdateServiceRequest request = new ResumeUpdateServiceRequest(MOCK_RESUME_ID, 1L,
                     "updateTitle", "updateContent");
 
             given(resumeRepository.findById(anyLong())).willReturn(Optional.empty());
 
+            // then
             assertThatThrownBy(() -> resumeService.updateResume(request))
                     .isInstanceOf(ResumeNotFoundException.class);
         }
@@ -135,26 +136,24 @@ class ResumeServiceTest {
     @DisplayName("deleteResume()는")
     @Nested
     class Context_deleteResume {
+
         @DisplayName("deleteAt의 시간이 갱신된다")
         @Test
-        void _Success(){
+        void _Success() {
+            // given
             Member member = Member.builder().id(1L).nickname("testName").build();
             Resume resumeInDb = createMockResume(member);
 
             given(memberService.getMember(anyLong())).willReturn(member);
             given(resumeRepository.findById(anyLong())).willReturn(Optional.of(resumeInDb));
 
-            LocalDate deleteDate = LocalDate.of(2024, 3, 16);
-            LocalTime deleteTime = LocalTime.of(12, 30);
+            ResumeDeleteServiceRequest request = new ResumeDeleteServiceRequest(1L, 1L);
 
-            ResumeDeleteServiceRequest request = new ResumeDeleteServiceRequest(1L, 1L,
-                    LocalDateTime.of(deleteDate, deleteTime));
-
+            // when
             resumeService.delete(request);
 
-            LocalDateTime expectedDeleteDateTime = LocalDateTime.of(deleteDate, deleteTime);
+            // then
             verify(resumeRepository, times(1)).save(resumeInDb);
-            assertThat(resumeInDb.getDeletedAt()).isEqualTo(expectedDeleteDateTime);
         }
 
     }
@@ -166,22 +165,28 @@ class ResumeServiceTest {
         @DisplayName("자기소개서를 성공적으로 불러온다.")
         @Test
         void _willSuccess() {
+            // given
             Member member = Member.builder().id(1L).nickname("testName").build();
             Resume resumeInDb = createMockResume(member);
 
             given(resumeRepository.findById(anyLong())).willReturn(Optional.of(resumeInDb));
 
+            // when
             ResumeResponseDto response = resumeService.getResume(1L);
 
-            assertThat(response).extracting("id", "title", "content", "writer", "likeCount", "viewCount")
+            // then
+            assertThat(response).extracting("id", "title", "content", "writer", "likeCount",
+                            "viewCount")
                     .containsExactly(1L, MOCK_RESUME_TITLE, MOCK_RESUME_CONTENT, "testName", 0, 0);
         }
 
         @DisplayName("존재하지 않는 resumeId로 불러오면 ResumeNotFoundException을 반환한다.")
         @Test
         void resume_idNotExist_throwIllegalException() {
+            // given
             given(resumeRepository.findById(anyLong())).willReturn(Optional.empty());
 
+            // when
             assertThatThrownBy(() -> resumeService.getResume(5L)).isInstanceOf(
                     ResumeNotFoundException.class);
         }

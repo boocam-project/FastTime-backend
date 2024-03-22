@@ -4,6 +4,7 @@ public record ResumeUpdateServiceRequest(
         Long resumeId,
         Long memberId,
         String title,
-        String content) {
+        String content
+) {
 
 }

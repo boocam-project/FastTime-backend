@@ -27,7 +27,9 @@ public class Resume extends BaseTimeEntity {
     private Long id;
 
     private String title;
+
     private String content;
+
     @ColumnDefault("0")
     private int likeCount;
 

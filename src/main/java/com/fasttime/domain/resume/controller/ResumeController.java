@@ -9,7 +9,6 @@ import com.fasttime.domain.resume.service.ResumeService;
 import com.fasttime.global.util.ResponseDTO;
 import com.fasttime.global.util.SecurityUtil;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,8 @@ public class ResumeController {
     private final SecurityUtil securityUtil;
     private final ResumeService resumeService;
 
-    // Resume create
     @PostMapping()
-    public ResponseEntity<ResponseDTO<ResumeResponseDto>> creatResume(
+    public ResponseEntity<ResponseDTO<ResumeResponseDto>> createResume(
             @RequestBody @Valid ResumeRequestDto requestDto) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -41,25 +39,21 @@ public class ResumeController {
                                 securityUtil.getCurrentMemberId())));
     }
 
-    // Resume delete
     @DeleteMapping("/{resumeId}")
     public ResponseEntity<ResponseDTO<Void>> deleteResume(@PathVariable Long resumeId) {
         resumeService.delete(new ResumeDeleteServiceRequest(
                 resumeId,
-                securityUtil.getCurrentMemberId(),
-                LocalDateTime.now()
+                securityUtil.getCurrentMemberId()
         ));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDTO.res(HttpStatus.OK, null, null));
     }
 
-    // Resume update
     @PutMapping("/{resumeId}")
     public ResponseEntity<ResponseDTO<ResumeResponseDto>> updateResume(
             @PathVariable Long resumeId,
             @RequestBody @Valid ResumeUpdateRequest request
     ) {
-
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResponseDTO.res(HttpStatus.OK, "자기소개서 업데이트 완료되었습니다.",
                         resumeService.updateResume(
@@ -69,7 +63,6 @@ public class ResumeController {
                                         request.content()))));
     }
 
-    // Resume get
     @GetMapping("/{resumeId}")
     public ResponseEntity<ResponseDTO<ResumeResponseDto>> getResume(
             @PathVariable Long resumeId
@@ -78,5 +71,4 @@ public class ResumeController {
                 .body(ResponseDTO.res(HttpStatus.OK,
                         resumeService.getResume(resumeId)));
     }
-    // Resume list get
 }
