@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -14,10 +13,10 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 
 import com.fasttime.docs.RestDocsSupport;
 import com.fasttime.domain.review.controller.ReviewController;
@@ -32,10 +31,12 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-
-import static org.springframework.restdocs.request.RequestDocumentation.*;
 
 class ReviewControllerDocsTest extends RestDocsSupport {
 
@@ -76,7 +77,8 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
                     fieldWithPath("data.bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("리뷰 제목"),
@@ -147,8 +149,10 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
+                    fieldWithPath("data.authorNickname").type(JsonFieldType.STRING)
+                        .description("작성자 닉네임"),
                     fieldWithPath("data.bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("리뷰 제목"),
@@ -166,40 +170,47 @@ class ReviewControllerDocsTest extends RestDocsSupport {
     @Test
     void getReviews() throws Exception {
         List<ReviewResponseDTO> reviews = List.of(
-            new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"),
-                Set.of("불친절해요"),
-                5, "리뷰 내용 1"),
-            new ReviewResponseDTO(2L, "말하는 고구마", "다른 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"),
-                Set.of("피드백이 느려요"),
-                4, "리뷰 내용 2")
+            new ReviewResponseDTO(1L, "말하는 감자", "부트캠프1", "리뷰 제목 1", Set.of("친절해요"),
+                Set.of("불친절해요"), 5, "리뷰 내용 1"),
+            new ReviewResponseDTO(2L, "말하는 고구마", "부트캠프2", "리뷰 제목 2", Set.of("강의가 좋아요"),
+                Set.of("피드백이 느려요"), 4, "리뷰 내용 2")
         );
+        Page<ReviewResponseDTO> reviewsPage = new PageImpl<>(reviews);
 
-        when(reviewService.getSortedReviews(anyString(), isNull())).thenReturn(reviews);
+        when(reviewService.getSortedReviews(anyString(),  any(Pageable.class))).thenReturn(reviewsPage)
+            .thenReturn(reviewsPage);
 
         mockMvc.perform(get("/api/v2/reviews")
+                .queryParam("bootcamp", "")
+                .queryParam("page", "0")
+                .queryParam("size", "6")
                 .queryParam("sortBy", "rating"))
             .andExpect(status().isOk())
             .andDo(document("reviews-get-all",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 queryParameters(
-                    parameterWithName("sortBy").description("기본값: 'createdAt' 옵션: 'rating'")
-                        .optional()
+                    parameterWithName("bootcamp").description("부트캠프 이름"),
+                    parameterWithName("page").description("페이지 번호"),
+                    parameterWithName("size").description("페이지당 항목 수"),
+                    parameterWithName("sortBy").description("정렬 기준").optional()
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                    fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
-                        .description("부트캠프 이름"),
-                    fieldWithPath("data[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
-                    fieldWithPath("data[].goodtags").type(JsonFieldType.ARRAY)
-                        .description("좋아요 태그 목록"),
-                    fieldWithPath("data[].badtags").type(JsonFieldType.ARRAY)
-                        .description("나빠요 태그 목록"),
-                    fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
-                    fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용")
+                    subsectionWithPath("data.reviews[]").type(JsonFieldType.ARRAY).description("페이지네이션된 리뷰 목록"),
+                    fieldWithPath("data.reviews[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.reviews[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.reviews[].bootcamp").type(JsonFieldType.STRING).description("부트캠프 이름"),
+                    fieldWithPath("data.reviews[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
+                    fieldWithPath("data.reviews[].goodtags").type(JsonFieldType.ARRAY).description("좋은 태그 목록"),
+                    fieldWithPath("data.reviews[].badtags").type(JsonFieldType.ARRAY).description("나쁜 태그 목록"),
+                    fieldWithPath("data.reviews[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
+                    fieldWithPath("data.reviews[].content").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
+                    fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+                    fieldWithPath("data.currentElements").type(JsonFieldType.NUMBER).description("현재 페이지의 리뷰 수"),
+                    fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 리뷰 수")
                 )
             ));
     }
@@ -209,43 +220,46 @@ class ReviewControllerDocsTest extends RestDocsSupport {
     void getReviewsByBootcamp() throws Exception {
         List<ReviewResponseDTO> reviews = List.of(
             new ReviewResponseDTO(1L, "말하는 감자", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 1", Set.of("친절해요"),
-                Set.of("불친절해요"),
-                5, "리뷰 내용 1"),
+                Set.of("불친절해요"), 5, "리뷰 내용 1"),
             new ReviewResponseDTO(2L, "말하는 고구마", "패스트캠퍼스X야놀자 부트캠프", "리뷰 제목 2", Set.of("강의가 좋아요"),
                 Set.of("피드백이 느려요"), 4, "리뷰 내용 2")
         );
+        Page<ReviewResponseDTO> reviewsPage = new PageImpl<>(reviews);
 
-        when(reviewService.getSortedReviews(eq("rating"), eq("패스트캠퍼스X야놀자 부트캠프")))
-            .thenReturn(reviews);
+        when(reviewService.getSortedReviews(eq("패스트캠퍼스X야놀자 부트캠프"), any(Pageable.class)))
+            .thenReturn(reviewsPage);
 
         mockMvc.perform(get("/api/v2/reviews")
                 .queryParam("bootcamp", "패스트캠퍼스X야놀자 부트캠프")
+                .queryParam("page", "0")
+                .queryParam("size", "6")
                 .queryParam("sortBy", "rating"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data").isArray())
-            .andExpect(jsonPath("$.data[0].id").exists())
             .andDo(document("reviews-get-bootcamp",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 queryParameters(
-                    parameterWithName("bootcamp").description("부트캠프 이름").optional(),
-                    parameterWithName("sortBy").description("기본값: 'createdAt' 옵션: 'rating'")
-                        .optional()
+                    parameterWithName("bootcamp").description("부트캠프 이름"),
+                    parameterWithName("page").description("페이지 번호"),
+                    parameterWithName("size").description("페이지당 항목 수"),
+                    parameterWithName("sortBy").description("정렬 기준").optional()
                 ),
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-                    fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
-                        .description("부트캠프 이름"),
-                    fieldWithPath("data[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
-                    fieldWithPath("data[].goodtags").type(JsonFieldType.ARRAY)
-                        .description("좋아요 태그 목록"),
-                    fieldWithPath("data[].badtags").type(JsonFieldType.ARRAY)
-                        .description("나빠요 태그 목록"),
-                    fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
-                    fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용")
+                    subsectionWithPath("data.reviews[]").type(JsonFieldType.ARRAY).description("페이지네이션된 리뷰 목록"),
+                    fieldWithPath("data.reviews[].id").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.reviews[].authorNickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
+                    fieldWithPath("data.reviews[].bootcamp").type(JsonFieldType.STRING).description("부트캠프 이름"),
+                    fieldWithPath("data.reviews[].title").type(JsonFieldType.STRING).description("리뷰 제목"),
+                    fieldWithPath("data.reviews[].goodtags").type(JsonFieldType.ARRAY).description("좋은 태그 목록"),
+                    fieldWithPath("data.reviews[].badtags").type(JsonFieldType.ARRAY).description("나쁜 태그 목록"),
+                    fieldWithPath("data.reviews[].rating").type(JsonFieldType.NUMBER).description("리뷰 평점"),
+                    fieldWithPath("data.reviews[].content").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
+                    fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+                    fieldWithPath("data.currentElements").type(JsonFieldType.NUMBER).description("현재 페이지의 리뷰 수"),
+                    fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 리뷰 수")
                 )
             ));
     }
@@ -254,11 +268,17 @@ class ReviewControllerDocsTest extends RestDocsSupport {
     @Test
     void getBootcampReviewSummaries() throws Exception {
         List<BootcampReviewSummaryDTO> summaries = List.of(
-            new BootcampReviewSummaryDTO("야놀자x패스트캠퍼스 부트캠프", 3.0, 7),
-            new BootcampReviewSummaryDTO("다른 부트캠프", 4.5, 2)
+            new BootcampReviewSummaryDTO("야놀자x패스트캠퍼스 부트캠프", 3.0, 7l),
+            new BootcampReviewSummaryDTO("다른 부트캠프", 4.5, 2l)
         );
 
-        when(reviewService.getBootcampReviewSummaries()).thenReturn(summaries);
+        int page = 0;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<BootcampReviewSummaryDTO> pagedSummaries = new PageImpl<>(summaries, pageable, summaries.size());
+
+        when(reviewService.getBootcampReviewSummaries(pageable)).thenReturn(pagedSummaries);
 
         mockMvc.perform(get("/api/v2/reviews/summary")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -269,12 +289,24 @@ class ReviewControllerDocsTest extends RestDocsSupport {
                 responseFields(
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("응답 코드"),
                     fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                    fieldWithPath("data[].bootcamp").type(JsonFieldType.STRING)
+                    subsectionWithPath("data").type(JsonFieldType.OBJECT)
+                        .description("응답 데이터"),
+                    subsectionWithPath("data.reviews").type(JsonFieldType.ARRAY)
+                        .description("부트캠프별 리뷰 요약 목록"),
+                    fieldWithPath("data.reviews[].bootcamp").type(JsonFieldType.STRING)
                         .description("부트캠프 이름"),
-                    fieldWithPath("data[].averageRating").type(JsonFieldType.NUMBER)
+                    fieldWithPath("data.reviews[].averageRating").type(JsonFieldType.NUMBER)
                         .description("평균 평점"),
-                    fieldWithPath("data[].totalReviews").type(JsonFieldType.NUMBER)
-                        .description("총 리뷰 수")
+                    fieldWithPath("data.reviews[].totalReviews").type(JsonFieldType.NUMBER)
+                        .description("총 리뷰 수"),
+                    fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
+                        .description("현재 페이지"),
+                    fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER)
+                        .description("총 페이지 수"),
+                    fieldWithPath("data.currentElements").type(JsonFieldType.NUMBER)
+                        .description("현재 페이지의 리뷰 요약 수"),
+                    fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
+                        .description("전체 리뷰 요약 수")
                 )
             ));
     }

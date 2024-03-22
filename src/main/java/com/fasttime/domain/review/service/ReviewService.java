@@ -20,7 +20,6 @@ import com.fasttime.domain.review.exception.UnauthorizedAccessException;
 import com.fasttime.domain.review.repository.ReviewRepository;
 import com.fasttime.domain.review.repository.ReviewTagRepository;
 import com.fasttime.domain.review.repository.TagRepository;
-import com.fasttime.global.util.PaginationResponseDTO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -204,20 +203,5 @@ public class ReviewService {
         }
 
         return new TagSummaryDTO(totalTags, tagCounts);
-    }
-
-    public Map<String, Object> convertToCustomPaginationResponse(Page<?> page) {
-        PaginationResponseDTO pageInfo = new PaginationResponseDTO(
-            page.getNumber() + 1,
-            page.getTotalPages(),
-            page.getNumberOfElements(),
-            page.getTotalElements()
-        );
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", page.getContent());
-        response.put("page", pageInfo);
-
-        return response;
     }
 }
