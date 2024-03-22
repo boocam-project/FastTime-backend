@@ -10,6 +10,7 @@ import com.fasttime.domain.resume.entity.Resume;
 import com.fasttime.domain.resume.exception.NoResumeWriterException;
 import com.fasttime.domain.resume.exception.ResumeNotFoundException;
 import com.fasttime.domain.resume.repository.ResumeRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,7 +79,7 @@ public class ResumeService {
                 deleteRequest.requestUserId());
         final Resume resume = findResumeById(deleteRequest.resumeId());
         isWriter(deleteRequestMember, resume);
-        resume.delete(deleteRequest.deleteAt());
+        resume.delete(LocalDateTime.now());
         resumeRepository.save(resume);
     }
 
