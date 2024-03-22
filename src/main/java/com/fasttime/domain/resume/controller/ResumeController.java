@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/resume")
+@RequestMapping("/api/v2/resumes")
 public class ResumeController {
 
     private final SecurityUtil securityUtil;
     private final ResumeService resumeService;
 
     // Resume create
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<ResponseDTO<ResumeResponseDto>> creatResume(
             @RequestBody @Valid ResumeRequestDto requestDto) {
         return ResponseEntity
