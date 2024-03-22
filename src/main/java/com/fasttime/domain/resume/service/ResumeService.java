@@ -87,7 +87,9 @@ public class ResumeService {
 
     private void isWriter(Member requestMember, Resume resume) {
         if (!requestMember.getId().equals(resume.getWriter().getId())) {
-            throw new NoResumeWriterException("");
+            throw new NoResumeWriterException(
+                    String.format("작성자가 아닙니다. request user id = %d, resume writer id = %d",
+                            requestMember.getId(), resume.getWriter().getId()));
         }
     }
 
