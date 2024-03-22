@@ -32,14 +32,12 @@ public class CrawlingService {
     private final String activityBaseUrl = "https://linkareer.com/list/activity?filterBy_interestIDs=13&filterType=INTEREST&orderBy_direction=DESC&orderBy_field=CREATED_AT&page=";
     private final String competitionBaseUrl = "https://linkareer.com/list/contest?filterBy_categoryIDs=35&filterType=CATEGORY&orderBy_direction=DESC&orderBy_field=CREATED_AT&page=";
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateNewCompetition() throws InterruptedException {
         WebDriver chromeDriver = webDriverUtil.getChromeDriver();
         searchNewReference(1, chromeDriver, SearchCrawling.COMPETITION);
         chromeDriver.quit();
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateNewActivity() throws InterruptedException {
         WebDriver chromeDriver = webDriverUtil.getChromeDriver();
         searchNewReference(1, chromeDriver, SearchCrawling.ACTIVITY);
@@ -47,7 +45,6 @@ public class CrawlingService {
         chromeDriver.quit();
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateDoneCompetition() throws InterruptedException {
         WebDriver chromeDriver = webDriverUtil.getChromeDriver();
         List<Integer> pages = initPage(chromeDriver, SearchCrawling.COMPETITION);
@@ -65,7 +62,6 @@ public class CrawlingService {
         }
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
     public void updateDoneActivity() throws InterruptedException {
         WebDriver chromeDriver = webDriverUtil.getChromeDriver();
         List<Integer> pages = initPage(chromeDriver, SearchCrawling.ACTIVITY);
