@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,9 +16,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 public class Resume extends BaseTimeEntity {
 
     @Id
@@ -39,12 +36,15 @@ public class Resume extends BaseTimeEntity {
     @ManyToOne
     private Member writer;
 
-    public static Resume createNewResume(Member member, String title, String content) {
-        return Resume.builder()
-                .title(title)
-                .content(content)
-                .writer(member)
-                .build();
+    @Builder
+    public Resume(Long id, String title, String content, int likeCount, int viewCount,
+            Member writer) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.likeCount = likeCount;
+        this.viewCount = viewCount;
+        this.writer = writer;
     }
 
     public void updateResume(String title, String content) {
@@ -57,11 +57,11 @@ public class Resume extends BaseTimeEntity {
         super.delete(currentTime);
     }
 
-    public void like(){
+    public void like() {
         this.likeCount += 1;
     }
 
-    public void view(){
+    public void view() {
         this.viewCount += 1;
     }
 }

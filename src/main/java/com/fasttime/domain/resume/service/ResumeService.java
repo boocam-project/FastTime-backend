@@ -39,9 +39,11 @@ public class ResumeService {
 
     public ResumeResponseDto createResume(ResumeRequestDto requestDto, Long memberId) {
         Member member = memberService.getMember(memberId);
-
-        final Resume newResume = Resume.createNewResume(member, requestDto.title(),
-                requestDto.content());
+        final Resume newResume = Resume.builder()
+                .title(requestDto.title())
+                .content(requestDto.content())
+                .writer(member)
+                .build();
         Resume createdResume = resumeRepository.save(newResume);
 
         return ResumeResponseDto.builder()
