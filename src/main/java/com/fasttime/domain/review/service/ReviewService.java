@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final BootCampRepository bootCampRepository;
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(MemberNotFoundException::new);
@@ -80,6 +83,7 @@ public class ReviewService {
             .collect(Collectors.toSet());
     }
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public void deleteReview(Long reviewId, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(ReviewNotFoundException::new);
@@ -94,6 +98,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(ReviewNotFoundException::new);
@@ -134,6 +139,7 @@ public class ReviewService {
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
     }
 
+    @Cacheable(value = "allReviewsCache")
     public Page<ReviewResponseDTO> getSortedReviews(String bootcamp, Pageable pageable) {
         Page<Review> reviewPage;
         if (bootcamp != null && !bootcamp.isEmpty()) {
@@ -168,6 +174,7 @@ public class ReviewService {
             .collect(Collectors.toSet());
     }
 
+    @Cacheable(value = "bootcampReviewSummariesCache")
     public Page<BootcampReviewSummaryDTO> getBootcampReviewSummaries(Pageable pageable) {
         List<String> bootcamps = reviewRepository.findAllBootcamps();
         List<BootcampReviewSummaryDTO> summaries = new ArrayList<>();
@@ -183,6 +190,7 @@ public class ReviewService {
         return reviewRepository.findBootcampReviewSummaries(pageable);
     }
 
+    @Cacheable(value = "tagGraphCache", key = "#bootcamp")
     public TagSummaryDTO getBootcampTagData(String bootcamp) {
 
         boolean exists = bootCampRepository.existsByName(bootcamp);
