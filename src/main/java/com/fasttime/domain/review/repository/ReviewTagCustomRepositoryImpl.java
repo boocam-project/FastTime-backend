@@ -1,5 +1,6 @@
 package com.fasttime.domain.review.repository;
 
+import com.fasttime.domain.review.entity.QReview;
 import com.fasttime.domain.review.entity.QReviewTag;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -20,11 +21,13 @@ public class ReviewTagCustomRepositoryImpl implements ReviewTagCustomRepository 
     @Override
     public List<Object[]> countTagsByBootcampGroupedByTagId(String bootcampName) {
         QReviewTag reviewTag = QReviewTag.reviewTag;
+        QReview review = QReview.review;
 
         List<Tuple> result = queryFactory
             .select(reviewTag.tag.id, reviewTag.id.count())
             .from(reviewTag)
-            .where(reviewTag.review.bootCamp.name.eq(bootcampName))
+            .join(reviewTag.review, review)
+            .where(review.bootCamp.name.eq(bootcampName).and(review.deletedAt.isNull()))
             .groupBy(reviewTag.tag.id)
             .fetch();
 
