@@ -28,7 +28,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final BootCampRepository bootCampRepository;
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public Review createReview(ReviewRequestDTO requestDTO, Long memberId) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(MemberNotFoundException::new);
@@ -79,6 +83,7 @@ public class ReviewService {
             .collect(Collectors.toSet());
     }
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public void deleteReview(Long reviewId, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(ReviewNotFoundException::new);
@@ -93,6 +98,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @CacheEvict(value = {"bootcampReviewSummariesCache", "tagGraphCache", "allReviewsCache"}, allEntries = true)
     public Review updateReview(Long reviewId, ReviewRequestDTO requestDTO, Long memberId) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(ReviewNotFoundException::new);
@@ -133,23 +139,20 @@ public class ReviewService {
         return ReviewResponseDTO.of(updatedReview, goodTagContents, badTagContents);
     }
 
-    public List<ReviewResponseDTO> getSortedReviews(String sortBy, String bootcamp) {
-        Sort sort = sortBy.equals("rating") ? Sort.by("rating").descending()
-            : Sort.by("createdAt").descending();
-
+    @Cacheable(value = "allReviewsCache")
+    public Page<ReviewResponseDTO> getSortedReviews(String bootcamp, Pageable pageable) {
+        Page<Review> reviewPage;
         if (bootcamp != null && !bootcamp.isEmpty()) {
             boolean exists = bootCampRepository.existsByName(bootcamp);
             if (!exists) {
                 throw new BootCampNotFoundException();
             }
-            List<Review> reviews = reviewRepository.findByBootcampName(bootcamp, sort);
-            return reviews.stream().map(this::convertToReviewResponseDTO)
-                .collect(Collectors.toList());
+            reviewPage = reviewRepository.findByBootcampName(bootcamp, pageable);
         } else {
-            List<Review> reviews = reviewRepository.findAll(sort);
-            return reviews.stream().map(this::convertToReviewResponseDTO)
-                .collect(Collectors.toList());
+            reviewPage = reviewRepository.findAll(pageable);
         }
+
+        return reviewPage.map(this::convertToReviewResponseDTO);
     }
 
     private ReviewResponseDTO convertToReviewResponseDTO(Review review) {
@@ -171,19 +174,23 @@ public class ReviewService {
             .collect(Collectors.toSet());
     }
 
-    public List<BootcampReviewSummaryDTO> getBootcampReviewSummaries() {
+    @Cacheable(value = "bootcampReviewSummariesCache")
+    public Page<BootcampReviewSummaryDTO> getBootcampReviewSummaries(Pageable pageable) {
         List<String> bootcamps = reviewRepository.findAllBootcamps();
         List<BootcampReviewSummaryDTO> summaries = new ArrayList<>();
 
         for (String bootcamp : bootcamps) {
             double averageRating = reviewRepository.findAverageRatingByBootcamp(bootcamp);
-            int totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            double roundedAverageRating = Math.round(averageRating * 10) / 10.0;
 
-            summaries.add(new BootcampReviewSummaryDTO(bootcamp, averageRating, totalReviews));
+            long totalReviews = reviewRepository.countByBootcamp(bootcamp);
+            summaries.add(
+                new BootcampReviewSummaryDTO(bootcamp, roundedAverageRating, totalReviews));
         }
-        return summaries;
+        return reviewRepository.findBootcampReviewSummaries(pageable);
     }
 
+    @Cacheable(value = "tagGraphCache", key = "#bootcamp")
     public TagSummaryDTO getBootcampTagData(String bootcamp) {
 
         boolean exists = bootCampRepository.existsByName(bootcamp);
