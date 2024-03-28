@@ -1,7 +1,5 @@
 package com.fasttime.domain.resume.unit.entity;
 
-
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.fasttime.domain.member.entity.Member;
@@ -14,12 +12,14 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class ResumeTest {
+
     @DisplayName("view()는")
     @Nested
-    class Context_Resume_View{
+    class Context_Resume_View {
+
         @DisplayName("Resume의 viewCount의 값을 1 올린다")
         @Test
-        void _Success(){
+        void _Success() {
             // given
             Resume resume = Resume.builder()
                     .id(1L)
